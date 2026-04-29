@@ -18,11 +18,10 @@
 
   <!-- Bottom bar: social icons + address -->
   <div class="hero-footer">
-    <img
-      src="/images/social-icons.svg"
-      alt="LinkedIn e redes sociais"
-      class="social-icons"
-    />
+    <div class="social-icons" aria-label="Redes sociais">
+      <img src="/images/linkedin.svg" alt="LinkedIn" />
+      <img src="/images/youtube.svg" alt="YouTube" />
+    </div>
 
     <address class="hero-address">
       Av. Eng. Luis Carlos Berrini, 1700<br />
@@ -78,8 +77,14 @@
   }
 
   .social-icons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .social-icons img {
+    width: 34px;
     height: 34px;
-    width: auto;
   }
 
   .hero-address {
