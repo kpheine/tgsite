@@ -32,6 +32,10 @@ body {
   overflow: hidden;
 }
 
+.has-open-modal body {
+  padding-right: var(--modal-scrollbar-width, 0px);
+}
+
 /* ─── Layout ──────────────────────────────────────────────────────────────── */
 main {
   display: flex;
@@ -49,12 +53,28 @@ main {
   color: inherit;
   margin: auto;
   overflow: visible;
+  opacity: 0;
   padding: 0;
+  transform: translateY(12px) scale(0.98);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.modal.is-open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
 .modal::backdrop {
   background: rgba(0, 0, 0, 0.74);
   backdrop-filter: blur(8px);
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.modal.is-open::backdrop {
+  opacity: 1;
 }
 
 .modal__panel {
@@ -116,6 +136,13 @@ main {
   .modal__panel,
   .modal--fullscreen .modal__panel {
     min-height: 100dvh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal,
+  .modal::backdrop {
+    transition: none;
   }
 }
 

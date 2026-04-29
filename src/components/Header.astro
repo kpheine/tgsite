@@ -83,27 +83,47 @@ import Modal from './Modal.astro';
   }
 
   .btn-contato {
+    position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    height: 59px;
-    padding: 0 2rem;
-    border: 2px solid #6789d9;
+    padding: 0.9rem 3rem;
+    border: 0;
     border-radius: 33px;
     background: transparent;
     cursor: pointer;
     font-family: 'Inter', sans-serif;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 700;
+    line-height: 1;
+    text-align: center;
     color: #fff;
     text-decoration: none;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    transition: background-color 0.15s ease;
+    letter-spacing: 0;
+    transition: filter 0.15s ease;
+  }
+
+  .btn-contato::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 2px;
+    background: linear-gradient(100deg, #3157d6 0%, #23d6ec 49%, #ec148f 100%);
+    pointer-events: none;
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
   }
 
   .btn-contato:hover {
-    background-color: rgba(103, 137, 217, 0.15);
+    filter: brightness(1.2);
   }
 
   .whatsapp-link {

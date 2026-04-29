@@ -18,7 +18,7 @@
 - Dev and prod use the same local storage approach — no env switching needed
 - Supabase free tier project pausing is a known risk — needs a keep-alive strategy or upgrade to Pro ($25/month)
 - Admin panel: simple password-protected page in Astro (SSR mode) with a form to CRUD projects
-- Popup framework: native HTML `<dialog>` wrapped by `src/components/Modal.astro`, controlled by `src/scripts/modal-manager.ts`; content is layout-agnostic and can come from Astro components, structured Supabase data, Markdown-rendered HTML, or sanitized raw HTML.
+- Popup framework: native HTML `<dialog>` wrapped by `src/components/Modal.astro`, controlled by `src/scripts/modal-manager.ts`; content is layout-agnostic and can come from Astro components, structured Supabase data, Markdown-rendered HTML, or sanitized raw HTML. Open/close transitions are handled with `.is-open` / `.is-closing` classes plus a short close delay so native dialogs can animate out. Modal scroll lock measures the active scrollbar width and compensates with body padding only when needed to avoid layout shifts without forcing a permanent gutter.
 
 ## Project Context
 
