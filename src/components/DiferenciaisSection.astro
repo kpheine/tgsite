@@ -1,0 +1,160 @@
+---
+---
+<section class="dif-section" id="diferenciais">
+  <div class="dif-inner">
+
+    <!-- Left: event photo collage -->
+    <div class="dif-image-col">
+      <img
+        src="/images/diferenciais-collage.png"
+        alt="Portfólio de eventos TG"
+        class="dif-image"
+      />
+    </div>
+
+    <!-- Right: title + 2×2 cards -->
+    <div class="dif-content">
+      <h2 class="dif-title">
+        <span class="dif-title-gradient">Aqui tem</span>
+        <span class="dif-title-dark"> o que faz a diferença</span>
+      </h2>
+
+      <div class="cards-grid">
+        <!-- Card 1 -->
+        <div class="card" style="background: linear-gradient(-64.17deg, rgb(120,30,135) 0%, rgb(191,27,145) 45%, rgb(242,137,0) 100%)">
+          <h3 class="card-title">Criatividade que move experiências</h3>
+          <p class="card-subtitle">Grandes encontros começam com uma boa ideia.</p>
+          <p class="card-body">Criamos conceitos, narrativas e ativações que conectam marcas e pessoas. Transformamos estratégia em impacto real, com engajamento e memória duradoura.</p>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="card" style="background: linear-gradient(-76.78deg, rgb(33,110,242) 22%, rgb(163,67,203) 62%, rgb(234,14,129) 89%)">
+          <h3 class="card-title">Execução que gera Inteligência</h3>
+          <p class="card-subtitle">Cada evento também gera informação.</p>
+          <p class="card-body">Observamos comportamento, fluxos e interações para transformar a execução em aprendizado aplicado a decisões futuras.</p>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="card" style="background: linear-gradient(107.33deg, rgb(33,110,242) 30%, rgb(163,67,203) 73%, rgb(234,14,129) 94%)">
+          <h3 class="card-title">Mentalidade de dono</h3>
+          <p class="card-subtitle">Trabalhamos como extensão do time do cliente.</p>
+          <p class="card-body">Entendemos o contexto do negócio, assumimos responsabilidade pelo resultado e buscamos as melhores soluções, mesmo quando isso significa revisar o briefing.</p>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="card" style="background: linear-gradient(-76.95deg, rgb(33,110,242) 8%, rgb(163,67,203) 49%, rgb(234,14,129) 87%)">
+          <h3 class="card-title">Independência com acesso global</h3>
+          <p class="card-subtitle">Somos uma agência brasileira independente.</p>
+          <p class="card-body">Ao mesmo tempo, atuamos conectados à Worldwide Partners Inc., com colaboração internacional e acesso a repertório global aplicado à realidade local.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<style>
+  .dif-section {
+    background-color: #fff;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .dif-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 100svh;
+    align-items: center;
+  }
+
+  /* ── Left: collage image ─────────────────────── */
+  .dif-image-col {
+    height: 100%;
+    min-height: 600px;
+    overflow: hidden;
+  }
+
+  .dif-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: left center;
+    display: block;
+  }
+
+  /* ── Right: content ──────────────────────────── */
+  .dif-content {
+    padding: 4rem 5% 4rem 4%;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  /* Title */
+  .dif-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 4.1vw, 4.9rem); /* ~78px at 1920px */
+    font-weight: 400;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .dif-title-gradient {
+    background: linear-gradient(
+      90deg,
+      rgb(120, 30, 135) 0%,
+      rgb(120, 30, 135) 20%,
+      rgb(191, 27, 145) 44%,
+      rgb(242, 137, 0) 85%,
+      rgb(247, 214, 0) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .dif-title-dark {
+    color: #000;
+  }
+
+  /* 2×2 cards grid */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .card {
+    border-radius: 20px;
+    padding: 2rem 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    min-height: 280px;
+  }
+
+  .card-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(1.3rem, 2.2vw, 2.625rem); /* ~42px */
+    font-weight: 400;
+    line-height: 1.1;
+    color: #fff;
+    text-transform: uppercase;
+  }
+
+  .card-subtitle {
+    font-family: 'Figtree', sans-serif;
+    font-size: clamp(0.85rem, 1.15vw, 1.375rem); /* ~22px */
+    font-weight: 700;
+    line-height: 1.3;
+    color: #fff;
+  }
+
+  .card-body {
+    font-family: 'Figtree', sans-serif;
+    font-size: clamp(0.8rem, 0.94vw, 1.125rem); /* ~18px */
+    font-weight: 400;
+    line-height: 1.5;
+    color: #fff;
+  }
+</style>
