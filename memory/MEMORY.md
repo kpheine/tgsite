@@ -27,6 +27,22 @@
 - Client implements deployment themselves on Google Cloud
 - Team: small team collaborating on this repo
 
+## Project Structure (scaffolded 2026-04-29)
+
+```
+src/
+  layouts/Layout.astro   — base HTML shell, imports global.css, Google Fonts (Inter)
+  pages/index.astro      — hello world page
+  styles/global.css      — CSS reset + custom properties (dark theme, accent: #e8ff00)
+Dockerfile               — multi-stage, Node 20 Alpine, runs dist/server/entry.mjs
+docker-compose.yml       — port 4321, uploads volume, reads .env
+.env.example             — SUPABASE_URL, SUPABASE_ANON_KEY, HOST, PORT
+astro.config.mjs         — output: server, adapter: @astrojs/node (standalone)
+```
+
+- `npm run dev` → dev server at localhost:4321
+- `docker compose up --build` → production container at localhost:4321
+
 ## Figma Workflow
 
 - The Figma file is messy — do NOT implement it as a whole
