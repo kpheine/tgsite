@@ -1,0 +1,28 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="TG Agency">
+  <main>
+    <header>
+      <span class="logo">TG</span>
+    </header>
+
+    <section class="hero">
+      <h1>Hello, World.</h1>
+      <p class="subtitle">This is the TG Agency website scaffold — running on Astro + Docker.</p>
+      <button id="btn" class="btn">Click me</button>
+      <p id="counter" class="counter">Clicks: 0</p>
+    </section>
+  </main>
+
+  <script>
+    const btn = document.getElementById('btn');
+    const counter = document.getElementById('counter');
+    let clicks = 0;
+
+    btn?.addEventListener('click', () => {
+      clicks++;
+      if (counter) counter.textContent = `Clicks: ${clicks}`;
+    });
+  </script>
+</Layout>

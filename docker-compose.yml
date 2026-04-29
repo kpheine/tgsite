@@ -1,0 +1,10 @@
+services:
+  app:
+    build: .
+    ports:
+      - "4321:4321"
+    volumes:
+      - ./uploads:/app/uploads
+    env_file:
+      - .env
+    restart: unless-stopped
