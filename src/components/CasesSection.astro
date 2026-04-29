@@ -1,0 +1,73 @@
+---
+---
+<section class="cases-section" id="cases">
+  <img
+    src="/images/cases-bg.png"
+    alt=""
+    class="cases-bg"
+    aria-hidden="true"
+  />
+
+  <div class="cases-inner">
+    <h2 class="cases-title">Cases</h2>
+
+    <!-- Carousel placeholder — to be implemented -->
+    <div class="carousel-placeholder" aria-label="Carousel de cases — em breve">
+      <span>Carousel</span>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cases-section {
+    position: relative;
+    width: 100%;
+    min-height: 100svh;
+    overflow: hidden;
+  }
+
+  .cases-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    pointer-events: none;
+  }
+
+  .cases-inner {
+    position: relative;
+    z-index: 1;
+    padding: 4rem 7.9% 5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  .cases-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 4.875rem; /* 78px */
+    font-weight: 400;
+    line-height: 1;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  /* Carousel placeholder */
+  .carousel-placeholder {
+    width: 100%;
+    min-height: 420px;
+    border: 2px dashed rgba(255, 255, 255, 0.25);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.4);
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+</style>
