@@ -43,6 +43,10 @@ astro.config.mjs         — output: server, adapter: @astrojs/node (standalone)
 - `npm run dev` → dev server at localhost:4321
 - `docker compose up --build` → production container at localhost:4321
 
+## Known Issues / Revisit Later
+
+- **PremiosSection collage image** (`src/components/PremiosSection.astro`) — size/layout not quite right, needs further adjustment. Currently uses `5fr 7fr` grid with right bleed.
+
 ## Roadmap
 
 Full phased plan in `./memory/ROADMAP.md`. Phases:
