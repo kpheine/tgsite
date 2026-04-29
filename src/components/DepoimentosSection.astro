@@ -1,0 +1,257 @@
+---
+const cards = [
+  {
+    gradient: "linear-gradient(-51.34deg, rgb(120,30,135) 0%, rgb(191,27,145) 22%, rgb(242,137,0) 96%, rgb(247,214,0) 121%)",
+    title: "Título aqui",
+    quote: '"This summit opened my eyes to the future of AI and how it will shape industries."',
+    name: "Nome Sobrenome",
+    role: "Marketing, BASF",
+  },
+  {
+    gradient: "linear-gradient(-68.78deg, rgb(33,110,242) 22%, rgb(163,67,203) 62%, rgb(234,14,129) 89%)",
+    title: "Título aqui",
+    quote: '"Incredible speakers, top-tier networking, and cutting-edge discussions all in one place."',
+    name: "Nome Sobrenome",
+    role: "Marketing, EDP",
+  },
+  {
+    gradient: "linear-gradient(117.28deg, rgb(33,110,242) 30%, rgb(163,67,203) 73%, rgb(234,14,129) 94%)",
+    title: "Título aqui",
+    quote: '"From hands-on workshops to visionary talks, this summit is a must-attend for AI professionals."',
+    name: "Nome Sobrenome",
+    role: "Marketing, Volkswagen",
+  },
+  {
+    gradient: "linear-gradient(-51.34deg, rgb(120,30,135) 0%, rgb(191,27,145) 22%, rgb(242,137,0) 96%, rgb(247,214,0) 121%)",
+    title: "Título aqui",
+    quote: '"An unforgettable experience that challenged everything we thought we knew about strategy."',
+    name: "Nome Sobrenome",
+    role: "Marketing, Claro",
+  },
+  {
+    gradient: "linear-gradient(-68.78deg, rgb(33,110,242) 22%, rgb(163,67,203) 62%, rgb(234,14,129) 89%)",
+    title: "Título aqui",
+    quote: '"The connections made here translated directly into business results within months."',
+    name: "Nome Sobrenome",
+    role: "Marketing, Natura",
+  },
+];
+---
+
+<div class="dep-section" id="depoimentos">
+  <div class="dep-inner">
+    <!-- Title + nav row -->
+    <div class="dep-header">
+      <h2 class="dep-title">
+        <span class="dep-gradient">Aqui tem</span>
+        <span class="dep-white"> quem recomenda.</span>
+      </h2>
+
+      <div class="dep-nav">
+        <button class="nav-btn nav-prev" aria-label="Anterior">
+          <img src="/images/arrow-left.svg" alt="" aria-hidden="true" />
+        </button>
+        <button class="nav-btn nav-next" aria-label="Próximo">
+          <img src="/images/arrow-right.svg" alt="" aria-hidden="true" />
+        </button>
+      </div>
+    </div>
+
+    <!-- Carousel viewport -->
+    <div class="carousel-viewport">
+      <div class="carousel-track" id="dep-track">
+        {cards.map((card) => (
+          <div class="dep-card" style={`background: ${card.gradient}`}>
+            <h3 class="card-title">{card.title}</h3>
+            <p class="card-quote">{card.quote}</p>
+            <div class="card-attr">
+              <p class="card-name">{card.name}</p>
+              <p class="card-role">{card.role}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .dep-section {
+    background-color: #0d0d0d;
+    width: 100%;
+    padding-bottom: 5rem;
+  }
+
+  .dep-inner {
+    padding: 4rem 8.4% 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  /* Header row */
+  .dep-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+
+  .dep-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 5.2vw, 6.25rem);
+    font-weight: 400;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .dep-gradient {
+    background: linear-gradient(
+      90deg,
+      rgb(241, 47, 255) 0%,
+      rgb(67, 129, 209) 14%,
+      rgb(97, 244, 232) 32%,
+      rgb(180, 253, 183) 55%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .dep-white {
+    color: #fff;
+  }
+
+  /* Nav buttons */
+  .dep-nav {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-shrink: 0;
+    padding-bottom: 0.25rem;
+  }
+
+  .nav-btn {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.15s ease;
+  }
+
+  .nav-btn img {
+    width: 28px;
+    height: 28px;
+    filter: brightness(0) invert(1);
+  }
+
+  .nav-prev {
+    background: transparent;
+    border: 1px solid #216ef2;
+  }
+
+  .nav-next {
+    background: linear-gradient(-87.39deg, rgb(33,110,242) 5%, rgb(163,67,203) 49%, rgb(234,14,129) 93%);
+  }
+
+  .nav-btn:hover {
+    opacity: 0.8;
+  }
+
+  .nav-btn:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  /* Carousel */
+  .carousel-viewport {
+    overflow: hidden;
+  }
+
+  .carousel-track {
+    display: flex;
+    gap: 1.25rem;
+    transition: transform 0.4s ease;
+    will-change: transform;
+  }
+
+  /* Cards — 3 visible at once */
+  .dep-card {
+    flex: 0 0 calc((100% - 2 * 1.25rem) / 3);
+    border-radius: 46px;
+    padding: 2.5rem 2rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-height: 307px;
+  }
+
+  .card-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.74rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #fff;
+    text-transform: uppercase;
+  }
+
+  .card-quote {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.16rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #fff;
+    flex: 1;
+  }
+
+  .card-attr {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .card-name,
+  .card-role {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.04rem;
+    font-weight: 400;
+    color: #fff;
+    line-height: 1.5;
+  }
+</style>
+
+<script>
+  const track = document.getElementById('dep-track') as HTMLElement;
+  const prevBtn = document.querySelector('.nav-prev') as HTMLButtonElement;
+  const nextBtn = document.querySelector('.nav-next') as HTMLButtonElement;
+
+  const cards = track.querySelectorAll('.dep-card');
+  const total = cards.length;
+  const visible = 3;
+  const maxIndex = total - visible;
+  let current = 0;
+
+  function updateCarousel() {
+    const cardWidth = (track.parentElement as HTMLElement).offsetWidth;
+    const gap = 20; // 1.25rem at 16px
+    const step = (cardWidth + gap) / visible;
+    track.style.transform = `translateX(-${current * step}px)`;
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current >= maxIndex;
+  }
+
+  prevBtn.addEventListener('click', () => {
+    if (current > 0) { current--; updateCarousel(); }
+  });
+
+  nextBtn.addEventListener('click', () => {
+    if (current < maxIndex) { current++; updateCarousel(); }
+  });
+
+  window.addEventListener('resize', updateCarousel);
+  updateCarousel();
+</script>
