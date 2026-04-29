@@ -36,7 +36,7 @@
 - **Dividers:** `<hr>` with `border-top: 1px solid #fff; margin: 30px 165px`
 - **Gradient borders:** use `::before` pseudo-element + CSS mask technique — avoids clipping artifacts with `border-radius: 50%` that the `padding-box/border-box` background trick produces
 - **Maps:** embed via `maps.google.com/maps?q=...&output=embed` — no API key needed
-- **Header:** `position: sticky; top: 0` (not fixed)
+- **Header:** `position: sticky; top: 0` (not fixed) with `margin-bottom: -120px` so the hero sits behind the transparent gradient header instead of creating a top band
 
 ## Font Stack
 
