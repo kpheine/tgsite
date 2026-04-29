@@ -43,6 +43,15 @@ astro.config.mjs         — output: server, adapter: @astrojs/node (standalone)
 - `npm run dev` → dev server at localhost:4321
 - `docker compose up --build` → production container at localhost:4321
 
+## Roadmap
+
+Full phased plan in `./memory/ROADMAP.md`. Phases:
+1. UI blocks from Figma (one at a time, always ask for link)
+2. Supabase integration
+3. Admin panel (SSR, CRUD, image upload)
+4. Wire portfolio to live data
+5. Production readiness + client handoff
+
 ## Figma Workflow
 
 - The Figma file is messy — do NOT implement it as a whole
