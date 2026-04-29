@@ -29,3 +29,6 @@ Thumbs.db
 .idea/
 *.suo
 *.user
+
+# ─── Claude Code (local config) ───────────────────────────────────────────────
+.claude/
