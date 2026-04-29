@@ -27,6 +27,59 @@
 - Client implements deployment themselves on Google Cloud
 - Team: small team collaborating on this repo
 
+## UI Conventions (confirmed in session)
+
+- **Horizontal padding:** 165px fixed on content sections (not percentage-based)
+- **Dark background:** `#0d0d0d` for most sections; white for Diferenciais section
+- **Decorative blobs:** use `mix-blend-mode: screen` so they glow organically on dark backgrounds
+- **Dividers:** `<hr>` with `border-top: 1px solid #fff; margin: 30px 165px`
+- **Gradient borders:** use `::before` pseudo-element + CSS mask technique — avoids clipping artifacts with `border-radius: 50%` that the `padding-box/border-box` background trick produces
+- **Maps:** embed via `maps.google.com/maps?q=...&output=embed` — no API key needed
+- **Header:** `position: sticky; top: 0` (not fixed)
+
+## Font Stack
+
+- **Bebas Neue** — section titles/headings (uppercase)
+- **Inter** — UI elements, buttons, body text, footer
+- **Figtree** — card body text (Diferenciais, Depoimentos sections)
+
+## Button Style (consistent across site)
+
+- Pill shape: `border-radius: 33px`, `height: 59-60px`
+- Outlined: `border: 2px solid #6789d9`, transparent bg, white text, Inter Bold, uppercase
+- Hover: `background-color: rgba(103, 137, 217, 0.15)`
+- Carousel nav: gradient fill = active; `::before` mask gradient ring = inactive/disabled
+
+## Sections Built (Phase 1 complete)
+
+All in `src/components/`:
+1. `Header.astro` — sticky, gradient nav, Contato pill, WhatsApp
+2. `HeroSection.astro` — full-bleed dark photo, gradient headline image, social + address
+3. `CasesSection.astro` — pixel gradient bg, "CASES" title (centered), carousel placeholder
+4. `HistoriaSection.astro` — 2-col: text+CTA left, blob photo right (uses `banner_1.png`)
+5. `DiferenciaisSection.astro` — white bg, event collage left, title + 2×2 gradient cards right
+6. `ClientesSection.astro` — dark, gradient title, 24 logos in 8×3 grid
+7. `DepoimentosSection.astro` — dark, gradient title, 3-card carousel with JS sliding
+8. `PremiosSection.astro` — dark, 2-col: text+award logos left, collage right *(layout needs revisit)*
+9. `WpiSection.astro` — dark, earth card + WPI/TG logos, tagline, 4 feature blobs
+10. `ContatoFooter.astro` — dark, title + CTA, gradient blob (screen blend), hr divider, Google Maps embed, footer
+
+## Git Workflow Preference
+
+- **Commit locally** after each change
+- **Push only when user explicitly asks** ("commit and push")
+- Do NOT auto-push after every commit
+
+## Figma Asset Workflow
+
+- Figma MCP returns images with temporary URLs (expire in 7 days) — always `curl` them to `public/images/` immediately
+- Check file type with `file` command — Figma often returns SVG saved as `.png`; rename accordingly
+- When Figma returns wrong/placeholder images, user may upload their own to `public/images/` directly
+
+## Communication Patterns
+
+- When user says "X is Y" about a UI element, it may mean "X should BE Y" (desired state), not reporting current state — confirm if ambiguous before making changes
+
 ## Project Structure (scaffolded 2026-04-29)
 
 ```
