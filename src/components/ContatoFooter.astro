@@ -1,0 +1,254 @@
+---
+---
+<section class="contato-section" id="contato">
+
+  <!-- Contact top area -->
+  <div class="contato-top">
+    <div class="contato-left">
+      <h2 class="contato-title">
+        <span class="title-gradient">Aqui tem</span>
+        <span class="title-white"> o seu próximo<br />grande projeto.</span>
+        <br />
+        <span class="title-white">E ele começa agora.</span>
+      </h2>
+
+      <div class="contato-actions">
+        <a href="tel:+551151053333" class="btn-fale">Fale com a gente</a>
+        <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+          <img src="/images/footer/zap.svg" alt="" class="zap-icon" aria-hidden="true" />
+        </a>
+      </div>
+    </div>
+
+    <!-- Decorative gradient blob -->
+    <div class="contato-blob" aria-hidden="true">
+      <img src="/images/footer/blob.png" alt="" />
+    </div>
+  </div>
+
+  <!-- Divider -->
+  <div class="contato-divider">
+    <img src="/images/footer/divider.svg" alt="" aria-hidden="true" />
+  </div>
+
+  <!-- Map -->
+  <div class="contato-map">
+    <img
+      src="/images/footer/map.png"
+      alt="Localização: Av. Eng. Luis Carlos Berrini, 1700, São Paulo"
+      class="map-img"
+    />
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-logo">
+      <img src="/images/footer/tg-logo.png" alt="TG Agency" class="footer-tg-logo" />
+    </div>
+
+    <div class="footer-contact">
+      <p class="footer-phone">+55 11 5105 3333</p>
+      <address class="footer-address">
+        Av. Eng. Luis Carlos Berrini, 1700<br />
+        16º andar – CEP 04571935<br />
+        São Paulo – SP – Brasil
+      </address>
+    </div>
+
+    <div class="footer-social">
+      <div class="social-wrap">
+        <img src="/images/footer/social-blob.png" alt="" class="social-blob" aria-hidden="true" />
+        <img src="/images/footer/social-icon.svg" alt="Redes sociais" class="social-icon" />
+      </div>
+    </div>
+  </footer>
+
+</section>
+
+<style>
+  .contato-section {
+    background-color: #0d0d0d;
+    width: 100%;
+  }
+
+  /* ── Contact top ─────────────────────────────── */
+  .contato-top {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 5rem 8.4% 0;
+    overflow: hidden;
+    min-height: 520px;
+  }
+
+  .contato-left {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    padding-bottom: 5rem;
+    z-index: 1;
+  }
+
+  .contato-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 5.2vw, 6.25rem);
+    font-weight: 400;
+    line-height: 1.05;
+    text-transform: uppercase;
+  }
+
+  .title-gradient {
+    background: linear-gradient(
+      -84.12deg,
+      rgb(234, 14, 129) 5%,
+      rgb(163, 67, 203) 83%,
+      rgb(87, 112, 225) 93%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .title-white {
+    color: #fff;
+  }
+
+  .contato-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+
+  .btn-fale {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 59px;
+    padding: 0 2.25rem;
+    border: 2px solid #6789d9;
+    border-radius: 33px;
+    font-family: 'Inter', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    transition: background-color 0.15s ease;
+    white-space: nowrap;
+  }
+
+  .btn-fale:hover {
+    background-color: rgba(103, 137, 217, 0.15);
+  }
+
+  .zap-icon {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+  }
+
+  /* Gradient blob — right side, overflows top */
+  .contato-blob {
+    position: absolute;
+    right: -2%;
+    top: -20%;
+    width: 56%;
+    pointer-events: none;
+  }
+
+  .contato-blob img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* ── Divider ─────────────────────────────────── */
+  .contato-divider {
+    width: 100%;
+    line-height: 0;
+  }
+
+  .contato-divider img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* ── Map ─────────────────────────────────────── */
+  .contato-map {
+    width: 100%;
+  }
+
+  .map-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+  }
+
+  /* ── Footer ──────────────────────────────────── */
+  .site-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2rem 8.4% 2.5rem;
+    gap: 2rem;
+  }
+
+  .footer-tg-logo {
+    height: 64px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+  }
+
+  .footer-contact {
+    text-align: right;
+  }
+
+  .footer-phone {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.3;
+  }
+
+  .footer-address {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.09rem;
+    font-weight: 400;
+    font-style: normal;
+    color: #fff;
+    line-height: 1.6;
+    margin-top: 0.5rem;
+  }
+
+  .footer-social {
+    flex-shrink: 0;
+  }
+
+  .social-wrap {
+    position: relative;
+    width: 64px;
+    height: 64px;
+  }
+
+  .social-blob {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .social-icon {
+    position: absolute;
+    inset: 20%;
+    width: 60%;
+    height: 60%;
+    object-fit: contain;
+  }
+</style>
