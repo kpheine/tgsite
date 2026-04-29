@@ -18,6 +18,7 @@
 - Dev and prod use the same local storage approach — no env switching needed
 - Supabase free tier project pausing is a known risk — needs a keep-alive strategy or upgrade to Pro ($25/month)
 - Admin panel: simple password-protected page in Astro (SSR mode) with a form to CRUD projects
+- Popup framework: native HTML `<dialog>` wrapped by `src/components/Modal.astro`, controlled by `src/scripts/modal-manager.ts`; content is layout-agnostic and can come from Astro components, structured Supabase data, Markdown-rendered HTML, or sanitized raw HTML.
 
 ## Project Context
 
@@ -84,8 +85,10 @@ All in `src/components/`:
 
 ```
 src/
+  components/Modal.astro    — reusable layout-agnostic modal shell using native <dialog>
   layouts/Layout.astro   — base HTML shell, imports global.css, Google Fonts (Inter)
   pages/index.astro      — hello world page
+  scripts/modal-manager.ts — delegated open/close behavior for all modals
   styles/global.css      — CSS reset + custom properties (dark theme, accent: #e8ff00)
 Dockerfile               — multi-stage, Node 20 Alpine, runs dist/server/entry.mjs
 docker-compose.yml       — port 4321, uploads volume, reads .env

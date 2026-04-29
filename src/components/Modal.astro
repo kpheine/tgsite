@@ -1,0 +1,33 @@
+---
+interface Props {
+  id: string;
+  labelledBy?: string;
+  ariaLabel?: string;
+  variant?: 'centered' | 'fullscreen' | 'media';
+  closeLabel?: string;
+}
+
+const {
+  id,
+  labelledBy,
+  ariaLabel,
+  variant = 'centered',
+  closeLabel = 'Fechar popup',
+} = Astro.props;
+---
+
+<dialog
+  id={id}
+  class={`modal modal--${variant}`}
+  aria-labelledby={labelledBy}
+  aria-label={ariaLabel}
+  data-modal
+>
+  <div class="modal__panel" data-modal-panel>
+    <button class="modal__close" type="button" data-modal-close aria-label={closeLabel}>
+      <span aria-hidden="true">×</span>
+    </button>
+
+    <slot />
+  </div>
+</dialog>
