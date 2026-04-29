@@ -135,12 +135,14 @@ const cards = [
     width: 68px;
     height: 68px;
     border-radius: 50%;
-    border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: opacity 0.15s ease;
+    /* Active: gradient fill */
+    background: linear-gradient(-87.39deg, rgb(33,110,242) 5%, rgb(163,67,203) 49%, rgb(234,14,129) 93%);
+    border: 2px solid transparent;
   }
 
   .nav-btn img {
@@ -149,21 +151,26 @@ const cards = [
     filter: brightness(0) invert(1);
   }
 
-  .nav-prev {
-    background: transparent;
-    border: 1px solid #216ef2;
+  /* Left arrow: rotate ↗ by -45deg then flip horizontally → ← */
+  .nav-prev img {
+    transform: rotate(-45deg) scaleX(-1);
   }
 
-  .nav-next {
-    background: linear-gradient(-87.39deg, rgb(33,110,242) 5%, rgb(163,67,203) 49%, rgb(234,14,129) 93%);
+  /* Right arrow: rotate ↗ by 45deg → → */
+  .nav-next img {
+    transform: rotate(45deg);
   }
 
-  .nav-btn:hover {
+  .nav-btn:hover:not(:disabled) {
     opacity: 0.8;
   }
 
+  /* Inactive: transparent bg + gradient border */
   .nav-btn:disabled {
-    opacity: 0.3;
+    background:
+      linear-gradient(#0d0d0d, #0d0d0d) padding-box,
+      linear-gradient(-87.39deg, rgb(33,110,242) 5%, rgb(163,67,203) 49%, rgb(234,14,129) 93%) border-box;
+    border: 2px solid transparent;
     cursor: default;
   }
 
