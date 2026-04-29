@@ -1,0 +1,102 @@
+---
+---
+<section class="hero-section">
+  <!-- Background photo -->
+  <img
+    src="/images/hero-bg.png"
+    alt=""
+    class="hero-bg"
+    aria-hidden="true"
+  />
+
+  <!-- "AQUI TEM SOLUÇÃO" gradient headline -->
+  <img
+    src="/images/hero-headline.png"
+    alt="Aqui tem solução"
+    class="hero-headline"
+  />
+
+  <!-- Bottom bar: social icons + address -->
+  <div class="hero-footer">
+    <img
+      src="/images/social-icons.svg"
+      alt="LinkedIn e redes sociais"
+      class="social-icons"
+    />
+
+    <address class="hero-address">
+      Av. Eng. Luis Carlos Berrini, 1700<br />
+      16º andar, São Paulo – SP – Brasil
+    </address>
+  </div>
+
+  <!-- Scroll indicator arrow -->
+  <div class="scroll-arrow" aria-hidden="true">
+    <img src="/images/hero-vector.svg" alt="" width="23" height="29" />
+  </div>
+</section>
+
+<style>
+  .hero-section {
+    position: relative;
+    width: 100%;
+    height: 100svh;
+    min-height: 500px;
+    overflow: hidden;
+  }
+
+  /* Background photo */
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    pointer-events: none;
+  }
+
+  /* Gradient headline — positioned at ~45% from top, 7.9% from left */
+  .hero-headline {
+    position: absolute;
+    top: 44.9%;
+    left: 7.9%;
+    width: 83.9%;
+    height: auto;
+    pointer-events: none;
+  }
+
+  /* Bottom bar */
+  .hero-footer {
+    position: absolute;
+    bottom: 4%;
+    left: 3%;
+    right: 3%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .social-icons {
+    height: 34px;
+    width: auto;
+  }
+
+  .hero-address {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-size: 1.09rem; /* ~17.4px */
+    line-height: 1.4;
+    color: #fff;
+    text-align: right;
+  }
+
+  /* Scroll-up arrow — bottom center */
+  .scroll-arrow {
+    position: absolute;
+    bottom: 4%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0.6;
+  }
+</style>
