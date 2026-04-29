@@ -45,10 +45,10 @@
 
   .premios-inner {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 5fr 7fr;
     align-items: center;
     min-height: 100svh;
-    padding: 5rem 8.4%;
+    padding: 5rem 0 5rem 8.4%;
     gap: 4rem;
   }
 
@@ -133,17 +133,19 @@
     background-color: rgba(103, 137, 217, 0.15);
   }
 
-  /* ── Right column ────────────────────────────── */
+  /* ── Right column — no right padding, bleeds to edge ── */
   .premios-image-col {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-end;
+    overflow: hidden;
   }
 
   .premios-collage {
     width: 100%;
     height: auto;
     object-fit: contain;
+    object-position: left center;
     display: block;
   }
 </style>
