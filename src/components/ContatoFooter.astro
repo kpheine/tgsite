@@ -31,11 +31,14 @@
 
   <!-- Map -->
   <div class="contato-map">
-    <img
-      src="/images/footer/map.png"
-      alt="Localização: Av. Eng. Luis Carlos Berrini, 1700, São Paulo"
-      class="map-img"
-    />
+    <iframe
+      class="map-iframe"
+      src="https://maps.google.com/maps?q=Av.+Engenheiro+Luis+Carlos+Berrini,+1700,+São+Paulo,+SP,+Brasil&t=&z=15&ie=UTF8&iwloc=&output=embed"
+      title="Localização TG Agency"
+      allowfullscreen
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+    ></iframe>
   </div>
 
   <!-- Footer -->
@@ -175,11 +178,12 @@
     padding: 0 165px;
   }
 
-  .map-img {
+  .map-iframe {
     width: 100%;
-    height: auto;
-    display: block;
+    height: 400px;
+    border: none;
     border-radius: 16px;
+    display: block;
   }
 
   /* ── Footer ──────────────────────────────────── */
