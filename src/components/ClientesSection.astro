@@ -86,19 +86,19 @@ const logos = [
     color: #fff;
   }
 
-  /* Logos grid — 8 per row, 3 rows */
+  /* Logos grid — 8 cols × 3 rows */
   .logos-grid {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(3, auto);
+    gap: 2rem 2rem;
     align-items: center;
-    gap: 2rem 3rem;
   }
 
   .logo-item {
     display: flex;
     align-items: center;
     justify-content: center;
-    flex: 0 0 auto;
   }
 
   .logo-img {
