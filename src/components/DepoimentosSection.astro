@@ -132,9 +132,11 @@ const cards = [
   }
 
   .nav-btn {
+    position: relative;
     width: 68px;
     height: 68px;
     border-radius: 50%;
+    border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -142,10 +144,11 @@ const cards = [
     transition: opacity 0.15s ease;
     /* Active: gradient fill */
     background: linear-gradient(-87.39deg, rgb(33,110,242) 5%, rgb(163,67,203) 49%, rgb(234,14,129) 93%);
-    border: 2px solid transparent;
   }
 
   .nav-btn img {
+    position: relative;
+    z-index: 1;
     width: 28px;
     height: 28px;
     filter: brightness(0) invert(1);
@@ -165,13 +168,22 @@ const cards = [
     opacity: 0.8;
   }
 
-  /* Inactive: transparent bg + gradient border */
+  /* Inactive: transparent bg + gradient border via mask */
   .nav-btn:disabled {
-    background:
-      linear-gradient(#0d0d0d, #0d0d0d) padding-box,
-      linear-gradient(-87.39deg, rgb(33,110,242) 5%, rgb(163,67,203) 49%, rgb(234,14,129) 93%) border-box;
-    border: 2px solid transparent;
+    background: transparent;
     cursor: default;
+  }
+
+  .nav-btn:disabled::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    padding: 2px;
+    background: linear-gradient(-87.39deg, rgb(33,110,242) 5%, rgb(163,67,203) 49%, rgb(234,14,129) 93%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
   }
 
   /* Carousel */
