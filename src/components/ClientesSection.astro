@@ -1,0 +1,112 @@
+---
+const logos = [
+  { src: "/images/logos/einstein.png",   alt: "Einstein" },
+  { src: "/images/logos/eurofarma.png",  alt: "Eurofarma" },
+  { src: "/images/logos/basf.png",       alt: "BASF" },
+  { src: "/images/logos/big.png",        alt: "BIG" },
+  { src: "/images/logos/boehringer.png", alt: "Boehringer Ingelheim" },
+  { src: "/images/logos/petropolis.png", alt: "Grupo Petrópolis" },
+  { src: "/images/logos/claro.png",      alt: "Claro" },
+  { src: "/images/logos/mitsubishi.png", alt: "Mitsubishi" },
+  { src: "/images/logos/coty.png",       alt: "Coty" },
+  { src: "/images/logos/getinge.png",    alt: "Getinge" },
+  { src: "/images/logos/edp.png",        alt: "EDP" },
+  { src: "/images/logos/marfrig.png",    alt: "Marfrig" },
+  { src: "/images/logos/galderma.png",   alt: "Galderma" },
+  { src: "/images/logos/genie.png",      alt: "Genie" },
+  { src: "/images/logos/santander.png",  alt: "Santander" },
+  { src: "/images/logos/natura.png",     alt: "Natura" },
+  { src: "/images/logos/vivo.png",       alt: "Vivo" },
+  { src: "/images/logos/netflix.png",    alt: "Netflix" },
+  { src: "/images/logos/vortx.png",      alt: "Vortx" },
+  { src: "/images/logos/vamos.png",      alt: "Vamos" },
+  { src: "/images/logos/nissin.png",     alt: "Nissin" },
+  { src: "/images/logos/volkswagen.png", alt: "Volkswagen" },
+  { src: "/images/logos/rd-saude.png",   alt: "RD Saúde" },
+  { src: "/images/logos/grupo4.png",     alt: "Cliente" },
+];
+---
+
+<section class="clientes-section" id="clientes">
+  <div class="clientes-inner">
+    <h2 class="clientes-title">
+      <span class="title-gradient">Aqui tem</span>
+      <span class="title-white"> marcas que confiam na entrega.</span>
+    </h2>
+
+    <div class="logos-grid">
+      {logos.map((logo) => (
+        <div class="logo-item">
+          <img src={logo.src} alt={logo.alt} class="logo-img" />
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- Placeholder for Depoimentos (second half) -->
+  <slot name="depoimentos" />
+</section>
+
+<style>
+  .clientes-section {
+    background-color: #0d0d0d;
+    width: 100%;
+  }
+
+  .clientes-inner {
+    padding: 5rem 8.4%;
+    display: flex;
+    flex-direction: column;
+    gap: 3.5rem;
+  }
+
+  /* Title */
+  .clientes-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 5.2vw, 6.25rem); /* ~100px at 1920px */
+    font-weight: 400;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .title-gradient {
+    background: linear-gradient(
+      90deg,
+      rgb(241, 47, 255) 0%,
+      rgb(67, 129, 209) 14%,
+      rgb(97, 244, 232) 32%,
+      rgb(180, 253, 183) 55%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .title-white {
+    color: #fff;
+  }
+
+  /* Logos grid — 8 per row, 3 rows */
+  .logos-grid {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2rem 3rem;
+  }
+
+  .logo-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+  }
+
+  .logo-img {
+    height: 48px;
+    width: auto;
+    max-width: 160px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+    opacity: 0.85;
+  }
+</style>
