@@ -150,6 +150,10 @@ astro.config.mjs         — output: server, adapter: @astrojs/node (standalone)
 - **PremiosSection collage image** (`src/components/PremiosSection.astro`) — size/layout not quite right, needs further adjustment. Currently uses `5fr 7fr` grid with right bleed.
 - **Blob unification** — decorative blob images exist across multiple sections (home + `/sobre` stats). Needs audit and consolidation into a shared set. **Do not act on this until user explicitly asks.**
 
+## Pending Setup (next session)
+
+- **Chrome DevTools MCP** — gives Claude visual + structural self-feedback on localhost (screenshots, computed CSS, element dims, console errors). Details in `./memory/browser-feedback.md`.
+
 ## Roadmap
 
 Full phased plan in `./memory/ROADMAP.md`. Phases:
