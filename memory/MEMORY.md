@@ -65,6 +65,16 @@ All in `src/components/`:
 9. `WpiSection.astro` — dark, earth card + WPI/TG logos, tagline, 4 feature blobs
 10. `ContatoFooter.astro` — dark, title + CTA, gradient blob (screen blend), hr divider, Google Maps embed, footer
 
+## /sobre Page (in progress)
+
+All in `src/components/` and `src/pages/sobre.astro`:
+1. `sobre.astro` — page shell: Header + sections + ContatoFooter
+2. Hero — full-bleed event photo (`sobre_hero.jpg`), Bebas Neue heading overlay
+3. `SobreStatsSection.astro` — dark, Bebas Neue heading, "Já foram mais de", 4-col stats with gradient blobs + dividers, tagline
+4. `SobreClientesSection.astro` — dark, gradient "AQUI TEM" title, Figtree subtitle, 8×3 logo grid (25 logos in `public/images/sobre_clientes/`)
+5. `SobrePremiosSection.astro` — same as `PremiosSection.astro` but without the CTA button
+6. `SobreAwardsCards.astro` — 3 gradient award cards (FIP full-width, Colunistas+Lusófonos row, Caio full-width)
+
 ## Git Workflow Preference
 
 - **Commit locally** after each change
@@ -76,6 +86,42 @@ All in `src/components/`:
 - Figma MCP returns images with temporary URLs (expire in 7 days) — always `curl` them to `public/images/` immediately
 - Check file type with `file` command — Figma often returns SVG saved as `.png`; rename accordingly
 - When Figma returns wrong/placeholder images, user may upload their own to `public/images/` directly
+- Download multiple assets in parallel batches (curl in one Bash call) to save time
+- For sections with many logos/assets, create a dedicated subfolder under `public/images/` (e.g. `sobre_clientes/`)
+
+## Figma Spacing Workflow
+
+- Figma MCP returns absolute canvas Y-coordinates for every element — always compute gaps: `top_of_next − (top_of_prev + estimated_height)`
+- Estimated height: font-size × line-height × number_of_lines (e.g. 120px Bebas Neue, 1 line ≈ 130px)
+- `whitespace-nowrap` in Figma output = single line, no wrapping — use that for height estimates
+- Apply computed gaps directly as CSS `margin-top` values; do not guess or use round numbers
+- Always do this math before setting any margin/padding in a new section
+
+## Logo Grid Conventions
+
+- Logo grid cells: `overflow: hidden; display: flex; align-items: center; justify-content: center`
+- All `img` inside: `min-width: 0; max-width: 100%; flex-shrink: 1` — prevents overflow in multi-image cells
+- White logos on dark bg: `filter: brightness(0) invert(1); opacity: 0.85`
+- Multi-image cells (e.g. composite logos): add `gap` on the cell, both images get `flex-shrink: 1`
+
+## Gradient Text Technique
+
+```css
+background: linear-gradient(to right, #colorA, #colorB);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+```
+- Works for partial gradient (e.g. first two words gradient, rest white): wrap each part in a `<span>`
+- Preserve exact gradient angle and stop percentages verbatim from Figma output
+
+## Gradient Cards Pattern (SobreAwardsCards)
+
+- Cards: `border: 1px solid #cdcdcd; border-radius: 30px; min-height: 246px`
+- Background: verbatim `linear-gradient(...)` from Figma — never approximate colors
+- Internal layout: CSS Grid (`repeat(3, 1fr)` for full-width cards, `repeat(2, 1fr)` for split cards)
+- Row 2 asymmetric split: `grid-template-columns: 465fr 1113fr; gap: 18px` (from Figma pixel widths)
+- Title: Figtree Black (900), 42px; Body: Figtree Regular, ~21px
 
 ## Communication Patterns
 
@@ -102,6 +148,7 @@ astro.config.mjs         — output: server, adapter: @astrojs/node (standalone)
 ## Known Issues / Revisit Later
 
 - **PremiosSection collage image** (`src/components/PremiosSection.astro`) — size/layout not quite right, needs further adjustment. Currently uses `5fr 7fr` grid with right bleed.
+- **Blob unification** — decorative blob images exist across multiple sections (home + `/sobre` stats). Needs audit and consolidation into a shared set. **Do not act on this until user explicitly asks.**
 
 ## Roadmap
 

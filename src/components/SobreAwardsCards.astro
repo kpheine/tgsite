@@ -1,0 +1,170 @@
+---
+---
+<section class="awards-cards">
+
+  <!-- Row 1: FIP Awards — full width, 3 columns -->
+  <div class="card card--fip">
+    <div class="card-col">
+      <h3 class="award-title">Prêmio FIP Awards</h3>
+      <p>Circuito Grandes Feiras - BASF | 2024<br />Categoria: Ações Vinculadas ao Agro</p>
+    </div>
+    <div class="card-col">
+      <p>Sendi | EDP | 2024<br />Melhor Evento Verde</p>
+      <p>Evento Cada Vez Mais BASF | 2024<br />Categoria: Eventos com Inteligência Artificial</p>
+      <p>Drive in | BASF | 2023<br />Categoria: Eventos Noturnos</p>
+    </div>
+    <div class="card-col">
+      <p>Estande CCXP | Nissin | 2023<br />Categoria: Millenials</p>
+      <p>Estande CCXP | Nissin | 2023<br />Categoria: Merchandising e Stands</p>
+      <p>Estande CCXP | Nissin | 2023<br />Categoria: Merchandising e Stands</p>
+    </div>
+  </div>
+
+  <!-- Row 2: two cards side by side -->
+  <div class="row2">
+
+    <!-- Card 2a: Colunistas — narrow -->
+    <div class="card card--colunistas">
+      <div class="card-col">
+        <h3 class="award-title">Prêmio Colunistas</h3>
+        <p>Estande Nissin na CCXP | 2024<br />Categoria: Participação em Feira<br />ou Exposição</p>
+      </div>
+    </div>
+
+    <!-- Card 2b: Lusófonos — wide, 2 columns -->
+    <div class="card card--lusofonos">
+      <div class="card-col">
+        <h3 class="award-title">Prêmio Lusófonos<br />de Criatividade</h3>
+        <p>Prêmio Euro | Eurofarma | 2024<br />Categoria: Eventos de Marca</p>
+      </div>
+      <div class="card-col">
+        <p>FESTAE Albert Einstein | 2024<br />Categoria: Mega Evento</p>
+        <p>Convenção Grupo Petrópolis | 2024<br />Categoria: Mega Evento de Grandes Dimensões</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Row 3: Caio — full width, 3 columns -->
+  <div class="card card--caio">
+    <div class="card-col">
+      <h3 class="award-title">Prêmio Caio</h3>
+      <p>Lançamento Toyota Corolla Cross | 2021<br />Categoria: Eventos Realizados<br />ou Estandes Montados no Exterior</p>
+    </div>
+    <div class="card-col">
+      <p>Prêmio Euro | Eurofarma | 2021<br />Categoria: Evento Social</p>
+      <p>Juntos em Um Só Coração | Santander | 2021<br />Categoria: Live do Ano para Datas Especiais</p>
+      <p>Juntos em Um Só Coração | Santander | 2021<br />Categoria: Evento Corporativo</p>
+    </div>
+    <div class="card-col">
+      <p>Encontro Anual Santander | 2019<br />Categoria: Evento do Ano para Convidados</p>
+    </div>
+  </div>
+
+</section>
+
+<style>
+  .awards-cards {
+    background-color: #0d0d0d;
+    padding: 0 165px 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+  }
+
+  /* Base card */
+  .card {
+    border: 1px solid #cdcdcd;
+    border-radius: 30px;
+    min-height: 246px;
+    display: grid;
+    align-items: start;
+    padding: 22px 40px;
+    gap: 24px;
+    color: #fff;
+  }
+
+  /* Full-width cards: 3 equal columns */
+  .card--fip,
+  .card--caio {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .card--fip {
+    background: linear-gradient(
+      -76.46deg,
+      rgba(103, 137, 217, 0.75) 12%,
+      rgba(37, 62, 173, 0.75)   3.66%,
+      rgba(33, 110, 242, 0.75)  20.36%,
+      rgba(163, 67, 203, 0.75)  67.43%,
+      rgba(234, 14, 129, 0.75)  93.24%
+    );
+  }
+
+  .card--caio {
+    background: linear-gradient(
+      69.26deg,
+      rgba(120, 30, 135, 0.75)  32.96%,
+      rgba(120, 30, 135, 0.75)  49.36%,
+      rgba(191, 27, 145, 0.75)  69.22%,
+      rgba(242, 137, 0, 0.75)   102.64%,
+      rgba(247, 214, 0, 0.75)   114.94%
+    );
+  }
+
+  /* Row 2 wrapper */
+  .row2 {
+    display: grid;
+    grid-template-columns: 465fr 1113fr;
+    gap: 18px;
+  }
+
+  .card--colunistas {
+    grid-template-columns: 1fr;
+    background: linear-gradient(
+      -70.21deg,
+      rgba(13, 9, 64, 0.75)    3.65%,
+      rgba(23, 58, 141, 0.75)  25.27%,
+      rgba(120, 30, 135, 0.75) 54.19%,
+      rgba(191, 27, 145, 0.75) 83.11%,
+      rgba(242, 137, 0, 0.75)  112.03%,
+      rgba(247, 214, 0, 0.75)  140.96%
+    );
+  }
+
+  .card--lusofonos {
+    grid-template-columns: repeat(2, 1fr);
+    background: linear-gradient(
+      101.05deg,
+      rgba(13, 9, 64, 0.75)    9.49%,
+      rgba(23, 58, 141, 0.75)  18.95%,
+      rgba(120, 30, 135, 0.75) 47.4%,
+      rgba(191, 27, 145, 0.75) 75.84%,
+      rgba(242, 137, 0, 0.75)  104.29%,
+      rgba(247, 214, 0, 0.75)  132.73%
+    );
+  }
+
+  /* Card columns */
+  .card-col {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .award-title {
+    font-family: 'Figtree', sans-serif;
+    font-weight: 900;
+    font-size: 2.625rem;
+    line-height: 1.1;
+    margin: 0;
+  }
+
+  .card-col p {
+    font-family: 'Figtree', sans-serif;
+    font-weight: 400;
+    font-size: 1.333rem;
+    line-height: 1.4;
+    margin: 0;
+  }
+</style>
