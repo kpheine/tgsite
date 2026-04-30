@@ -1,0 +1,148 @@
+---
+---
+<section class="sobre-stats">
+  <div class="sobre-stats__heading">
+    <h2>Unindo sensibilidade humana<br />à precisão da tecnologia.</h2>
+  </div>
+
+  <p class="sobre-stats__pre">Já foram mais de</p>
+
+  <div class="sobre-stats__grid">
+    <div class="sobre-stats__col">
+      <img src="/images/sobre_blob1.png" alt="" class="blob" aria-hidden="true" />
+      <span class="number">2.000</span>
+      <span class="label">Eventos</span>
+    </div>
+
+    <div class="sobre-stats__divider"></div>
+
+    <div class="sobre-stats__col">
+      <img src="/images/sobre_blob2.png" alt="" class="blob blob--rot120" aria-hidden="true" />
+      <span class="number">2.000</span>
+      <span class="label">Estandes</span>
+    </div>
+
+    <div class="sobre-stats__divider"></div>
+
+    <div class="sobre-stats__col">
+      <img src="/images/sobre_blob3.png" alt="" class="blob blob--rot30" aria-hidden="true" />
+      <span class="number">450</span>
+      <span class="label">Promoções</span>
+    </div>
+
+    <div class="sobre-stats__divider"></div>
+
+    <div class="sobre-stats__col">
+      <img src="/images/sobre_blob1.png" alt="" class="blob" aria-hidden="true" />
+      <span class="number">200</span>
+      <span class="label">Clientes</span>
+    </div>
+  </div>
+
+  <p class="sobre-stats__tagline">Números que não contam só volume. Contam consistência.</p>
+</section>
+
+<style>
+  .sobre-stats {
+    background-color: #0d0d0d;
+    color: #fff;
+    padding: 100px 165px;
+    text-align: center;
+  }
+
+  /* Heading */
+  .sobre-stats__heading h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 8vw, 7.5rem);
+    line-height: 1.08;
+    margin: 0;
+  }
+
+  /* "Já foram mais de" */
+  .sobre-stats__pre {
+    font-family: 'Figtree', sans-serif;
+    font-size: clamp(1.5rem, 3vw, 2.75rem);
+    font-weight: 400;
+    margin: 80px 0 0;
+  }
+
+  /* Stats grid */
+  .sobre-stats__grid {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+    gap: 0;
+  }
+
+  .sobre-stats__col {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 0;
+    min-height: 220px;
+  }
+
+  .blob {
+    position: absolute;
+    width: 140px;
+    height: 140px;
+    object-fit: contain;
+    left: 50%;
+    top: 50%;
+    transform: translate(-80%, -50%);
+    mix-blend-mode: screen;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .blob--rot120 {
+    transform: translate(-80%, -50%) rotate(-120deg);
+  }
+
+  .blob--rot30 {
+    transform: translate(-80%, -50%) rotate(-30deg);
+  }
+
+  .number {
+    position: relative;
+    z-index: 1;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(4rem, 10vw, 11.25rem);
+    line-height: 1;
+    display: block;
+  }
+
+  .label {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(1.2rem, 2.5vw, 2.625rem);
+    font-weight: 400;
+    margin-top: 8px;
+    display: block;
+  }
+
+  /* Gradient divider */
+  .sobre-stats__divider {
+    width: 3px;
+    height: 190px;
+    flex-shrink: 0;
+    background: linear-gradient(
+      8.6deg,
+      rgb(33, 110, 242) 4.38%,
+      rgb(163, 67, 203) 55.7%,
+      rgb(234, 14, 129) 107%
+    );
+  }
+
+  /* Tagline */
+  .sobre-stats__tagline {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2rem, 4.5vw, 4.375rem);
+    text-transform: uppercase;
+    margin: 60px 0 0;
+    line-height: 1.1;
+  }
+</style>

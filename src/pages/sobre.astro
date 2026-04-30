@@ -1,0 +1,62 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import SobreStatsSection from '../components/SobreStatsSection.astro';
+import ContatoFooter from '../components/ContatoFooter.astro';
+---
+<Layout title="Sobre | TG Agency">
+  <Header />
+  <main>
+    <section class="sobre-hero">
+      <img src="/images/sobre_hero.jpg" alt="TG Agency event" class="sobre-hero__bg" />
+      <div class="sobre-hero__overlay"></div>
+      <div class="sobre-hero__content">
+        <h1>Mais de 30 anos de mercado.<br />E seguimos evoluindo junto com o mundo.</h1>
+      </div>
+    </section>
+    <SobreStatsSection />
+  </main>
+  <ContatoFooter />
+</Layout>
+
+<style>
+  .sobre-hero {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sobre-hero__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .sobre-hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+  }
+
+  .sobre-hero__content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 0 165px;
+  }
+
+  .sobre-hero__content h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 7vw, 7.3rem);
+    line-height: 1.08;
+    color: #fff;
+    margin: 0;
+  }
+</style>
