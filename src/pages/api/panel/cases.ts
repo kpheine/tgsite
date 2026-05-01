@@ -6,10 +6,15 @@ import { saveUpload } from '../../../lib/uploads';
 async function saveImages(formData: FormData, caseId: number) {
   let sortOrder = 0;
   const insertImage = db.prepare('INSERT INTO imagens_case (case_id, sort_order, url, destaque) VALUES (?, ?, ?, ?)');
+  const orders = formData.getAll('new_image_order');
+  const destaques = formData.getAll('new_image_destaque');
 
-  for (const value of formData.getAll('images')) {
+  for (const [index, value] of formData.getAll('images').entries()) {
     if (value instanceof File && value.size > 0) {
-      insertImage.run(caseId, sortOrder, await saveUpload(value, 'image'), 0);
+      const requestedOrder = Number(orders[index]);
+      const imageOrder = Number.isFinite(requestedOrder) ? requestedOrder : sortOrder;
+
+      insertImage.run(caseId, imageOrder, await saveUpload(value, 'image'), destaques[index] === '1' ? 1 : 0);
       sortOrder += 1;
     }
   }

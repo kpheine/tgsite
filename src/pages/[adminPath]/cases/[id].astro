@@ -1,5 +1,6 @@
 ---
 import AdminLayout from '../../../components/AdminLayout.astro';
+import AdminCaseImageCard from '../../../components/AdminCaseImageCard.astro';
 import { adminUrl, isAdminPath, requireUser } from '../../../lib/auth';
 import { db, type CaseImageRecord, type CaseRecord } from '../../../lib/db';
 
@@ -38,6 +39,7 @@ const images = db.prepare('SELECT * FROM imagens_case WHERE case_id = ? ORDER BY
         <div class="admin-video-current">
           <p class="admin-muted">Vídeo atual:</p>
           <video src={item.video_url} controls playsinline></video>
+          <label class="admin-checkbox admin-checkbox--inline"><input type="checkbox" name="remove_video" value="1" /> Remover vídeo atual</label>
         </div>
       )}
       <input class="admin-input" id="video" name="video" type="file" accept="video/*" data-video-input />
@@ -50,24 +52,25 @@ const images = db.prepare('SELECT * FROM imagens_case WHERE case_id = ? ORDER BY
     <div class="admin-field"><label for="entrega">Entrega</label><textarea class="admin-textarea" id="entrega" name="entrega">{item.entrega || ''}</textarea></div>
     <div class="admin-field"><label for="resultado">Resultado</label><textarea class="admin-textarea" id="resultado" name="resultado">{item.resultado || ''}</textarea></div>
 
-    <div class="admin-field">
-      <label>Imagens atuais</label>
+    <div class="admin-field" data-image-upload>
+      <label for="images">Adicionar imagens</label>
+      <div class="admin-upload-zone" data-upload-zone>
+        <input class="admin-file-input" id="images" name="images" type="file" accept="image/*" multiple data-upload-input />
+        <div>
+          <strong>Solte novas imagens aqui</strong>
+          <p class="admin-muted">As imagens selecionadas entram na grade abaixo. Arraste qualquer card para definir a ordem final.</p>
+        </div>
+        <button class="admin-button" type="button" data-upload-button>Selecionar imagens</button>
+      </div>
+      <template data-upload-card-template><AdminCaseImageCard mode="upload-template" /></template>
+      <label>Imagens do case</label>
       {images.length === 0 && <p class="admin-muted">Nenhuma imagem adicionada ainda.</p>}
-      <div class="admin-image-list">
+      <div class="admin-image-list" data-image-list>
         {images.map((image) => (
-          <article class="admin-image-card">
-            <input type="hidden" name="image_id" value={image.id} />
-            <a href={image.url} target="_blank" rel="noreferrer"><img src={image.url} alt="" /></a>
-            <div class="admin-form-row admin-form-row--compact">
-              <div class="admin-field"><label for={`image_order_${image.id}`}>Ordem</label><input class="admin-input" id={`image_order_${image.id}`} name={`image_order_${image.id}`} type="number" value={image.sort_order} /></div>
-              <label class="admin-checkbox"><input type="checkbox" name={`image_destaque_${image.id}`} value="1" checked={image.destaque === 1} /> Destaque</label>
-            </div>
-          </article>
+          <AdminCaseImageCard mode="existing" id={image.id} url={image.url} destaque={image.destaque === 1} order={image.sort_order} />
         ))}
       </div>
     </div>
-
-    <div class="admin-field"><label for="images">Adicionar imagens</label><input class="admin-input" id="images" name="images" type="file" accept="image/*" multiple /></div>
     <div class="admin-actions"><button class="admin-button admin-button--primary" type="submit">Salvar alterações</button><a class="admin-button" href={adminUrl('cases')}>Voltar</a></div>
   </form>
 
@@ -97,4 +100,5 @@ const images = db.prepare('SELECT * FROM imagens_case WHERE case_id = ? ORDER BY
     player.src = previewUrl;
     preview.removeAttribute('hidden');
   });
+
 </script>

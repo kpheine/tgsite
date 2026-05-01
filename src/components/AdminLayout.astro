@@ -35,6 +35,9 @@ const { title, email } = Astro.props;
     <main class="admin-main">
       <slot />
     </main>
+    <script>
+      import '../scripts/admin-image-upload';
+    </script>
   </body>
 </html>
 
@@ -148,13 +151,74 @@ const { title, email } = Astro.props;
   .admin-media-list { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; padding: 0; }
   .admin-media-list li { list-style: none; }
   .admin-media-list a { color: var(--admin-accent); }
-  .admin-image-list { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
-  .admin-image-card { border: 1px solid var(--admin-line); border-radius: 18px; display: grid; gap: 12px; padding: 12px; }
-  .admin-image-card img { aspect-ratio: 16 / 10; border-radius: 12px; display: block; object-fit: cover; width: 100%; }
+  .admin-image-list, .admin-upload-list { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+  .admin-case-image-card {
+    border: 1px solid var(--admin-line);
+    border-radius: 18px;
+    cursor: grab;
+    display: grid;
+    gap: 12px;
+    overflow: hidden;
+    padding: 12px;
+    position: relative;
+    transition: border-color 160ms ease, opacity 160ms ease, transform 160ms ease;
+  }
+  .admin-case-image-card.is-featured { border-color: #f4d94e; box-shadow: 0 0 0 1px rgba(244, 217, 78, 0.35); }
+  .admin-case-image-card.is-removing { border-color: rgba(255, 117, 117, 0.7); opacity: 0.72; }
+  .admin-case-image-card.is-dragging { border-color: var(--admin-accent); cursor: grabbing; opacity: 0.55; }
+  .admin-case-image-card img { aspect-ratio: 16 / 10; border-radius: 12px; display: block; object-fit: cover; width: 100%; }
+  .admin-case-image-card__banner {
+    background: rgba(143, 168, 255, 0.92);
+    border-radius: 999px;
+    color: #070707;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    padding: 7px 10px;
+    position: absolute;
+    right: 10px;
+    text-transform: uppercase;
+    top: 10px;
+    z-index: 1;
+  }
+  .admin-case-image-card.is-removing .admin-case-image-card__banner { background: rgba(255, 117, 117, 0.96); }
+  .admin-case-image-card__meta { display: grid; gap: 5px; min-width: 0; }
+  .admin-case-image-card__meta strong { color: #fff; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .admin-case-image-card__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .admin-image-action {
+    border: 1px solid var(--admin-line);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--admin-text);
+    cursor: pointer;
+    font: 800 12px/1 Inter, system-ui, sans-serif;
+    padding: 9px 12px;
+    text-transform: uppercase;
+  }
+  .admin-image-action--feature.is-active { border-color: #f4d94e; color: #f4d94e; }
+  .admin-image-action--remove { border-color: rgba(255, 117, 117, 0.5); color: var(--admin-danger); }
+  .admin-image-action--restore { border-color: rgba(167, 255, 131, 0.5); color: var(--admin-good); }
+  .admin-drag-handle { color: var(--admin-accent); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+  .admin-file-input { height: 1px; opacity: 0; overflow: hidden; position: absolute; width: 1px; }
+  .admin-upload-zone {
+    align-items: center;
+    border: 1px dashed rgba(143, 168, 255, 0.5);
+    border-radius: 20px;
+    display: flex;
+    gap: 18px;
+    justify-content: space-between;
+    padding: 22px;
+    transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+  }
+  .admin-upload-zone.is-drag-over { background: rgba(143, 168, 255, 0.1); border-color: var(--admin-accent); transform: translateY(-1px); }
+  .admin-upload-zone strong { color: #fff; display: block; font-size: 18px; margin-bottom: 6px; }
+  .admin-upload-zone p { margin: 0; }
   .admin-video-current, .admin-video-preview { border: 1px solid var(--admin-line); border-radius: 18px; display: grid; gap: 10px; padding: 12px; }
   .admin-video-current p, .admin-video-preview p { margin: 0; }
   .admin-video-current video, .admin-video-preview video { aspect-ratio: 16 / 9; background: #050505; border-radius: 12px; display: block; width: 100%; }
   .admin-checkbox { align-items: center; color: var(--admin-text); display: flex; gap: 8px; font-size: 13px; font-weight: 700; padding-bottom: 15px; text-transform: uppercase; }
+  .admin-checkbox--inline { padding-bottom: 0; }
   .admin-alert { border: 1px solid rgba(255, 117, 117, 0.45); border-radius: 14px; color: var(--admin-danger); margin-bottom: 18px; padding: 14px 16px; }
 
   @media (max-width: 840px) {
@@ -163,6 +227,7 @@ const { title, email } = Astro.props;
     .admin-main { padding: 24px 16px; }
     .admin-header, .admin-form-row { display: grid; }
     .admin-grid { grid-template-columns: 1fr; }
+    .admin-upload-zone { align-items: stretch; display: grid; }
     .admin-table-wrap { overflow-x: auto; }
   }
 </style>

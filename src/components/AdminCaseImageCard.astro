@@ -1,0 +1,70 @@
+---
+interface Props {
+  mode: 'existing' | 'upload-template';
+  id?: number;
+  url?: string;
+  destaque?: boolean;
+  order?: number;
+}
+
+const { mode, id, url = '', destaque = false, order = 0 } = Astro.props;
+const isExisting = mode === 'existing';
+const articleAttrs = isExisting
+  ? { 'data-image-card': '' }
+  : { 'data-upload-card': '', 'data-upload-id': '' };
+---
+<article
+  class:list={['admin-case-image-card', { 'is-featured': destaque, 'is-upload': !isExisting }]}
+  draggable="true"
+  {...articleAttrs}
+>
+  <div class="admin-case-image-card__banner" data-card-banner hidden={isExisting}>{isExisting ? 'Será removida' : 'Nova'}</div>
+
+  {isExisting && id !== undefined && (
+    <>
+      <input type="hidden" name="image_id" value={id} />
+      <input type="hidden" name={`image_order_${id}`} value={order} data-image-order />
+      <input type="hidden" name={`image_destaque_${id}`} value={destaque ? '1' : '0'} data-destaque-input />
+      <input type="hidden" name="remove_image_id" value={id} data-remove-image-input disabled />
+    </>
+  )}
+
+  {!isExisting && (
+    <>
+      <input type="hidden" name="new_image_order" value="0" data-image-order />
+      <input type="hidden" name="new_image_destaque" value="0" data-destaque-input />
+    </>
+  )}
+
+  <span class="admin-drag-handle" aria-hidden="true">Arraste para ordenar</span>
+
+  {isExisting ? (
+    <a href={url} target="_blank" rel="noreferrer"><img src={url} alt="" /></a>
+  ) : (
+    <img src="" alt="" data-upload-preview />
+  )}
+
+  <div class="admin-case-image-card__meta" hidden={isExisting}>
+    <strong data-upload-name></strong>
+    <span class="admin-muted" data-upload-size></span>
+  </div>
+
+  <div class="admin-case-image-card__actions">
+    <button
+      class:list={['admin-image-action', 'admin-image-action--feature', { 'is-active': destaque }]}
+      type="button"
+      data-destaque-toggle
+      aria-pressed={destaque ? 'true' : 'false'}
+    >
+      Destaque
+    </button>
+    <button
+      class="admin-image-action admin-image-action--remove"
+      type="button"
+      data-remove-existing={isExisting ? '' : undefined}
+      data-remove-upload={isExisting ? undefined : ''}
+    >
+      Remover
+    </button>
+  </div>
+</article>

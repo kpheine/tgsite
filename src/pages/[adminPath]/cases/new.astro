@@ -1,5 +1,6 @@
 ---
 import AdminLayout from '../../../components/AdminLayout.astro';
+import AdminCaseImageCard from '../../../components/AdminCaseImageCard.astro';
 import { adminUrl, isAdminPath, requireUser } from '../../../lib/auth';
 
 if (!isAdminPath(Astro.params.adminPath)) {
@@ -37,8 +38,20 @@ if (!user) return Astro.redirect(adminUrl('login'));
     <div class="admin-field"><label for="desafio">Desafio</label><textarea class="admin-textarea" id="desafio" name="desafio"></textarea></div>
     <div class="admin-field"><label for="entrega">Entrega</label><textarea class="admin-textarea" id="entrega" name="entrega"></textarea></div>
     <div class="admin-field"><label for="resultado">Resultado</label><textarea class="admin-textarea" id="resultado" name="resultado"></textarea></div>
-    <div class="admin-field"><label for="images">Imagens do case</label><input class="admin-input" id="images" name="images" type="file" accept="image/*" multiple /></div>
-    <p class="admin-muted">Após criar o case, edite-o para ajustar a ordem e marcar imagens como destaque.</p>
+    <div class="admin-field" data-image-upload>
+      <label for="images">Imagens do case</label>
+      <div class="admin-upload-zone" data-upload-zone>
+        <input class="admin-file-input" id="images" name="images" type="file" accept="image/*" multiple data-upload-input />
+        <div>
+          <strong>Solte as imagens aqui</strong>
+          <p class="admin-muted">As imagens selecionadas aparecem na grade abaixo para remoção e ordenação antes do envio.</p>
+        </div>
+        <button class="admin-button" type="button" data-upload-button>Selecionar imagens</button>
+      </div>
+      <template data-upload-card-template><AdminCaseImageCard mode="upload-template" /></template>
+      <div class="admin-image-list" data-image-list></div>
+    </div>
+    <p class="admin-muted">Depois de selecionar as imagens, arraste os cards para definir a ordem de exibição.</p>
     <div class="admin-actions"><button class="admin-button admin-button--primary" type="submit">Criar case</button><a class="admin-button" href={adminUrl('cases')}>Cancelar</a></div>
   </form>
 </AdminLayout>
