@@ -8,9 +8,11 @@ const SESSION_DAYS = 7;
 
 interface UserRecord {
   id: number;
-  email: string;
+  username: string;
   password_hash: string;
   role: string;
+  support_enabled: 0 | 1;
+  support_expires_at: string | null;
 }
 
 export function getAdminPath() {
@@ -35,15 +37,19 @@ function sqliteDateTime(date: Date) {
   return date.toISOString().slice(0, 19).replace('T', ' ');
 }
 
-export function login(email: string, password: string) {
-  const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email.trim().toLowerCase()) as UserRecord | undefined;
+export function login(username: string, password: string) {
+  const cleanUsername = username.trim().toLowerCase();
+  const user = db.prepare('SELECT * FROM users WHERE username = ?').get(cleanUsername) as UserRecord | undefined;
   if (!user || !compareSync(password, user.password_hash)) return null;
+  if (!user.support_enabled) return null;
+  if (user.support_expires_at && new Date(`${user.support_expires_at.replace(' ', 'T')}Z`) <= new Date()) return null;
 
   const token = randomBytes(32).toString('hex');
   const tokenHash = hashToken(token);
   const expiresAt = sqliteDateTime(new Date(Date.now() + SESSION_DAYS * 24 * 60 * 60 * 1000));
 
   db.prepare('INSERT INTO sessions (token_hash, user_id, expires_at) VALUES (?, ?, ?)').run(tokenHash, user.id, expiresAt);
+  db.prepare('UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE id = ?').run(user.id);
 
   return { token, expiresAt };
 }
@@ -71,11 +77,14 @@ export function getCurrentUser(cookies: any) {
   if (!token) return null;
 
   const user = db.prepare(`
-    SELECT users.id, users.email, users.role
+    SELECT users.id, users.username, users.role
     FROM sessions
     JOIN users ON users.id = sessions.user_id
-    WHERE sessions.token_hash = ? AND sessions.expires_at > CURRENT_TIMESTAMP
-  `).get(hashToken(token)) as Pick<UserRecord, 'id' | 'email' | 'role'> | undefined;
+    WHERE sessions.token_hash = ?
+      AND sessions.expires_at > CURRENT_TIMESTAMP
+      AND users.support_enabled = 1
+      AND (users.support_expires_at IS NULL OR users.support_expires_at > CURRENT_TIMESTAMP)
+  `).get(hashToken(token)) as Pick<UserRecord, 'id' | 'username' | 'role'> | undefined;
 
   return user || null;
 }

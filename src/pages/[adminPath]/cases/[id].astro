@@ -16,7 +16,7 @@ if (!item) return new Response('Não encontrado', { status: 404 });
 
 const images = db.prepare('SELECT * FROM imagens_case WHERE case_id = ? ORDER BY sort_order ASC, id ASC').all(item.id) as CaseImageRecord[];
 ---
-<AdminLayout title={`Editar ${item.titulo}`} email={user.email}>
+<AdminLayout title={`Editar ${item.titulo}`} username={user.username}>
   <header class="admin-header">
     <div>
       <p class="admin-kicker">Editar conteúdo</p>

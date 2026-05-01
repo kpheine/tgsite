@@ -1,7 +1,9 @@
 ---
 import AdminLayout from '../../components/AdminLayout.astro';
 import { adminUrl, isAdminPath, requireUser } from '../../lib/auth';
-import { db } from '../../lib/db';
+import { db, SUPPORT_ADMIN_USERNAME } from '../../lib/db';
+
+const SUPPORT_PASSWORD_COOKIE = 'tg_support_password_once';
 
 if (!isAdminPath(Astro.params.adminPath)) {
   return new Response('Não encontrado', { status: 404 });
@@ -17,8 +19,26 @@ const stats = db.prepare(`
     SUM(CASE WHEN status = 'draft' THEN 1 ELSE 0 END) as drafts
   FROM cases
 `).get() as { total: number; published: number | null; drafts: number | null };
+
+const supportUsername = SUPPORT_ADMIN_USERNAME;
+const supportUser = db.prepare(`
+  SELECT username, support_enabled, support_expires_at, last_login_at
+  FROM users
+  WHERE username = ? AND role = 'support'
+`).get(supportUsername) as {
+  username: string;
+  support_enabled: 0 | 1;
+  support_expires_at: string | null;
+  last_login_at: string | null;
+} | undefined;
+const supportPassword = Astro.cookies.get(SUPPORT_PASSWORD_COOKIE)?.value;
+if (supportPassword) Astro.cookies.delete(SUPPORT_PASSWORD_COOKIE, { path: '/' });
+const supportMessage = Astro.url.searchParams.get('support');
+const supportExpiresAt = supportUser?.support_expires_at ? new Date(`${supportUser.support_expires_at.replace(' ', 'T')}Z`) : null;
+const supportIsExpired = supportExpiresAt ? supportExpiresAt <= new Date() : false;
+const supportIsEnabled = Boolean(supportUser?.support_enabled && !supportIsExpired);
 ---
-<AdminLayout title="Painel" email={user.email}>
+<AdminLayout title="Painel" username={user.username}>
   <header class="admin-header">
     <div>
       <p class="admin-kicker">Área de conteúdo</p>
@@ -33,4 +53,54 @@ const stats = db.prepare(`
     <article class="admin-card">Publicados<strong>{stats.published ?? 0}</strong></article>
     <article class="admin-card">Rascunhos<strong>{stats.drafts ?? 0}</strong></article>
   </section>
+
+  {user.role === 'admin' && supportUser && (
+    <section class="admin-support-card" aria-labelledby="support-title">
+      <div>
+        <p class="admin-kicker">Acesso de suporte</p>
+        <h2 id="support-title">{supportUser.username}</h2>
+        <p class="admin-muted">
+          Gere uma senha temporária para liberar suporte técnico. A senha aparece uma única vez e expira em 24 horas.
+        </p>
+      </div>
+
+      {supportPassword && (
+        <div class="admin-support-password" role="status" aria-live="polite">
+          <span>Senha temporária</span>
+          <strong>{supportPassword}</strong>
+          <p>Copie agora: por segurança, ela não será exibida novamente.</p>
+        </div>
+      )}
+
+      {supportMessage === 'disabled' && <p class="admin-alert admin-alert--good">Acesso de suporte desativado.</p>}
+
+      <dl class="admin-support-status">
+        <div>
+          <dt>Status</dt>
+          <dd>{supportIsEnabled ? 'Ativo' : 'Desativado'}</dd>
+        </div>
+        <div>
+          <dt>Expira em</dt>
+          <dd>{supportIsEnabled && supportUser.support_expires_at ? supportUser.support_expires_at : 'Sem acesso ativo'}</dd>
+        </div>
+        <div>
+          <dt>Último login</dt>
+          <dd>{supportUser.last_login_at || 'Nunca'}</dd>
+        </div>
+      </dl>
+
+      <div class="admin-actions">
+        <form method="post" action="/api/panel/support-access">
+          <input type="hidden" name="action" value="enable" />
+          <button class="admin-button admin-button--primary" type="submit">
+            {supportIsEnabled ? 'Gerar nova senha' : 'Ativar suporte'}
+          </button>
+        </form>
+        <form method="post" action="/api/panel/support-access">
+          <input type="hidden" name="action" value="disable" />
+          <button class="admin-button admin-button--danger" type="submit" disabled={!supportIsEnabled}>Desativar suporte</button>
+        </form>
+      </div>
+    </section>
+  )}
 </AdminLayout>

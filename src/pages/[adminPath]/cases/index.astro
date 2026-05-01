@@ -13,7 +13,7 @@ if (!user) return Astro.redirect(adminUrl('login'));
 const cases = db.prepare('SELECT * FROM cases ORDER BY sort_order DESC, id DESC').all() as CaseRecord[];
 const statusLabels = { draft: 'Rascunho', published: 'Publicado' };
 ---
-<AdminLayout title="Cases" email={user.email}>
+<AdminLayout title="Cases" username={user.username}>
   <header class="admin-header">
     <div>
       <p class="admin-kicker">Conteúdo do portfólio</p>

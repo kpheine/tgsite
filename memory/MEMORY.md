@@ -16,7 +16,7 @@
 - Images stored in a local Docker volume — no GCS or external storage dependency
 - Compute Engine (VM) chosen over Cloud Run: supports persistent Docker volumes, simpler for client to self-manage (`docker compose up`)
 - Dev and prod use the same local storage approach — no env switching needed
-- Admin panel: configurable one-segment path from `ADMIN_PATH` (default `/painel-tg-2026`), password-protected via env-seeded admin user, SQLite sessions, case CRUD, create/edit case status toggle button (green when `Publicado`), square draggable case cards for ordering (new cases append at highest `sort_order` and display first via descending order), drag-and-drop image upload with upload-time preview/order/removal/destaque selection, local video upload with drag-and-drop zone, selected-video metadata/preview/removal, current-video remove/restore state, replacement mode that hides the old video while a new video is pending and restores it on cancel, individual image removal, and drag-and-drop existing image ordering. Case image cards use a shared Astro component for existing and pending uploads, with `Nova` / `Será removida` banners, button-based remove/restore, yellow bordered destaque toggle, non-opening draggable previews, pointer-aligned drag ghost previews, and one shared ordering grid so newly uploaded images can be placed among existing images before saving. Public site is not connected to dashboard data yet.
+- Admin panel: configurable one-segment path from `ADMIN_PATH` (default `/painel-tg-2026`), username/password login via env-seeded `ADMIN_USERNAME` admin user, SQLite sessions, fixed disabled-by-default `support-admin` account that the admin can enable from the dashboard to generate a 24-hour temporary password shown once, case CRUD, create/edit case status toggle button (green when `Publicado`), square draggable case cards for ordering (new cases append at highest `sort_order` and display first via descending order), drag-and-drop image upload with upload-time preview/order/removal/destaque selection, local video upload with drag-and-drop zone, selected-video metadata/preview/removal, current-video remove/restore state, replacement mode that hides the old video while a new video is pending and restores it on cancel, individual image removal, and drag-and-drop existing image ordering. Case image cards use a shared Astro component for existing and pending uploads, with `Nova` / `Será removida` banners, button-based remove/restore, yellow bordered destaque toggle, non-opening draggable previews, pointer-aligned drag ghost previews, and one shared ordering grid so newly uploaded images can be placed among existing images before saving. Public site is not connected to dashboard data yet.
 - Admin dashboard UI and admin-facing errors must always be in Brazilian Portuguese (`pt-BR`); keep internal status values like `draft`/`published` unchanged for database/API compatibility, but display them as `Rascunho`/`Publicado`.
 - Server env reads go through `src/lib/env.ts`, which checks Astro `import.meta.env` first and falls back to `process.env`; this keeps `.env` working in `npm run dev` and Docker/process env working in production.
 - Popup framework: native HTML `<dialog>` wrapped by `src/components/Modal.astro`, controlled by `src/scripts/modal-manager.ts`; content is layout-agnostic and can come from Astro components, structured Supabase data, Markdown-rendered HTML, or sanitized raw HTML. Open/close transitions are handled with `.is-open` / `.is-closing` classes plus a short close delay so native dialogs can animate out. Modal scroll lock measures the active scrollbar width and compensates with body padding only when needed to avoid layout shifts without forcing a permanent gutter.
@@ -135,8 +135,8 @@ src/
   components/AdminLayout.astro — standalone dashboard shell for private content management
   components/Modal.astro    — reusable layout-agnostic modal shell using native <dialog>
   layouts/Layout.astro   — base HTML shell, imports global.css, Google Fonts (Inter)
-  lib/auth.ts            — admin path helpers, login/session cookie utilities
-  lib/db.ts              — SQLite connection, schema, env admin seeding (`cases`, `imagens_case`)
+  lib/auth.ts            — admin path helpers, username login/session cookie utilities
+  lib/db.ts              — SQLite connection, schema, env admin/support user seeding (`cases`, `imagens_case`)
   lib/env.ts             — server env helper for Astro import.meta.env + process.env fallback
   lib/uploads.ts         — image/video upload validation and filesystem writes
   pages/[adminPath]/...  — configurable private dashboard routes
@@ -148,7 +148,7 @@ src/
   styles/global.css      — CSS reset + custom properties (dark theme, accent: #e8ff00)
 Dockerfile               — multi-stage, Node 20 Alpine + native build deps, runs dist/server/entry.mjs
 docker-compose.yml       — port 4321, data/uploads volumes, reads .env
-.env.example             — ADMIN_PATH, ADMIN_EMAIL, ADMIN_PASSWORD, SESSION_SECRET, HOST, PORT
+.env.example             — ADMIN_PATH, ADMIN_USERNAME, ADMIN_PASSWORD, SESSION_SECRET, HOST, PORT
 astro.config.mjs         — output: server, adapter: @astrojs/node (standalone)
 ```
 

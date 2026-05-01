@@ -1,8 +1,11 @@
 import Database from 'better-sqlite3';
 import { hashSync } from 'bcryptjs';
 import { mkdirSync } from 'node:fs';
+import { randomUUID } from 'node:crypto';
 import { dirname, resolve } from 'node:path';
 import { getEnv } from './env';
+
+export const SUPPORT_ADMIN_USERNAME = 'support-admin';
 
 const dbPath = resolve(process.cwd(), 'data/site.db');
 mkdirSync(dirname(dbPath), { recursive: true });
@@ -14,9 +17,12 @@ db.pragma('foreign_keys = ON');
 db.exec(`
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    email TEXT NOT NULL UNIQUE,
+    username TEXT NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
     role TEXT NOT NULL DEFAULT 'admin',
+    support_enabled INTEGER NOT NULL DEFAULT 1,
+    support_expires_at TEXT,
+    last_login_at TEXT,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
 
@@ -54,6 +60,52 @@ db.exec(`
   );
 `);
 
+function columnExists(table: string, column: string) {
+  return db.prepare(`PRAGMA table_info(${table})`).all().some((item: any) => item.name === column);
+}
+
+if (!columnExists('users', 'username')) {
+  db.prepare('ALTER TABLE users ADD COLUMN username TEXT').run();
+  db.prepare('UPDATE users SET username = lower(email) WHERE username IS NULL').run();
+  db.prepare('CREATE UNIQUE INDEX IF NOT EXISTS users_username_unique ON users(username)').run();
+}
+
+if (!columnExists('users', 'support_enabled')) {
+  db.prepare('ALTER TABLE users ADD COLUMN support_enabled INTEGER NOT NULL DEFAULT 1').run();
+}
+
+if (!columnExists('users', 'support_expires_at')) {
+  db.prepare('ALTER TABLE users ADD COLUMN support_expires_at TEXT').run();
+}
+
+if (!columnExists('users', 'last_login_at')) {
+  db.prepare('ALTER TABLE users ADD COLUMN last_login_at TEXT').run();
+}
+
+db.prepare('UPDATE users SET support_enabled = 1 WHERE support_enabled IS NULL').run();
+
+const hasLegacyEmailColumn = columnExists('users', 'email');
+
+function insertUser(username: string, passwordHash: string, role: string, supportEnabled: 0 | 1) {
+  if (hasLegacyEmailColumn) {
+    db.prepare('INSERT INTO users (email, username, password_hash, role, support_enabled) VALUES (?, ?, ?, ?, ?)').run(
+      `${username}@local.invalid`,
+      username,
+      passwordHash,
+      role,
+      supportEnabled,
+    );
+    return;
+  }
+
+  db.prepare('INSERT INTO users (username, password_hash, role, support_enabled) VALUES (?, ?, ?, ?)').run(
+    username,
+    passwordHash,
+    role,
+    supportEnabled,
+  );
+}
+
 export interface CaseRecord {
   id: number;
   titulo: string;
@@ -78,19 +130,48 @@ export interface CaseImageRecord {
 }
 
 function seedAdminUser() {
-  const existing = db.prepare('SELECT id FROM users LIMIT 1').get();
+  const existing = db.prepare("SELECT id FROM users WHERE role = 'admin' LIMIT 1").get();
   if (existing) return;
 
-  const email = getEnv('ADMIN_EMAIL');
+  const username = getEnv('ADMIN_USERNAME', 'admin');
   const password = getEnv('ADMIN_PASSWORD');
 
-  if (!email || !password) return;
+  if (!username || !password) return;
 
-  db.prepare('INSERT INTO users (email, password_hash, role) VALUES (?, ?, ?)').run(
-    email.toLowerCase(),
+  insertUser(
+    username.trim().toLowerCase(),
     hashSync(password, 12),
     'admin',
+    1,
+  );
+}
+
+function syncAdminUsernameFromEnv() {
+  const username = getEnv('ADMIN_USERNAME', 'admin').trim().toLowerCase();
+  const admin = db.prepare("SELECT id, username FROM users WHERE role = 'admin' ORDER BY id ASC LIMIT 1").get() as
+    | { id: number; username: string | null }
+    | undefined;
+  if (!admin || admin.username === username) return;
+
+  const usernameTaken = db.prepare('SELECT id FROM users WHERE username = ? AND id != ?').get(username, admin.id);
+  if (!usernameTaken) {
+    db.prepare('UPDATE users SET username = ? WHERE id = ?').run(username, admin.id);
+  }
+}
+
+function ensureSupportUser() {
+  const username = SUPPORT_ADMIN_USERNAME;
+  const existing = db.prepare('SELECT id FROM users WHERE username = ?').get(username);
+  if (existing) return;
+
+  insertUser(
+    username,
+    hashSync(randomUUID(), 12),
+    'support',
+    0,
   );
 }
 
 seedAdminUser();
+syncAdminUsernameFromEnv();
+ensureSupportUser();

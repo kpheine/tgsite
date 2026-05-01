@@ -10,7 +10,7 @@ if (!isAdminPath(Astro.params.adminPath)) {
 const user = requireUser(Astro.cookies);
 if (!user) return Astro.redirect(adminUrl('login'));
 ---
-<AdminLayout title="Novo case" email={user.email}>
+<AdminLayout title="Novo case" username={user.username}>
   <header class="admin-header">
     <div>
       <p class="admin-kicker">Criar conteúdo</p>
