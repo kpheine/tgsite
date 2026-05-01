@@ -206,8 +206,12 @@ function initImageUpload(root: HTMLElement) {
     if (!card) return;
 
     draggedCard = card;
+    const rect = card.getBoundingClientRect();
+    const offsetX = event.clientX - rect.left;
+    const offsetY = event.clientY - rect.top;
+
     event.dataTransfer?.setData('text/plain', '');
-    event.dataTransfer?.setDragImage(card, 24, 24);
+    event.dataTransfer?.setDragImage(card, offsetX, offsetY);
     requestAnimationFrame(() => card.classList.add('is-dragging'));
   });
 
