@@ -16,11 +16,11 @@ export async function saveUpload(file: File, kind: UploadKind) {
   const maxSize = isImage ? MAX_IMAGE_BYTES : MAX_VIDEO_BYTES;
 
   if (!allowed.has(file.type)) {
-    throw new Error(`Unsupported ${kind} type.`);
+    throw new Error(`Tipo de ${kind === 'image' ? 'imagem' : 'vídeo'} não suportado.`);
   }
 
   if (file.size > maxSize) {
-    throw new Error(`${kind} exceeds the ${Math.round(maxSize / 1024 / 1024)}MB limit.`);
+    throw new Error(`${kind === 'image' ? 'A imagem' : 'O vídeo'} excede o limite de ${Math.round(maxSize / 1024 / 1024)}MB.`);
   }
 
   const originalExt = extname(file.name).toLowerCase();

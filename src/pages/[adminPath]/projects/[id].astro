@@ -4,59 +4,59 @@ import { adminUrl, isAdminPath, requireUser } from '../../../lib/auth';
 import { db, type ProjectRecord } from '../../../lib/db';
 
 if (!isAdminPath(Astro.params.adminPath)) {
-  return new Response('Not found', { status: 404 });
+  return new Response('Não encontrado', { status: 404 });
 }
 
 const user = requireUser(Astro.cookies);
 if (!user) return Astro.redirect(adminUrl('login'));
 
 const project = db.prepare('SELECT * FROM projects WHERE id = ?').get(Astro.params.id) as ProjectRecord | undefined;
-if (!project) return new Response('Not found', { status: 404 });
+if (!project) return new Response('Não encontrado', { status: 404 });
 
 const images = JSON.parse(project.images || '[]') as string[];
 const videos = JSON.parse(project.videos || '[]') as string[];
 ---
-<AdminLayout title={`Edit ${project.title}`} email={user.email}>
+<AdminLayout title={`Editar ${project.title}`} email={user.email}>
   <header class="admin-header">
     <div>
-      <p class="admin-kicker">Edit content</p>
+      <p class="admin-kicker">Editar conteúdo</p>
       <h1 class="admin-title">{project.title}</h1>
     </div>
   </header>
 
   <form class="admin-form" method="post" action={`/api/panel/projects/${project.id}`} enctype="multipart/form-data">
     <div class="admin-form-row">
-      <div class="admin-field"><label for="title">Title</label><input class="admin-input" id="title" name="title" value={project.title} required /></div>
+      <div class="admin-field"><label for="title">Título</label><input class="admin-input" id="title" name="title" value={project.title} required /></div>
       <div class="admin-field"><label for="slug">Slug</label><input class="admin-input" id="slug" name="slug" value={project.slug} /></div>
     </div>
     <div class="admin-form-row">
-      <div class="admin-field"><label for="client">Client</label><input class="admin-input" id="client" name="client" value={project.client || ''} /></div>
-      <div class="admin-field"><label for="year">Year</label><input class="admin-input" id="year" name="year" value={project.year || ''} /></div>
+      <div class="admin-field"><label for="client">Cliente</label><input class="admin-input" id="client" name="client" value={project.client || ''} /></div>
+      <div class="admin-field"><label for="year">Ano</label><input class="admin-input" id="year" name="year" value={project.year || ''} /></div>
     </div>
     <div class="admin-form-row">
-      <div class="admin-field"><label for="status">Status</label><select class="admin-select" id="status" name="status"><option value="draft" selected={project.status === 'draft'}>Draft</option><option value="published" selected={project.status === 'published'}>Published</option></select></div>
-      <div class="admin-field"><label for="sort_order">Order</label><input class="admin-input" id="sort_order" name="sort_order" type="number" value={project.sort_order} /></div>
+      <div class="admin-field"><label for="status">Status</label><select class="admin-select" id="status" name="status"><option value="draft" selected={project.status === 'draft'}>Rascunho</option><option value="published" selected={project.status === 'published'}>Publicado</option></select></div>
+      <div class="admin-field"><label for="sort_order">Ordem</label><input class="admin-input" id="sort_order" name="sort_order" type="number" value={project.sort_order} /></div>
     </div>
-    <div class="admin-field"><label for="description">Description</label><textarea class="admin-textarea" id="description" name="description">{project.description || ''}</textarea></div>
+    <div class="admin-field"><label for="description">Descrição</label><textarea class="admin-textarea" id="description" name="description">{project.description || ''}</textarea></div>
     <div class="admin-field">
-      <label>Current media</label>
+      <label>Mídia atual</label>
       <ul class="admin-media-list">
-        {project.cover_image && <li><a href={project.cover_image} target="_blank">Cover image</a></li>}
-        {images.map((image) => <li><a href={image} target="_blank">Image</a></li>)}
-        {videos.map((video) => <li><a href={video} target="_blank">Video</a></li>)}
+        {project.cover_image && <li><a href={project.cover_image} target="_blank">Imagem de capa</a></li>}
+        {images.map((image) => <li><a href={image} target="_blank">Imagem</a></li>)}
+        {videos.map((video) => <li><a href={video} target="_blank">Vídeo</a></li>)}
       </ul>
     </div>
     <div class="admin-form-row">
-      <div class="admin-field"><label for="cover_image">Replace cover image</label><input class="admin-input" id="cover_image" name="cover_image" type="file" accept="image/*" /></div>
-      <div class="admin-field"><label for="images">Add gallery images</label><input class="admin-input" id="images" name="images" type="file" accept="image/*" multiple /></div>
+      <div class="admin-field"><label for="cover_image">Substituir imagem de capa</label><input class="admin-input" id="cover_image" name="cover_image" type="file" accept="image/*" /></div>
+      <div class="admin-field"><label for="images">Adicionar imagens à galeria</label><input class="admin-input" id="images" name="images" type="file" accept="image/*" multiple /></div>
     </div>
-    <div class="admin-field"><label for="videos">Add videos</label><input class="admin-input" id="videos" name="videos" type="file" accept="video/mp4,video/webm,video/quicktime" multiple /></div>
-    <div class="admin-actions"><button class="admin-button admin-button--primary" type="submit">Save changes</button><a class="admin-button" href={adminUrl('projects')}>Back</a></div>
+    <div class="admin-field"><label for="videos">Adicionar vídeos</label><input class="admin-input" id="videos" name="videos" type="file" accept="video/mp4,video/webm,video/quicktime" multiple /></div>
+    <div class="admin-actions"><button class="admin-button admin-button--primary" type="submit">Salvar alterações</button><a class="admin-button" href={adminUrl('projects')}>Voltar</a></div>
   </form>
 
   <form class="admin-form" method="post" action={`/api/panel/projects/${project.id}`} style="margin-top: 18px;">
     <input type="hidden" name="_action" value="delete" />
-    <p class="admin-muted">Deleting removes the project record, but leaves uploaded files on disk for safety.</p>
-    <button class="admin-button admin-button--danger" type="submit">Delete project</button>
+    <p class="admin-muted">Excluir remove o registro do projeto, mas mantém os arquivos enviados no disco por segurança.</p>
+    <button class="admin-button admin-button--danger" type="submit">Excluir projeto</button>
   </form>
 </AdminLayout>

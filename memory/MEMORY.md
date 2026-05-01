@@ -17,6 +17,7 @@
 - Compute Engine (VM) chosen over Cloud Run: supports persistent Docker volumes, simpler for client to self-manage (`docker compose up`)
 - Dev and prod use the same local storage approach — no env switching needed
 - Admin panel: configurable one-segment path from `ADMIN_PATH` (default `/painel-tg-2026`), password-protected via env-seeded admin user, SQLite sessions, project CRUD, image upload, and video upload. Public site is not connected to dashboard data yet.
+- Admin dashboard UI and admin-facing errors must always be in Brazilian Portuguese (`pt-BR`); keep internal status values like `draft`/`published` unchanged for database/API compatibility, but display them as `Rascunho`/`Publicado`.
 - Server env reads go through `src/lib/env.ts`, which checks Astro `import.meta.env` first and falls back to `process.env`; this keeps `.env` working in `npm run dev` and Docker/process env working in production.
 - Popup framework: native HTML `<dialog>` wrapped by `src/components/Modal.astro`, controlled by `src/scripts/modal-manager.ts`; content is layout-agnostic and can come from Astro components, structured Supabase data, Markdown-rendered HTML, or sanitized raw HTML. Open/close transitions are handled with `.is-open` / `.is-closing` classes plus a short close delay so native dialogs can animate out. Modal scroll lock measures the active scrollbar width and compensates with body padding only when needed to avoid layout shifts without forcing a permanent gutter.
 

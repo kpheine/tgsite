@@ -10,7 +10,7 @@ function slugify(value: string) {
     .toLowerCase()
     .trim()
     .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '') || 'project';
+    .replace(/^-+|-+$/g, '') || 'projeto';
 }
 
 function uniqueSlug(baseSlug: string, currentId: string | undefined) {
@@ -41,7 +41,7 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
   }
 
   const project = db.prepare('SELECT * FROM projects WHERE id = ?').get(params.id) as ProjectRecord | undefined;
-  if (!project) return new Response('Not found', { status: 404 });
+  if (!project) return new Response('Não encontrado', { status: 404 });
 
   const formData = await request.formData();
   if (formData.get('_action') === 'delete') {
@@ -50,7 +50,7 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
   }
 
   const title = String(formData.get('title') || '').trim();
-  if (!title) return new Response('Title is required', { status: 400 });
+  if (!title) return new Response('O título é obrigatório', { status: 400 });
 
   const coverFile = formData.get('cover_image');
   const coverImage = coverFile instanceof File && coverFile.size > 0 ? await saveUpload(coverFile, 'image') : project.cover_image;

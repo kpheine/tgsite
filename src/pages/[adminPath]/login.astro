@@ -2,7 +2,7 @@
 import { adminUrl, getCurrentUser, isAdminPath } from '../../lib/auth';
 
 if (!isAdminPath(Astro.params.adminPath)) {
-  return new Response('Not found', { status: 404 });
+  return new Response('Não encontrado', { status: 404 });
 }
 
 if (getCurrentUser(Astro.cookies)) {
@@ -16,7 +16,7 @@ const error = Astro.url.searchParams.get('error');
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login | TG Admin</title>
+    <title>Entrar | TG Admin</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -25,18 +25,18 @@ const error = Astro.url.searchParams.get('error');
     <main class="login-page">
       <form class="login-card" method="post" action="/api/panel/login">
         <input type="hidden" name="adminPath" value={Astro.params.adminPath} />
-        <p class="login-kicker">Private area</p>
+        <p class="login-kicker">Área restrita</p>
         <h1>TG Admin</h1>
-        {error && <p class="login-error">Invalid email or password.</p>}
+        {error && <p class="login-error">E-mail ou senha inválidos.</p>}
         <label>
           Email
           <input name="email" type="email" autocomplete="email" required />
         </label>
         <label>
-          Password
+          Senha
           <input name="password" type="password" autocomplete="current-password" required />
         </label>
-        <button type="submit">Sign in</button>
+        <button type="submit">Entrar</button>
       </form>
     </main>
   </body>

@@ -10,7 +10,7 @@ function slugify(value: string) {
     .toLowerCase()
     .trim()
     .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '') || 'project';
+    .replace(/^-+|-+$/g, '') || 'projeto';
 }
 
 function uniqueSlug(baseSlug: string) {
@@ -42,7 +42,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
   const formData = await request.formData();
   const title = String(formData.get('title') || '').trim();
-  if (!title) return new Response('Title is required', { status: 400 });
+  if (!title) return new Response('O título é obrigatório', { status: 400 });
 
   const coverFile = formData.get('cover_image');
   const coverImage = coverFile instanceof File && coverFile.size > 0 ? await saveUpload(coverFile, 'image') : null;
