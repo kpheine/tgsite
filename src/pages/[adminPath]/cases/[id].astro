@@ -78,7 +78,7 @@ const images = db.prepare('SELECT * FROM imagens_case WHERE case_id = ? ORDER BY
         <input class="admin-file-input" id="video" name="video" type="file" accept="video/*" data-video-input />
         <div>
           <strong>{item.video_url ? 'Solte um novo vídeo aqui' : 'Solte o vídeo aqui'}</strong>
-          <p class="admin-muted">MP4, WebM ou MOV até 80MB. {item.video_url ? 'Um novo arquivo substitui o vídeo atual ao salvar.' : 'A prévia aparece antes de salvar o case.'}</p>
+          <p class="admin-muted">MP4, WebM ou MOV até 2GB. {item.video_url ? 'Um novo arquivo substitui o vídeo atual ao salvar.' : 'A prévia aparece antes de salvar o case.'}</p>
         </div>
         <button class="admin-button" type="button" data-video-button>Selecionar vídeo</button>
       </div>

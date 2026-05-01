@@ -1,7 +1,8 @@
-const MAX_VIDEO_BYTES = 80 * 1024 * 1024;
+const MAX_VIDEO_BYTES = 2 * 1024 * 1024 * 1024;
 
 function formatFileSize(bytes: number) {
   if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  if (bytes >= 1024 * 1024 * 1024) return `${(bytes / 1024 / 1024 / 1024).toFixed(2)} GB`;
   return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 }
 
@@ -71,7 +72,7 @@ function initVideoUpload(root: HTMLElement) {
 
     if (file.size > MAX_VIDEO_BYTES) {
       clearSelection();
-      setMessage(message, 'O vídeo excede o limite de 80MB.');
+      setMessage(message, 'O vídeo excede o limite de 2GB.');
       return;
     }
 
