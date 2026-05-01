@@ -9,6 +9,7 @@ mkdirSync(dirname(dbPath), { recursive: true });
 
 export const db = new Database(dbPath);
 db.pragma('journal_mode = WAL');
+db.pragma('foreign_keys = ON');
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS users (
@@ -28,37 +29,52 @@ db.exec(`
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
   );
 
-  CREATE TABLE IF NOT EXISTS projects (
+  CREATE TABLE IF NOT EXISTS cases (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
-    slug TEXT NOT NULL UNIQUE,
-    client TEXT,
-    year TEXT,
-    description TEXT,
+    titulo TEXT NOT NULL,
+    cliente TEXT,
+    video_url TEXT,
+    desafio TEXT,
+    entrega TEXT,
+    resultado TEXT,
     status TEXT NOT NULL DEFAULT 'draft',
     sort_order INTEGER NOT NULL DEFAULT 0,
-    cover_image TEXT,
-    images TEXT NOT NULL DEFAULT '[]',
-    videos TEXT NOT NULL DEFAULT '[]',
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
+
+  CREATE TABLE IF NOT EXISTS imagens_case (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    case_id INTEGER NOT NULL,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    url TEXT NOT NULL,
+    destaque INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (case_id) REFERENCES cases(id) ON DELETE CASCADE
+  );
 `);
 
-export interface ProjectRecord {
+export interface CaseRecord {
   id: number;
-  title: string;
-  slug: string;
-  client: string | null;
-  year: string | null;
-  description: string | null;
+  titulo: string;
+  cliente: string | null;
+  video_url: string | null;
+  desafio: string | null;
+  entrega: string | null;
+  resultado: string | null;
   status: 'draft' | 'published';
   sort_order: number;
-  cover_image: string | null;
-  images: string;
-  videos: string;
   created_at: string;
   updated_at: string;
+}
+
+export interface CaseImageRecord {
+  id: number;
+  case_id: number;
+  sort_order: number;
+  url: string;
+  destaque: 0 | 1;
+  created_at: string;
 }
 
 function seedAdminUser() {

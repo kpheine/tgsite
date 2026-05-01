@@ -1,0 +1,37 @@
+---
+import AdminLayout from '../../../components/AdminLayout.astro';
+import { adminUrl, isAdminPath, requireUser } from '../../../lib/auth';
+
+if (!isAdminPath(Astro.params.adminPath)) {
+  return new Response('Não encontrado', { status: 404 });
+}
+
+const user = requireUser(Astro.cookies);
+if (!user) return Astro.redirect(adminUrl('login'));
+---
+<AdminLayout title="Novo case" email={user.email}>
+  <header class="admin-header">
+    <div>
+      <p class="admin-kicker">Criar conteúdo</p>
+      <h1 class="admin-title">Novo case</h1>
+    </div>
+  </header>
+
+  <form class="admin-form" method="post" action="/api/panel/cases" enctype="multipart/form-data">
+    <div class="admin-form-row">
+      <div class="admin-field"><label for="titulo">Título</label><input class="admin-input" id="titulo" name="titulo" required /></div>
+      <div class="admin-field"><label for="cliente">Cliente</label><input class="admin-input" id="cliente" name="cliente" /></div>
+    </div>
+    <div class="admin-form-row">
+      <div class="admin-field"><label for="status">Status</label><select class="admin-select" id="status" name="status"><option value="draft">Rascunho</option><option value="published">Publicado</option></select></div>
+      <div class="admin-field"><label for="sort_order">Ordem</label><input class="admin-input" id="sort_order" name="sort_order" type="number" value="0" /></div>
+    </div>
+    <div class="admin-field"><label for="video_url">URL do vídeo</label><input class="admin-input" id="video_url" name="video_url" type="url" placeholder="https://..." /></div>
+    <div class="admin-field"><label for="desafio">Desafio</label><textarea class="admin-textarea" id="desafio" name="desafio"></textarea></div>
+    <div class="admin-field"><label for="entrega">Entrega</label><textarea class="admin-textarea" id="entrega" name="entrega"></textarea></div>
+    <div class="admin-field"><label for="resultado">Resultado</label><textarea class="admin-textarea" id="resultado" name="resultado"></textarea></div>
+    <div class="admin-field"><label for="images">Imagens do case</label><input class="admin-input" id="images" name="images" type="file" accept="image/*" multiple /></div>
+    <p class="admin-muted">Após criar o case, edite-o para ajustar a ordem e marcar imagens como destaque.</p>
+    <div class="admin-actions"><button class="admin-button admin-button--primary" type="submit">Criar case</button><a class="admin-button" href={adminUrl('cases')}>Cancelar</a></div>
+  </form>
+</AdminLayout>

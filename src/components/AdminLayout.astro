@@ -23,7 +23,7 @@ const { title, email } = Astro.props;
       <a class="admin-brand" href={adminUrl()}>TG Admin</a>
       <nav class="admin-nav" aria-label="Navegação do painel administrativo">
         <a href={adminUrl()}>Painel</a>
-        <a href={adminUrl('projects')}>Projetos</a>
+        <a href={adminUrl('cases')}>Cases</a>
       </nav>
       {email && <p class="admin-user">Conectado como<br /><strong>{email}</strong></p>}
       {email && (
@@ -131,6 +131,7 @@ const { title, email } = Astro.props;
   .admin-status--draft { background: rgba(255, 255, 255, 0.08); color: var(--admin-muted); }
   .admin-form { display: grid; gap: 18px; max-width: 980px; }
   .admin-form-row { display: grid; gap: 18px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-form-row--compact { align-items: end; grid-template-columns: minmax(0, 1fr) auto; }
   .admin-field { display: grid; gap: 8px; }
   .admin-field label { color: var(--admin-muted); font-size: 13px; font-weight: 700; text-transform: uppercase; }
   .admin-input, .admin-textarea, .admin-select {
@@ -147,6 +148,10 @@ const { title, email } = Astro.props;
   .admin-media-list { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; padding: 0; }
   .admin-media-list li { list-style: none; }
   .admin-media-list a { color: var(--admin-accent); }
+  .admin-image-list { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+  .admin-image-card { border: 1px solid var(--admin-line); border-radius: 18px; display: grid; gap: 12px; padding: 12px; }
+  .admin-image-card img { aspect-ratio: 16 / 10; border-radius: 12px; display: block; object-fit: cover; width: 100%; }
+  .admin-checkbox { align-items: center; color: var(--admin-text); display: flex; gap: 8px; font-size: 13px; font-weight: 700; padding-bottom: 15px; text-transform: uppercase; }
   .admin-alert { border: 1px solid rgba(255, 117, 117, 0.45); border-radius: 14px; color: var(--admin-danger); margin-bottom: 18px; padding: 14px 16px; }
 
   @media (max-width: 840px) {

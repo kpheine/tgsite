@@ -10,8 +10,8 @@
 > **Rule:** Always ask for the Figma block link before starting each section.
 
 ## Phase 2 — Local SQLite Content Storage
-- [x] Create local SQLite schema for admin users, sessions, and projects
-- [x] Store project metadata in `./data/site.db`
+- [x] Create local SQLite schema for admin users, sessions, cases, and case images
+- [x] Store case metadata in `./data/site.db`
 - [x] Store image/video uploads in `./uploads/`
 
 ## Phase 3 — Admin Panel
@@ -21,7 +21,7 @@
 - [x] Media served from `uploads/` Docker volume
 
 ## Phase 4 — Live Data
-- [ ] Replace hardcoded project data with SQLite queries in the portfolio section
+- [ ] Replace hardcoded case data with SQLite queries in the portfolio section
 
 ## Phase 5 — Production Readiness
 - [ ] `docker compose up` tested end-to-end
