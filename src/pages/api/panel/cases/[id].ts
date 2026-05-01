@@ -103,7 +103,7 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
 
   db.prepare(`
     UPDATE cases
-    SET titulo = ?, cliente = ?, video_url = ?, desafio = ?, entrega = ?, resultado = ?, status = ?, sort_order = ?, updated_at = CURRENT_TIMESTAMP
+    SET titulo = ?, cliente = ?, video_url = ?, desafio = ?, entrega = ?, resultado = ?, status = ?, updated_at = CURRENT_TIMESTAMP
     WHERE id = ?
   `).run(
     titulo,
@@ -113,7 +113,6 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
     textValue(formData, 'entrega'),
     textValue(formData, 'resultado'),
     formData.get('status') === 'published' ? 'published' : 'draft',
-    Number(formData.get('sort_order') || 0),
     caseId,
   );
 

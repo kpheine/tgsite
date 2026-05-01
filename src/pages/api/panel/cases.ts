@@ -29,6 +29,11 @@ function textValue(formData: FormData, name: string) {
   return String(formData.get(name) || '').trim() || null;
 }
 
+function nextCaseSortOrder() {
+  const result = db.prepare('SELECT COALESCE(MAX(sort_order), -1) + 1 as value FROM cases').get() as { value: number };
+  return result.value;
+}
+
 export const POST: APIRoute = async ({ request, cookies }) => {
   if (!requireUser(cookies)) {
     return new Response(null, { status: 303, headers: { Location: adminUrl('login') } });
@@ -49,7 +54,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     textValue(formData, 'entrega'),
     textValue(formData, 'resultado'),
     formData.get('status') === 'published' ? 'published' : 'draft',
-    Number(formData.get('sort_order') || 0),
+    nextCaseSortOrder(),
   );
 
   await saveImages(formData, Number(result.lastInsertRowid));

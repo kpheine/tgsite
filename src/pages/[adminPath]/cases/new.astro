@@ -23,15 +23,31 @@ if (!user) return Astro.redirect(adminUrl('login'));
       <div class="admin-field"><label for="titulo">Título</label><input class="admin-input" id="titulo" name="titulo" required /></div>
       <div class="admin-field"><label for="cliente">Cliente</label><input class="admin-input" id="cliente" name="cliente" /></div>
     </div>
-    <div class="admin-form-row">
-      <div class="admin-field"><label for="status">Status</label><select class="admin-select" id="status" name="status"><option value="draft">Rascunho</option><option value="published">Publicado</option></select></div>
-      <div class="admin-field"><label for="sort_order">Ordem</label><input class="admin-input" id="sort_order" name="sort_order" type="number" value="0" /></div>
-    </div>
-    <div class="admin-field">
+    <div class="admin-field"><label for="status">Status</label><select class="admin-select" id="status" name="status"><option value="draft">Rascunho</option><option value="published">Publicado</option></select></div>
+    <div class="admin-field" data-video-upload>
       <label for="video">Vídeo do case</label>
-      <input class="admin-input" id="video" name="video" type="file" accept="video/*" data-video-input />
+      <div class="admin-video-upload" data-video-zone>
+        <input class="admin-file-input" id="video" name="video" type="file" accept="video/*" data-video-input />
+        <div>
+          <strong>Solte o vídeo aqui</strong>
+          <p class="admin-muted">MP4, WebM ou MOV até 80MB. A prévia aparece antes de criar o case.</p>
+        </div>
+        <button class="admin-button" type="button" data-video-button>Selecionar vídeo</button>
+      </div>
+      <p class="admin-alert admin-alert--compact" data-video-message hidden></p>
       <div class="admin-video-preview" data-video-preview hidden>
-        <p class="admin-muted">Prévia do vídeo selecionado:</p>
+        <div class="admin-video-preview__header">
+          <div>
+            <p class="admin-muted">Vídeo selecionado</p>
+            <strong data-video-name></strong>
+            <span class="admin-muted" data-video-size></span>
+            <span class="admin-muted" data-video-type></span>
+          </div>
+          <div class="admin-video-actions">
+            <button class="admin-image-action" type="button" data-video-button>Trocar vídeo</button>
+            <button class="admin-image-action admin-image-action--remove" type="button" data-video-remove-selection>Remover seleção</button>
+          </div>
+        </div>
         <video controls playsinline data-video-preview-player></video>
       </div>
     </div>
@@ -55,24 +71,3 @@ if (!user) return Astro.redirect(adminUrl('login'));
     <div class="admin-actions"><button class="admin-button admin-button--primary" type="submit">Criar case</button><a class="admin-button" href={adminUrl('cases')}>Cancelar</a></div>
   </form>
 </AdminLayout>
-
-<script>
-  const videoInput = document.querySelector<HTMLInputElement>('[data-video-input]');
-  const preview = document.querySelector<HTMLElement>('[data-video-preview]');
-  const player = document.querySelector<HTMLVideoElement>('[data-video-preview-player]');
-  let previewUrl: string | null = null;
-
-  videoInput?.addEventListener('change', () => {
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
-
-    const file = videoInput.files?.[0];
-    if (!file || !preview || !player) {
-      preview?.setAttribute('hidden', '');
-      return;
-    }
-
-    previewUrl = URL.createObjectURL(file);
-    player.src = previewUrl;
-    preview.removeAttribute('hidden');
-  });
-</script>

@@ -29,24 +29,47 @@ const images = db.prepare('SELECT * FROM imagens_case WHERE case_id = ? ORDER BY
       <div class="admin-field"><label for="titulo">Título</label><input class="admin-input" id="titulo" name="titulo" value={item.titulo} required /></div>
       <div class="admin-field"><label for="cliente">Cliente</label><input class="admin-input" id="cliente" name="cliente" value={item.cliente || ''} /></div>
     </div>
-    <div class="admin-form-row">
-      <div class="admin-field"><label for="status">Status</label><select class="admin-select" id="status" name="status"><option value="draft" selected={item.status === 'draft'}>Rascunho</option><option value="published" selected={item.status === 'published'}>Publicado</option></select></div>
-      <div class="admin-field"><label for="sort_order">Ordem</label><input class="admin-input" id="sort_order" name="sort_order" type="number" value={item.sort_order} /></div>
-    </div>
-    <div class="admin-field">
+    <div class="admin-field"><label for="status">Status</label><select class="admin-select" id="status" name="status"><option value="draft" selected={item.status === 'draft'}>Rascunho</option><option value="published" selected={item.status === 'published'}>Publicado</option></select></div>
+    <div class="admin-field" data-video-upload>
       <label for="video">Vídeo do case</label>
       {item.video_url && (
-        <div class="admin-video-current">
-          <p class="admin-muted">Vídeo atual:</p>
+        <div class="admin-video-current" data-current-video-card>
+          <div class="admin-case-image-card__banner" data-current-video-banner hidden>Será removido</div>
+          <div class="admin-video-preview__header">
+            <div>
+              <p class="admin-muted">Vídeo atual</p>
+              <strong>Este vídeo será mantido se nenhum novo vídeo for selecionado.</strong>
+            </div>
+            <button class="admin-image-action admin-image-action--remove" type="button" data-remove-current-video>Remover vídeo atual</button>
+          </div>
           <video src={item.video_url} controls playsinline></video>
-          <label class="admin-checkbox admin-checkbox--inline"><input type="checkbox" name="remove_video" value="1" /> Remover vídeo atual</label>
+          <input type="hidden" name="remove_video" value="1" data-remove-current-video-input disabled />
         </div>
       )}
-      <input class="admin-input" id="video" name="video" type="file" accept="video/*" data-video-input />
       <div class="admin-video-preview" data-video-preview hidden>
-        <p class="admin-muted">Prévia do novo vídeo selecionado:</p>
+        <div class="admin-video-preview__header">
+          <div>
+            <p class="admin-muted">Novo vídeo selecionado</p>
+            <strong data-video-name></strong>
+            <span class="admin-muted" data-video-size></span>
+            <span class="admin-muted" data-video-type></span>
+          </div>
+          <div class="admin-video-actions">
+            <button class="admin-image-action" type="button" data-video-button>Trocar vídeo</button>
+            <button class="admin-image-action admin-image-action--remove" type="button" data-video-remove-selection>Remover seleção</button>
+          </div>
+        </div>
         <video controls playsinline data-video-preview-player></video>
       </div>
+      <div class="admin-video-upload" data-video-zone>
+        <input class="admin-file-input" id="video" name="video" type="file" accept="video/*" data-video-input />
+        <div>
+          <strong>{item.video_url ? 'Solte um novo vídeo aqui' : 'Solte o vídeo aqui'}</strong>
+          <p class="admin-muted">MP4, WebM ou MOV até 80MB. {item.video_url ? 'Um novo arquivo substitui o vídeo atual ao salvar.' : 'A prévia aparece antes de salvar o case.'}</p>
+        </div>
+        <button class="admin-button" type="button" data-video-button>Selecionar vídeo</button>
+      </div>
+      <p class="admin-alert admin-alert--compact" data-video-message hidden></p>
     </div>
     <div class="admin-field"><label for="desafio">Desafio</label><textarea class="admin-textarea" id="desafio" name="desafio">{item.desafio || ''}</textarea></div>
     <div class="admin-field"><label for="entrega">Entrega</label><textarea class="admin-textarea" id="entrega" name="entrega">{item.entrega || ''}</textarea></div>
@@ -80,25 +103,3 @@ const images = db.prepare('SELECT * FROM imagens_case WHERE case_id = ? ORDER BY
     <button class="admin-button admin-button--danger" type="submit">Excluir case</button>
   </form>
 </AdminLayout>
-
-<script>
-  const videoInput = document.querySelector<HTMLInputElement>('[data-video-input]');
-  const preview = document.querySelector<HTMLElement>('[data-video-preview]');
-  const player = document.querySelector<HTMLVideoElement>('[data-video-preview-player]');
-  let previewUrl: string | null = null;
-
-  videoInput?.addEventListener('change', () => {
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
-
-    const file = videoInput.files?.[0];
-    if (!file || !preview || !player) {
-      preview?.setAttribute('hidden', '');
-      return;
-    }
-
-    previewUrl = URL.createObjectURL(file);
-    player.src = previewUrl;
-    preview.removeAttribute('hidden');
-  });
-
-</script>

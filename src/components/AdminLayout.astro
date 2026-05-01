@@ -37,6 +37,8 @@ const { title, email } = Astro.props;
     </main>
     <script>
       import '../scripts/admin-image-upload';
+      import '../scripts/admin-case-order';
+      import '../scripts/admin-video-upload';
     </script>
   </body>
 </html>
@@ -117,7 +119,7 @@ const { title, email } = Astro.props;
   .admin-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(44px, 6vw, 72px); font-weight: 400; letter-spacing: 0.02em; line-height: 0.9; margin: 0; }
   .admin-muted { color: var(--admin-muted); }
   .admin-grid { display: grid; gap: 18px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .admin-card, .admin-form, .admin-table-wrap {
+  .admin-card, .admin-form, .admin-table-wrap, .admin-case-order-panel {
     border: 1px solid var(--admin-line);
     border-radius: 24px;
     background: linear-gradient(145deg, rgba(28, 28, 28, 0.92), rgba(12, 12, 12, 0.92));
@@ -129,6 +131,50 @@ const { title, email } = Astro.props;
   .admin-table th, .admin-table td { border-bottom: 1px solid var(--admin-line); padding: 15px 12px; text-align: left; vertical-align: top; }
   .admin-table th { color: var(--admin-muted); font-size: 12px; text-transform: uppercase; }
   .admin-table a { color: #fff; font-weight: 700; }
+  .admin-case-order-panel { display: grid; gap: 18px; }
+  .admin-case-order-panel__header { align-items: flex-start; display: flex; gap: 16px; justify-content: space-between; }
+  .admin-case-order-panel__header p { margin: 0; }
+  .admin-case-list { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+  .admin-case-card {
+    aspect-ratio: 1 / 1;
+    border: 1px solid var(--admin-line);
+    border-radius: 18px;
+    cursor: grab;
+    display: grid;
+    gap: 16px;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    min-height: 220px;
+    overflow: hidden;
+    padding: 16px;
+    transition: border-color 160ms ease, opacity 160ms ease, transform 160ms ease;
+  }
+  .admin-case-card:hover { border-color: rgba(143, 168, 255, 0.48); }
+  .admin-case-card.is-dragging { border-color: var(--admin-accent); cursor: grabbing; opacity: 0.55; }
+  .admin-case-card__topline, .admin-case-card__footer { align-items: center; display: flex; gap: 10px; justify-content: space-between; }
+  .admin-case-card__content { align-self: center; display: grid; gap: 10px; min-height: 0; min-width: 0; }
+  .admin-case-card h2 {
+    color: #fff;
+    display: -webkit-box;
+    font-size: clamp(20px, 2vw, 28px);
+    line-height: 1.05;
+    margin: 0;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+  }
+  .admin-case-card p {
+    color: var(--admin-muted);
+    display: -webkit-box;
+    font-size: 14px;
+    line-height: 1.35;
+    margin: 0;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+  .admin-case-card__footer { color: var(--admin-muted); font-size: 12px; line-height: 1.35; }
+  .admin-case-card__footer a { color: var(--admin-accent); font-weight: 800; text-transform: uppercase; }
   .admin-status { border-radius: 999px; display: inline-flex; font-size: 12px; font-weight: 700; padding: 6px 10px; text-transform: uppercase; }
   .admin-status--published { background: rgba(167, 255, 131, 0.12); color: var(--admin-good); }
   .admin-status--draft { background: rgba(255, 255, 255, 0.08); color: var(--admin-muted); }
@@ -214,20 +260,52 @@ const { title, email } = Astro.props;
   .admin-upload-zone.is-drag-over { background: rgba(143, 168, 255, 0.1); border-color: var(--admin-accent); transform: translateY(-1px); }
   .admin-upload-zone strong { color: #fff; display: block; font-size: 18px; margin-bottom: 6px; }
   .admin-upload-zone p { margin: 0; }
-  .admin-video-current, .admin-video-preview { border: 1px solid var(--admin-line); border-radius: 18px; display: grid; gap: 10px; padding: 12px; }
+  .admin-video-upload {
+    align-items: center;
+    border: 1px dashed rgba(143, 168, 255, 0.5);
+    border-radius: 20px;
+    display: flex;
+    gap: 18px;
+    justify-content: space-between;
+    padding: 22px;
+    transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+  }
+  .admin-video-upload.is-drag-over { background: rgba(143, 168, 255, 0.1); border-color: var(--admin-accent); transform: translateY(-1px); }
+  .admin-video-upload strong { color: #fff; display: block; font-size: 18px; margin-bottom: 6px; }
+  .admin-video-upload p { margin: 0; }
+  .admin-video-current, .admin-video-preview {
+    border: 1px solid var(--admin-line);
+    border-radius: 18px;
+    display: grid;
+    gap: 12px;
+    overflow: hidden;
+    padding: 12px;
+    position: relative;
+    transition: border-color 160ms ease, opacity 160ms ease;
+  }
+  .admin-video-current[hidden], .admin-video-preview[hidden], .admin-alert[hidden] { display: none; }
+  .admin-video-current.is-removing { border-color: rgba(255, 117, 117, 0.7); opacity: 0.72; }
+  .admin-video-preview__header { align-items: flex-start; display: flex; gap: 14px; justify-content: space-between; }
+  .admin-video-preview__header p { margin: 0 0 6px; }
+  .admin-video-preview__header strong { color: #fff; display: block; font-size: 14px; line-height: 1.4; word-break: break-word; }
+  .admin-video-preview__header span { display: inline-block; font-size: 12px; margin-right: 10px; margin-top: 5px; }
+  .admin-video-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
   .admin-video-current p, .admin-video-preview p { margin: 0; }
   .admin-video-current video, .admin-video-preview video { aspect-ratio: 16 / 9; background: #050505; border-radius: 12px; display: block; width: 100%; }
   .admin-checkbox { align-items: center; color: var(--admin-text); display: flex; gap: 8px; font-size: 13px; font-weight: 700; padding-bottom: 15px; text-transform: uppercase; }
   .admin-checkbox--inline { padding-bottom: 0; }
   .admin-alert { border: 1px solid rgba(255, 117, 117, 0.45); border-radius: 14px; color: var(--admin-danger); margin-bottom: 18px; padding: 14px 16px; }
+  .admin-alert--compact { margin: 0; padding: 11px 13px; }
 
   @media (max-width: 840px) {
     body.admin-shell { display: block; }
     .admin-sidebar { position: static; height: auto; }
     .admin-main { padding: 24px 16px; }
-    .admin-header, .admin-form-row { display: grid; }
+    .admin-header, .admin-form-row, .admin-case-order-panel__header { display: grid; }
     .admin-grid { grid-template-columns: 1fr; }
-    .admin-upload-zone { align-items: stretch; display: grid; }
+    .admin-case-list { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+    .admin-upload-zone, .admin-video-upload, .admin-video-preview__header { align-items: stretch; display: grid; }
+    .admin-video-actions { justify-content: flex-start; }
     .admin-table-wrap { overflow-x: auto; }
   }
 </style>

@@ -10,7 +10,7 @@ if (!isAdminPath(Astro.params.adminPath)) {
 const user = requireUser(Astro.cookies);
 if (!user) return Astro.redirect(adminUrl('login'));
 
-const cases = db.prepare('SELECT * FROM cases ORDER BY sort_order ASC, updated_at DESC').all() as CaseRecord[];
+const cases = db.prepare('SELECT * FROM cases ORDER BY sort_order DESC, id DESC').all() as CaseRecord[];
 const statusLabels = { draft: 'Rascunho', published: 'Publicado' };
 ---
 <AdminLayout title="Cases" email={user.email}>
@@ -22,23 +22,30 @@ const statusLabels = { draft: 'Rascunho', published: 'Publicado' };
     <a class="admin-button admin-button--primary" href={adminUrl('cases/new')}>Novo case</a>
   </header>
 
-  <section class="admin-table-wrap">
-    <table class="admin-table">
-      <thead>
-        <tr><th>Título</th><th>Cliente</th><th>Status</th><th>Ordem</th><th>Atualizado</th></tr>
-      </thead>
-      <tbody>
-        {cases.length === 0 && <tr><td colspan="5" class="admin-muted">Nenhum case criado ainda.</td></tr>}
-        {cases.map((item) => (
-          <tr>
-            <td><a href={adminUrl(`cases/${item.id}`)}>{item.titulo}</a></td>
-            <td>{item.cliente || '-'}</td>
-            <td><span class={`admin-status admin-status--${item.status}`}>{statusLabels[item.status]}</span></td>
-            <td>{item.sort_order}</td>
-            <td>{new Date(item.updated_at).toLocaleDateString('pt-BR')}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+  <section class="admin-case-order-panel" data-case-order-panel>
+    <div class="admin-case-order-panel__header">
+      <p class="admin-muted">Arraste os cards para definir a ordem de exibição. Novos cases entram no topo automaticamente.</p>
+      <p class="admin-muted" data-case-order-status aria-live="polite"></p>
+    </div>
+
+    {cases.length === 0 && <p class="admin-muted">Nenhum case criado ainda.</p>}
+    <div class="admin-case-list" data-case-order-list>
+      {cases.map((item) => (
+        <article class="admin-case-card" data-case-card data-case-id={item.id} draggable="true">
+          <div class="admin-case-card__topline">
+            <span class="admin-drag-handle" aria-hidden="true">Arraste</span>
+            <span class={`admin-status admin-status--${item.status}`}>{statusLabels[item.status]}</span>
+          </div>
+          <div class="admin-case-card__content">
+            <h2>{item.titulo}</h2>
+            <p>{item.cliente || 'Sem cliente informado'}</p>
+          </div>
+          <div class="admin-case-card__footer">
+            <span>Atualizado em {new Date(item.updated_at).toLocaleDateString('pt-BR')}</span>
+            <a href={adminUrl(`cases/${item.id}`)}>Editar</a>
+          </div>
+        </article>
+      ))}
+    </div>
   </section>
 </AdminLayout>
