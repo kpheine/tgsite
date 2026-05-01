@@ -23,7 +23,13 @@ if (!user) return Astro.redirect(adminUrl('login'));
       <div class="admin-field"><label for="titulo">Título</label><input class="admin-input" id="titulo" name="titulo" required /></div>
       <div class="admin-field"><label for="cliente">Cliente</label><input class="admin-input" id="cliente" name="cliente" /></div>
     </div>
-    <div class="admin-field"><label for="status">Status</label><select class="admin-select" id="status" name="status"><option value="draft">Rascunho</option><option value="published">Publicado</option></select></div>
+    <div class="admin-field" data-status-toggle-field>
+      <label for="status">Status</label>
+      <input id="status" name="status" type="hidden" value="draft" data-status-toggle-input />
+      <button class="admin-status-toggle" type="button" data-status-toggle aria-pressed="false">
+        <span data-status-toggle-label>Rascunho</span>
+      </button>
+    </div>
     <div class="admin-field" data-video-upload>
       <label for="video">Vídeo do case</label>
       <div class="admin-video-upload" data-video-zone>

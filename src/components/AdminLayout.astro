@@ -38,6 +38,7 @@ const { title, email } = Astro.props;
     <script>
       import '../scripts/admin-image-upload';
       import '../scripts/admin-case-order';
+      import '../scripts/admin-case-status-toggle';
       import '../scripts/admin-video-upload';
     </script>
   </body>
@@ -178,6 +179,22 @@ const { title, email } = Astro.props;
   .admin-status { border-radius: 999px; display: inline-flex; font-size: 12px; font-weight: 700; padding: 6px 10px; text-transform: uppercase; }
   .admin-status--published { background: rgba(167, 255, 131, 0.12); color: var(--admin-good); }
   .admin-status--draft { background: rgba(255, 255, 255, 0.08); color: var(--admin-muted); }
+  .admin-status-toggle {
+    border: 1px solid var(--admin-line);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--admin-muted);
+    cursor: pointer;
+    font: 800 14px/1 Inter, system-ui, sans-serif;
+    letter-spacing: 0.08em;
+    padding: 17px 18px;
+    text-align: center;
+    text-transform: uppercase;
+    transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+    width: 100%;
+  }
+  .admin-status-toggle[aria-pressed="true"] { background: rgba(167, 255, 131, 0.12); border-color: rgba(167, 255, 131, 0.55); color: var(--admin-good); }
+  .admin-status-toggle:hover { border-color: var(--admin-accent); }
   .admin-form { display: grid; gap: 18px; max-width: 980px; }
   .admin-form-row { display: grid; gap: 18px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .admin-form-row--compact { align-items: end; grid-template-columns: minmax(0, 1fr) auto; }

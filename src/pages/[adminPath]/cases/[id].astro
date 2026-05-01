@@ -29,7 +29,13 @@ const images = db.prepare('SELECT * FROM imagens_case WHERE case_id = ? ORDER BY
       <div class="admin-field"><label for="titulo">Título</label><input class="admin-input" id="titulo" name="titulo" value={item.titulo} required /></div>
       <div class="admin-field"><label for="cliente">Cliente</label><input class="admin-input" id="cliente" name="cliente" value={item.cliente || ''} /></div>
     </div>
-    <div class="admin-field"><label for="status">Status</label><select class="admin-select" id="status" name="status"><option value="draft" selected={item.status === 'draft'}>Rascunho</option><option value="published" selected={item.status === 'published'}>Publicado</option></select></div>
+    <div class="admin-field" data-status-toggle-field>
+      <label for="status">Status</label>
+      <input id="status" name="status" type="hidden" value={item.status} data-status-toggle-input />
+      <button class="admin-status-toggle" type="button" data-status-toggle aria-pressed={item.status === 'published' ? 'true' : 'false'}>
+        <span data-status-toggle-label>{item.status === 'published' ? 'Publicado' : 'Rascunho'}</span>
+      </button>
+    </div>
     <div class="admin-field" data-video-upload>
       <label for="video">Vídeo do case</label>
       {item.video_url && (
