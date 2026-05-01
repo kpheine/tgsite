@@ -32,7 +32,20 @@ const images = db.prepare('SELECT * FROM imagens_case WHERE case_id = ? ORDER BY
       <div class="admin-field"><label for="status">Status</label><select class="admin-select" id="status" name="status"><option value="draft" selected={item.status === 'draft'}>Rascunho</option><option value="published" selected={item.status === 'published'}>Publicado</option></select></div>
       <div class="admin-field"><label for="sort_order">Ordem</label><input class="admin-input" id="sort_order" name="sort_order" type="number" value={item.sort_order} /></div>
     </div>
-    <div class="admin-field"><label for="video_url">URL do vídeo</label><input class="admin-input" id="video_url" name="video_url" type="url" value={item.video_url || ''} placeholder="https://..." /></div>
+    <div class="admin-field">
+      <label for="video">Vídeo do case</label>
+      {item.video_url && (
+        <div class="admin-video-current">
+          <p class="admin-muted">Vídeo atual:</p>
+          <video src={item.video_url} controls playsinline></video>
+        </div>
+      )}
+      <input class="admin-input" id="video" name="video" type="file" accept="video/*" data-video-input />
+      <div class="admin-video-preview" data-video-preview hidden>
+        <p class="admin-muted">Prévia do novo vídeo selecionado:</p>
+        <video controls playsinline data-video-preview-player></video>
+      </div>
+    </div>
     <div class="admin-field"><label for="desafio">Desafio</label><textarea class="admin-textarea" id="desafio" name="desafio">{item.desafio || ''}</textarea></div>
     <div class="admin-field"><label for="entrega">Entrega</label><textarea class="admin-textarea" id="entrega" name="entrega">{item.entrega || ''}</textarea></div>
     <div class="admin-field"><label for="resultado">Resultado</label><textarea class="admin-textarea" id="resultado" name="resultado">{item.resultado || ''}</textarea></div>
@@ -60,7 +73,28 @@ const images = db.prepare('SELECT * FROM imagens_case WHERE case_id = ? ORDER BY
 
   <form class="admin-form" method="post" action={`/api/panel/cases/${item.id}`} style="margin-top: 18px;">
     <input type="hidden" name="_action" value="delete" />
-    <p class="admin-muted">Excluir remove o registro do case e suas imagens do banco, mas mantém os arquivos enviados no disco por segurança.</p>
+    <p class="admin-muted">Excluir remove o case, suas imagens e seu vídeo do banco e do disco.</p>
     <button class="admin-button admin-button--danger" type="submit">Excluir case</button>
   </form>
 </AdminLayout>
+
+<script>
+  const videoInput = document.querySelector<HTMLInputElement>('[data-video-input]');
+  const preview = document.querySelector<HTMLElement>('[data-video-preview]');
+  const player = document.querySelector<HTMLVideoElement>('[data-video-preview-player]');
+  let previewUrl: string | null = null;
+
+  videoInput?.addEventListener('change', () => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+
+    const file = videoInput.files?.[0];
+    if (!file || !preview || !player) {
+      preview?.setAttribute('hidden', '');
+      return;
+    }
+
+    previewUrl = URL.createObjectURL(file);
+    player.src = previewUrl;
+    preview.removeAttribute('hidden');
+  });
+</script>

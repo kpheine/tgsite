@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { adminUrl, requireUser } from '../../../../lib/auth';
-import { db, type CaseRecord } from '../../../../lib/db';
-import { saveUpload } from '../../../../lib/uploads';
+import { db, type CaseImageRecord, type CaseRecord } from '../../../../lib/db';
+import { deleteUploadedFile, saveUpload } from '../../../../lib/uploads';
 
 function textValue(formData: FormData, name: string) {
   return String(formData.get(name) || '').trim() || null;
@@ -18,6 +18,18 @@ async function saveNewImages(formData: FormData, caseId: number) {
       sortOrder += 1;
     }
   }
+}
+
+async function saveVideo(formData: FormData) {
+  const video = formData.get('video');
+  return video instanceof File && video.size > 0 ? saveUpload(video, 'video') : null;
+}
+
+function deleteCaseMedia(item: CaseRecord) {
+  const images = db.prepare('SELECT * FROM imagens_case WHERE case_id = ?').all(item.id) as CaseImageRecord[];
+
+  deleteUploadedFile(item.video_url);
+  for (const image of images) deleteUploadedFile(image.url);
 }
 
 function updateExistingImages(formData: FormData, caseId: number) {
@@ -49,12 +61,16 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
 
   const formData = await request.formData();
   if (formData.get('_action') === 'delete') {
+    deleteCaseMedia(item);
     db.prepare('DELETE FROM cases WHERE id = ?').run(caseId);
     return new Response(null, { status: 303, headers: { Location: adminUrl('cases') } });
   }
 
   const titulo = String(formData.get('titulo') || '').trim();
   if (!titulo) return new Response('O título é obrigatório', { status: 400 });
+
+  const videoUrl = await saveVideo(formData);
+  if (videoUrl) deleteUploadedFile(item.video_url);
 
   db.prepare(`
     UPDATE cases
@@ -63,7 +79,7 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
   `).run(
     titulo,
     textValue(formData, 'cliente'),
-    textValue(formData, 'video_url'),
+    videoUrl || item.video_url,
     textValue(formData, 'desafio'),
     textValue(formData, 'entrega'),
     textValue(formData, 'resultado'),

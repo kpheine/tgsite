@@ -26,7 +26,14 @@ if (!user) return Astro.redirect(adminUrl('login'));
       <div class="admin-field"><label for="status">Status</label><select class="admin-select" id="status" name="status"><option value="draft">Rascunho</option><option value="published">Publicado</option></select></div>
       <div class="admin-field"><label for="sort_order">Ordem</label><input class="admin-input" id="sort_order" name="sort_order" type="number" value="0" /></div>
     </div>
-    <div class="admin-field"><label for="video_url">URL do vídeo</label><input class="admin-input" id="video_url" name="video_url" type="url" placeholder="https://..." /></div>
+    <div class="admin-field">
+      <label for="video">Vídeo do case</label>
+      <input class="admin-input" id="video" name="video" type="file" accept="video/*" data-video-input />
+      <div class="admin-video-preview" data-video-preview hidden>
+        <p class="admin-muted">Prévia do vídeo selecionado:</p>
+        <video controls playsinline data-video-preview-player></video>
+      </div>
+    </div>
     <div class="admin-field"><label for="desafio">Desafio</label><textarea class="admin-textarea" id="desafio" name="desafio"></textarea></div>
     <div class="admin-field"><label for="entrega">Entrega</label><textarea class="admin-textarea" id="entrega" name="entrega"></textarea></div>
     <div class="admin-field"><label for="resultado">Resultado</label><textarea class="admin-textarea" id="resultado" name="resultado"></textarea></div>
@@ -35,3 +42,24 @@ if (!user) return Astro.redirect(adminUrl('login'));
     <div class="admin-actions"><button class="admin-button admin-button--primary" type="submit">Criar case</button><a class="admin-button" href={adminUrl('cases')}>Cancelar</a></div>
   </form>
 </AdminLayout>
+
+<script>
+  const videoInput = document.querySelector<HTMLInputElement>('[data-video-input]');
+  const preview = document.querySelector<HTMLElement>('[data-video-preview]');
+  const player = document.querySelector<HTMLVideoElement>('[data-video-preview-player]');
+  let previewUrl: string | null = null;
+
+  videoInput?.addEventListener('change', () => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+
+    const file = videoInput.files?.[0];
+    if (!file || !preview || !player) {
+      preview?.setAttribute('hidden', '');
+      return;
+    }
+
+    previewUrl = URL.createObjectURL(file);
+    player.src = previewUrl;
+    preview.removeAttribute('hidden');
+  });
+</script>

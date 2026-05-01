@@ -15,6 +15,11 @@ async function saveImages(formData: FormData, caseId: number) {
   }
 }
 
+async function saveVideo(formData: FormData) {
+  const video = formData.get('video');
+  return video instanceof File && video.size > 0 ? saveUpload(video, 'video') : null;
+}
+
 function textValue(formData: FormData, name: string) {
   return String(formData.get(name) || '').trim() || null;
 }
@@ -34,7 +39,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   `).run(
     titulo,
     textValue(formData, 'cliente'),
-    textValue(formData, 'video_url'),
+    await saveVideo(formData),
     textValue(formData, 'desafio'),
     textValue(formData, 'entrega'),
     textValue(formData, 'resultado'),

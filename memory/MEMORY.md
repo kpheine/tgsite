@@ -16,7 +16,7 @@
 - Images stored in a local Docker volume — no GCS or external storage dependency
 - Compute Engine (VM) chosen over Cloud Run: supports persistent Docker volumes, simpler for client to self-manage (`docker compose up`)
 - Dev and prod use the same local storage approach — no env switching needed
-- Admin panel: configurable one-segment path from `ADMIN_PATH` (default `/painel-tg-2026`), password-protected via env-seeded admin user, SQLite sessions, case CRUD, and image upload. Public site is not connected to dashboard data yet.
+- Admin panel: configurable one-segment path from `ADMIN_PATH` (default `/painel-tg-2026`), password-protected via env-seeded admin user, SQLite sessions, case CRUD, image upload, and local video upload with admin preview. Public site is not connected to dashboard data yet.
 - Admin dashboard UI and admin-facing errors must always be in Brazilian Portuguese (`pt-BR`); keep internal status values like `draft`/`published` unchanged for database/API compatibility, but display them as `Rascunho`/`Publicado`.
 - Server env reads go through `src/lib/env.ts`, which checks Astro `import.meta.env` first and falls back to `process.env`; this keeps `.env` working in `npm run dev` and Docker/process env working in production.
 - Popup framework: native HTML `<dialog>` wrapped by `src/components/Modal.astro`, controlled by `src/scripts/modal-manager.ts`; content is layout-agnostic and can come from Astro components, structured Supabase data, Markdown-rendered HTML, or sanitized raw HTML. Open/close transitions are handled with `.is-open` / `.is-closing` classes plus a short close delay so native dialogs can animate out. Modal scroll lock measures the active scrollbar width and compensates with body padding only when needed to avoid layout shifts without forcing a permanent gutter.
@@ -25,7 +25,7 @@
 
 - Client: advertising agency
 - Traffic: <2k visitors/month
-- Editable section planned: cases/portfolio (popup overlay) — título, cliente, video URL, desafio, entrega, resultado, status, and images per case. Admin stores this data now, but public sections still use hardcoded content.
+- Editable section planned: cases/portfolio (popup overlay) — título, cliente, uploaded local video, desafio, entrega, resultado, status, and images per case. Admin stores this data now, but public sections still use hardcoded content.
 - Client implements deployment themselves on Google Cloud
 - Team: small team collaborating on this repo
 
@@ -140,7 +140,7 @@ src/
   lib/env.ts             — server env helper for Astro import.meta.env + process.env fallback
   lib/uploads.ts         — image/video upload validation and filesystem writes
   pages/[adminPath]/...  — configurable private dashboard routes
-  pages/api/panel/...    — protected login/logout/case/upload endpoints
+  pages/api/panel/...    — protected login/logout/case endpoints
   pages/index.astro      — hello world page
   pages/uploads/[...path].ts — serves media from local uploads volume
   scripts/modal-manager.ts — delegated open/close behavior for all modals
@@ -150,6 +150,8 @@ docker-compose.yml       — port 4321, data/uploads volumes, reads .env
 .env.example             — ADMIN_PATH, ADMIN_EMAIL, ADMIN_PASSWORD, SESSION_SECRET, HOST, PORT
 astro.config.mjs         — output: server, adapter: @astrojs/node (standalone)
 ```
+
+- Case uploads use UUID v4 filenames. Images and videos are hard-linked to cases for simplicity: deleting a case deletes its image/video DB rows and local files from `./uploads/`.
 
 - `npm run dev` → dev server at localhost:4321
 - `docker compose up --build` → production container at localhost:4321

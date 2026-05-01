@@ -151,6 +151,9 @@ const { title, email } = Astro.props;
   .admin-image-list { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
   .admin-image-card { border: 1px solid var(--admin-line); border-radius: 18px; display: grid; gap: 12px; padding: 12px; }
   .admin-image-card img { aspect-ratio: 16 / 10; border-radius: 12px; display: block; object-fit: cover; width: 100%; }
+  .admin-video-current, .admin-video-preview { border: 1px solid var(--admin-line); border-radius: 18px; display: grid; gap: 10px; padding: 12px; }
+  .admin-video-current p, .admin-video-preview p { margin: 0; }
+  .admin-video-current video, .admin-video-preview video { aspect-ratio: 16 / 9; background: #050505; border-radius: 12px; display: block; width: 100%; }
   .admin-checkbox { align-items: center; color: var(--admin-text); display: flex; gap: 8px; font-size: 13px; font-weight: 700; padding-bottom: 15px; text-transform: uppercase; }
   .admin-alert { border: 1px solid rgba(255, 117, 117, 0.45); border-radius: 14px; color: var(--admin-danger); margin-bottom: 18px; padding: 14px 16px; }
 
