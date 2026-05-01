@@ -326,7 +326,7 @@ const { title, username } = Astro.props;
     position: relative;
     transition: border-color 160ms ease, opacity 160ms ease;
   }
-  .admin-video-current[hidden], .admin-video-preview[hidden], .admin-alert[hidden], .admin-upload-modal[hidden], .admin-upload-modal [hidden] { display: none; }
+  .admin-video-current[hidden], .admin-video-current video[hidden], .admin-video-preview[hidden], .admin-video-preview video[hidden], .admin-alert[hidden], .admin-upload-modal[hidden], .admin-upload-modal [hidden] { display: none; }
   .admin-video-current.is-removing { border-color: rgba(255, 117, 117, 0.7); opacity: 0.72; }
   .admin-video-preview__header { align-items: flex-start; display: flex; gap: 14px; justify-content: space-between; }
   .admin-video-preview__header p { margin: 0 0 6px; }
@@ -335,6 +335,27 @@ const { title, username } = Astro.props;
   .admin-video-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
   .admin-video-current p, .admin-video-preview p { margin: 0; }
   .admin-video-current video, .admin-video-preview video { aspect-ratio: 16 / 9; background: #050505; border-radius: 12px; display: block; width: 100%; }
+  .admin-video-lazy {
+    align-items: center;
+    aspect-ratio: 16 / 9;
+    background: radial-gradient(circle at center, rgba(143, 168, 255, 0.18), rgba(5, 5, 5, 0.96) 58%);
+    border: 1px solid rgba(143, 168, 255, 0.22);
+    border-radius: 12px;
+    color: var(--admin-text);
+    cursor: pointer;
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    padding: 20px;
+    text-align: left;
+    transition: border-color 160ms ease, transform 160ms ease;
+    width: 100%;
+  }
+  .admin-video-lazy:hover { border-color: rgba(143, 168, 255, 0.7); transform: translateY(-1px); }
+  .admin-video-lazy[hidden] { display: none; }
+  .admin-video-lazy strong { color: #fff; display: block; font-size: 15px; margin-bottom: 4px; }
+  .admin-video-lazy span span { color: var(--admin-muted); display: block; font-size: 13px; }
+  .admin-video-lazy__icon { align-items: center; background: var(--admin-accent); border-radius: 999px; color: #08101f; display: flex; flex: 0 0 44px; font-size: 18px; height: 44px; justify-content: center; line-height: 1; width: 44px; }
   .admin-checkbox { align-items: center; color: var(--admin-text); display: flex; gap: 8px; font-size: 13px; font-weight: 700; padding-bottom: 15px; text-transform: uppercase; }
   .admin-checkbox--inline { padding-bottom: 0; }
   .admin-alert { border: 1px solid rgba(255, 117, 117, 0.45); border-radius: 14px; color: var(--admin-danger); margin-bottom: 18px; padding: 14px 16px; }

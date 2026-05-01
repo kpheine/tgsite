@@ -48,7 +48,14 @@ const images = db.prepare('SELECT * FROM imagens_case WHERE case_id = ? ORDER BY
             </div>
             <button class="admin-image-action admin-image-action--remove" type="button" data-remove-current-video>Remover vídeo atual</button>
           </div>
-          <video src={item.video_url} controls playsinline></video>
+          <button class="admin-video-lazy" type="button" data-current-video-load data-video-src={item.video_url}>
+            <span class="admin-video-lazy__icon" aria-hidden="true">▶</span>
+            <span>
+              <strong>Carregar vídeo atual</strong>
+              <span>Clique para pré-visualizar sem baixar automaticamente.</span>
+            </span>
+          </button>
+          <video controls playsinline preload="none" data-current-video-player hidden></video>
           <input type="hidden" name="remove_video" value="1" data-remove-current-video-input disabled />
         </div>
       )}

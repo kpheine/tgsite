@@ -32,6 +32,8 @@ function initVideoUpload(root: HTMLElement) {
   const removeCurrentButton = root.querySelector<HTMLButtonElement>('[data-remove-current-video]');
   const currentCard = root.querySelector<HTMLElement>('[data-current-video-card]');
   const currentBanner = root.querySelector<HTMLElement>('[data-current-video-banner]');
+  const currentLoadButton = root.querySelector<HTMLButtonElement>('[data-current-video-load]');
+  const currentPlayer = root.querySelector<HTMLVideoElement>('[data-current-video-player]');
 
   if (!input || !zone || !preview || !player) return;
 
@@ -107,6 +109,15 @@ function initVideoUpload(root: HTMLElement) {
   removeSelection?.addEventListener('click', clearSelection);
   removeCurrentButton?.addEventListener('click', () => {
     setCurrentRemoval(removeCurrentInput?.disabled ?? false);
+  });
+
+  currentLoadButton?.addEventListener('click', () => {
+    if (!currentPlayer || !currentLoadButton.dataset.videoSrc) return;
+
+    currentPlayer.src = currentLoadButton.dataset.videoSrc;
+    currentPlayer.hidden = false;
+    currentLoadButton.hidden = true;
+    currentPlayer.load();
   });
 
   input.addEventListener('change', () => {
