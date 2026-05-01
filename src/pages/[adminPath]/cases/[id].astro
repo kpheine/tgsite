@@ -24,7 +24,7 @@ const images = db.prepare('SELECT * FROM imagens_case WHERE case_id = ? ORDER BY
     </div>
   </header>
 
-  <form class="admin-form" method="post" action={`/api/panel/cases/${item.id}`} enctype="multipart/form-data">
+  <form class="admin-form" method="post" action={`/api/panel/cases/${item.id}`} enctype="multipart/form-data" data-case-form>
     <div class="admin-form-row">
       <div class="admin-field"><label for="titulo">Título</label><input class="admin-input" id="titulo" name="titulo" value={item.titulo} required /></div>
       <div class="admin-field"><label for="cliente">Cliente</label><input class="admin-input" id="cliente" name="cliente" value={item.cliente || ''} /></div>
