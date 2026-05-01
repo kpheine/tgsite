@@ -1,0 +1,160 @@
+---
+import { adminUrl } from '../lib/auth';
+
+interface Props {
+  title: string;
+  email?: string;
+}
+
+const { title, email } = Astro.props;
+---
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title} | TG Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  </head>
+  <body class="admin-shell">
+    <aside class="admin-sidebar">
+      <a class="admin-brand" href={adminUrl()}>TG Admin</a>
+      <nav class="admin-nav" aria-label="Admin navigation">
+        <a href={adminUrl()}>Dashboard</a>
+        <a href={adminUrl('projects')}>Projects</a>
+      </nav>
+      {email && <p class="admin-user">Signed in as<br /><strong>{email}</strong></p>}
+      {email && (
+        <form method="post" action="/api/panel/logout">
+          <button class="admin-logout" type="submit">Logout</button>
+        </form>
+      )}
+    </aside>
+    <main class="admin-main">
+      <slot />
+    </main>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --admin-bg: #090909;
+    --admin-panel: #141414;
+    --admin-panel-2: #1c1c1c;
+    --admin-line: rgba(255, 255, 255, 0.12);
+    --admin-text: #f4f4f4;
+    --admin-muted: #a8a8a8;
+    --admin-accent: #8fa8ff;
+    --admin-good: #a7ff83;
+    --admin-danger: #ff7575;
+  }
+
+  * { box-sizing: border-box; }
+  body.admin-shell {
+    margin: 0;
+    min-height: 100dvh;
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    background: radial-gradient(circle at top right, rgba(103, 137, 217, 0.18), transparent 34%), var(--admin-bg);
+    color: var(--admin-text);
+    font-family: Inter, system-ui, sans-serif;
+  }
+
+  .admin-sidebar {
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    border-right: 1px solid var(--admin-line);
+    background: rgba(12, 12, 12, 0.92);
+    padding: 28px;
+  }
+
+  .admin-brand {
+    color: #fff;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+  }
+
+  .admin-nav { display: grid; gap: 10px; }
+  .admin-nav a, .admin-button, .admin-logout {
+    border: 1px solid var(--admin-line);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--admin-text);
+    cursor: pointer;
+    font: 700 13px/1 Inter, system-ui, sans-serif;
+    padding: 13px 16px;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .admin-nav a:hover, .admin-button:hover, .admin-logout:hover { border-color: var(--admin-accent); }
+  .admin-button--primary { background: linear-gradient(135deg, #6789d9, #b7c8ff); color: #080808; }
+  .admin-button--danger { border-color: rgba(255, 117, 117, 0.45); color: var(--admin-danger); }
+
+  .admin-user {
+    margin-top: auto;
+    color: var(--admin-muted);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .admin-logout { width: 100%; }
+  .admin-main { min-width: 0; padding: 42px; }
+  .admin-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 28px; }
+  .admin-kicker { color: var(--admin-accent); font-size: 12px; font-weight: 700; letter-spacing: 0.12em; margin: 0 0 8px; text-transform: uppercase; }
+  .admin-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(44px, 6vw, 72px); font-weight: 400; letter-spacing: 0.02em; line-height: 0.9; margin: 0; }
+  .admin-muted { color: var(--admin-muted); }
+  .admin-grid { display: grid; gap: 18px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .admin-card, .admin-form, .admin-table-wrap {
+    border: 1px solid var(--admin-line);
+    border-radius: 24px;
+    background: linear-gradient(145deg, rgba(28, 28, 28, 0.92), rgba(12, 12, 12, 0.92));
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+    padding: 24px;
+  }
+  .admin-card strong { display: block; font-size: 40px; margin-top: 10px; }
+  .admin-table { border-collapse: collapse; width: 100%; }
+  .admin-table th, .admin-table td { border-bottom: 1px solid var(--admin-line); padding: 15px 12px; text-align: left; vertical-align: top; }
+  .admin-table th { color: var(--admin-muted); font-size: 12px; text-transform: uppercase; }
+  .admin-table a { color: #fff; font-weight: 700; }
+  .admin-status { border-radius: 999px; display: inline-flex; font-size: 12px; font-weight: 700; padding: 6px 10px; text-transform: uppercase; }
+  .admin-status--published { background: rgba(167, 255, 131, 0.12); color: var(--admin-good); }
+  .admin-status--draft { background: rgba(255, 255, 255, 0.08); color: var(--admin-muted); }
+  .admin-form { display: grid; gap: 18px; max-width: 980px; }
+  .admin-form-row { display: grid; gap: 18px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-field { display: grid; gap: 8px; }
+  .admin-field label { color: var(--admin-muted); font-size: 13px; font-weight: 700; text-transform: uppercase; }
+  .admin-input, .admin-textarea, .admin-select {
+    width: 100%;
+    border: 1px solid var(--admin-line);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.04);
+    color: #fff;
+    font: 400 15px/1.4 Inter, system-ui, sans-serif;
+    padding: 14px 16px;
+  }
+  .admin-textarea { min-height: 180px; resize: vertical; }
+  .admin-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+  .admin-media-list { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; padding: 0; }
+  .admin-media-list li { list-style: none; }
+  .admin-media-list a { color: var(--admin-accent); }
+  .admin-alert { border: 1px solid rgba(255, 117, 117, 0.45); border-radius: 14px; color: var(--admin-danger); margin-bottom: 18px; padding: 14px 16px; }
+
+  @media (max-width: 840px) {
+    body.admin-shell { display: block; }
+    .admin-sidebar { position: static; height: auto; }
+    .admin-main { padding: 24px 16px; }
+    .admin-header, .admin-form-row { display: grid; }
+    .admin-grid { grid-template-columns: 1fr; }
+    .admin-table-wrap { overflow-x: auto; }
+  }
+</style>

@@ -1,0 +1,36 @@
+---
+import AdminLayout from '../../components/AdminLayout.astro';
+import { adminUrl, isAdminPath, requireUser } from '../../lib/auth';
+import { db } from '../../lib/db';
+
+if (!isAdminPath(Astro.params.adminPath)) {
+  return new Response('Not found', { status: 404 });
+}
+
+const user = requireUser(Astro.cookies);
+if (!user) return Astro.redirect(adminUrl('login'));
+
+const stats = db.prepare(`
+  SELECT
+    COUNT(*) as total,
+    SUM(CASE WHEN status = 'published' THEN 1 ELSE 0 END) as published,
+    SUM(CASE WHEN status = 'draft' THEN 1 ELSE 0 END) as drafts
+  FROM projects
+`).get() as { total: number; published: number | null; drafts: number | null };
+---
+<AdminLayout title="Dashboard" email={user.email}>
+  <header class="admin-header">
+    <div>
+      <p class="admin-kicker">Content workspace</p>
+      <h1 class="admin-title">Dashboard</h1>
+      <p class="admin-muted">Manage draft project content and media. The public site is not connected yet.</p>
+    </div>
+    <a class="admin-button admin-button--primary" href={adminUrl('projects/new')}>New project</a>
+  </header>
+
+  <section class="admin-grid" aria-label="Project stats">
+    <article class="admin-card">Total projects<strong>{stats.total}</strong></article>
+    <article class="admin-card">Published drafts<strong>{stats.published ?? 0}</strong></article>
+    <article class="admin-card">Drafts<strong>{stats.drafts ?? 0}</strong></article>
+  </section>
+</AdminLayout>

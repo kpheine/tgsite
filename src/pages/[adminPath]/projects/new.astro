@@ -1,0 +1,41 @@
+---
+import AdminLayout from '../../../components/AdminLayout.astro';
+import { adminUrl, isAdminPath, requireUser } from '../../../lib/auth';
+
+if (!isAdminPath(Astro.params.adminPath)) {
+  return new Response('Not found', { status: 404 });
+}
+
+const user = requireUser(Astro.cookies);
+if (!user) return Astro.redirect(adminUrl('login'));
+---
+<AdminLayout title="New project" email={user.email}>
+  <header class="admin-header">
+    <div>
+      <p class="admin-kicker">Create content</p>
+      <h1 class="admin-title">New Project</h1>
+    </div>
+  </header>
+
+  <form class="admin-form" method="post" action="/api/panel/projects" enctype="multipart/form-data">
+    <div class="admin-form-row">
+      <div class="admin-field"><label for="title">Title</label><input class="admin-input" id="title" name="title" required /></div>
+      <div class="admin-field"><label for="slug">Slug</label><input class="admin-input" id="slug" name="slug" placeholder="auto-generated if blank" /></div>
+    </div>
+    <div class="admin-form-row">
+      <div class="admin-field"><label for="client">Client</label><input class="admin-input" id="client" name="client" /></div>
+      <div class="admin-field"><label for="year">Year</label><input class="admin-input" id="year" name="year" /></div>
+    </div>
+    <div class="admin-form-row">
+      <div class="admin-field"><label for="status">Status</label><select class="admin-select" id="status" name="status"><option value="draft">Draft</option><option value="published">Published</option></select></div>
+      <div class="admin-field"><label for="sort_order">Order</label><input class="admin-input" id="sort_order" name="sort_order" type="number" value="0" /></div>
+    </div>
+    <div class="admin-field"><label for="description">Description</label><textarea class="admin-textarea" id="description" name="description"></textarea></div>
+    <div class="admin-form-row">
+      <div class="admin-field"><label for="cover_image">Cover image</label><input class="admin-input" id="cover_image" name="cover_image" type="file" accept="image/*" /></div>
+      <div class="admin-field"><label for="images">Gallery images</label><input class="admin-input" id="images" name="images" type="file" accept="image/*" multiple /></div>
+    </div>
+    <div class="admin-field"><label for="videos">Videos</label><input class="admin-input" id="videos" name="videos" type="file" accept="video/mp4,video/webm,video/quicktime" multiple /></div>
+    <div class="admin-actions"><button class="admin-button admin-button--primary" type="submit">Create project</button><a class="admin-button" href={adminUrl('projects')}>Cancel</a></div>
+  </form>
+</AdminLayout>

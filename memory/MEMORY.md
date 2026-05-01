@@ -3,7 +3,7 @@
 ## Stack Decision (2026-04-29)
 
 **Frontend:** Astro (static site generation, pure HTML output)
-**Database:** Supabase free tier (DB only — text data for projects)
+**Database:** SQLite via `better-sqlite3` (`./data/site.db` Docker volume)
 **Image Storage:** Local Docker volume (mounted at `./uploads/`)
 **Hosting:** Google Cloud Compute Engine VM (or any VPS)
 **Containerization:** Docker Compose
@@ -12,19 +12,19 @@
 ## Key Decisions & Rationale
 
 - Astro chosen over Next.js for simplicity and zero-cost static output
-- Supabase used for DB only (not image storage) to avoid 1 GB storage limit and bandwidth concerns
+- SQLite replaced Supabase for the admin/content database to avoid external service dependency and free-tier pausing risk
 - Images stored in a local Docker volume — no GCS or external storage dependency
 - Compute Engine (VM) chosen over Cloud Run: supports persistent Docker volumes, simpler for client to self-manage (`docker compose up`)
 - Dev and prod use the same local storage approach — no env switching needed
-- Supabase free tier project pausing is a known risk — needs a keep-alive strategy or upgrade to Pro ($25/month)
-- Admin panel: simple password-protected page in Astro (SSR mode) with a form to CRUD projects
+- Admin panel: configurable one-segment path from `ADMIN_PATH` (default `/painel-tg-2026`), password-protected via env-seeded admin user, SQLite sessions, project CRUD, image upload, and video upload. Public site is not connected to dashboard data yet.
+- Server env reads go through `src/lib/env.ts`, which checks Astro `import.meta.env` first and falls back to `process.env`; this keeps `.env` working in `npm run dev` and Docker/process env working in production.
 - Popup framework: native HTML `<dialog>` wrapped by `src/components/Modal.astro`, controlled by `src/scripts/modal-manager.ts`; content is layout-agnostic and can come from Astro components, structured Supabase data, Markdown-rendered HTML, or sanitized raw HTML. Open/close transitions are handled with `.is-open` / `.is-closing` classes plus a short close delay so native dialogs can animate out. Modal scroll lock measures the active scrollbar width and compensates with body padding only when needed to avoid layout shifts without forcing a permanent gutter.
 
 ## Project Context
 
 - Client: advertising agency
 - Traffic: <2k visitors/month
-- Editable section: projects/portfolio (popup overlay) — title, description, images per project
+- Editable section planned: projects/portfolio (popup overlay) — title, description, images/videos per project. Admin stores this data now, but public sections still use hardcoded content.
 - Client implements deployment themselves on Google Cloud
 - Team: small team collaborating on this repo
 
@@ -131,14 +131,22 @@ background-clip: text;
 
 ```
 src/
+  components/AdminLayout.astro — standalone dashboard shell for private content management
   components/Modal.astro    — reusable layout-agnostic modal shell using native <dialog>
   layouts/Layout.astro   — base HTML shell, imports global.css, Google Fonts (Inter)
+  lib/auth.ts            — admin path helpers, login/session cookie utilities
+  lib/db.ts              — SQLite connection, schema, env admin seeding
+  lib/env.ts             — server env helper for Astro import.meta.env + process.env fallback
+  lib/uploads.ts         — image/video upload validation and filesystem writes
+  pages/[adminPath]/...  — configurable private dashboard routes
+  pages/api/panel/...    — protected login/logout/project/upload endpoints
   pages/index.astro      — hello world page
+  pages/uploads/[...path].ts — serves media from local uploads volume
   scripts/modal-manager.ts — delegated open/close behavior for all modals
   styles/global.css      — CSS reset + custom properties (dark theme, accent: #e8ff00)
-Dockerfile               — multi-stage, Node 20 Alpine, runs dist/server/entry.mjs
-docker-compose.yml       — port 4321, uploads volume, reads .env
-.env.example             — SUPABASE_URL, SUPABASE_ANON_KEY, HOST, PORT
+Dockerfile               — multi-stage, Node 20 Alpine + native build deps, runs dist/server/entry.mjs
+docker-compose.yml       — port 4321, data/uploads volumes, reads .env
+.env.example             — ADMIN_PATH, ADMIN_EMAIL, ADMIN_PASSWORD, SESSION_SECRET, HOST, PORT
 astro.config.mjs         — output: server, adapter: @astrojs/node (standalone)
 ```
 

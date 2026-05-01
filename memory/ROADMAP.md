@@ -9,19 +9,21 @@
 
 > **Rule:** Always ask for the Figma block link before starting each section.
 
-## Phase 2 — Supabase Integration
-- [ ] Create `projects` table (title, description, image_paths, order)
-- [ ] Connect Astro to Supabase (env vars already stubbed in `.env.example`)
+## Phase 2 — Local SQLite Content Storage
+- [x] Create local SQLite schema for admin users, sessions, and projects
+- [x] Store project metadata in `./data/site.db`
+- [x] Store image/video uploads in `./uploads/`
 
 ## Phase 3 — Admin Panel
-- [ ] Password-protected `/admin` page (Astro SSR)
-- [ ] CRUD form: title, description, image upload
-- [ ] Images served from `uploads/` Docker volume
+- [x] Password-protected configurable admin path via `ADMIN_PATH`
+- [x] Env-seeded admin user
+- [x] CRUD form: title, description, image upload, video upload
+- [x] Media served from `uploads/` Docker volume
 
 ## Phase 4 — Live Data
-- [ ] Replace hardcoded project data with Supabase queries in the portfolio section
+- [ ] Replace hardcoded project data with SQLite queries in the portfolio section
 
 ## Phase 5 — Production Readiness
 - [ ] `docker compose up` tested end-to-end
 - [ ] `.env` documented for client handoff
-- [ ] Supabase keep-alive strategy decided (cron ping or Pro plan)
+- [ ] SQLite backup/handoff process documented for `data/` and `uploads/`

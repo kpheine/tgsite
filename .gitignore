@@ -15,7 +15,8 @@ dist/
 !.env.example
 
 # ─── Uploads (local Docker volume — never commit user files) ──────────────────
-uploads/
+/data/
+/uploads/
 
 # ─── Docker ──────────────────────────────────────────────────────────────────
 docker-compose.override.yml
