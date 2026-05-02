@@ -28,6 +28,7 @@ if (!user) return Astro.redirect(adminUrl('login'));
       <input id="status" name="status" type="hidden" value="draft" data-status-toggle-input />
       <button class="admin-status-toggle" type="button" data-status-toggle aria-pressed="false">
         <span data-status-toggle-label>Rascunho</span>
+        <small>Clique aqui para mudar o status</small>
       </button>
     </div>
     <div class="admin-field" data-main-image-upload>
