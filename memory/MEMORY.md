@@ -28,7 +28,7 @@
 
 - Client: advertising agency
 - Traffic: <2k visitors/month
-- Editable section planned: cases/portfolio (popup overlay) — título, cliente, required separate main thumbnail image, uploaded local video, desafio, entrega, resultado, status, and gallery images per case. Admin stores this data now, but public sections still use hardcoded content.
+- Editable section planned: cases/portfolio (popup overlay) — título, cliente, required separate main thumbnail image, uploaded local video, desafio, entrega, resultado, status, and gallery images per case. Admin stores this data now, and the public cases carousel reads published cases from SQLite through `/api/cases`.
 - Client implements deployment themselves on Google Cloud
 - Team: small team collaborating on this repo
 
@@ -60,7 +60,7 @@
 All in `src/components/`:
 1. `Header.astro` — sticky, gradient nav, Contato pill, WhatsApp
 2. `HeroSection.astro` — full-bleed dark photo, gradient headline image, social + address
-3. `CasesSection.astro` + `CasesCarousel.astro` — pixel gradient bg, "CASES" title (centered), vertically centered section content, height-driven desktop card sizing, fixed-height carousel viewport, aligned vertical cards carousel with gradient title bars, distance-based depth sizing around a larger focused center card using transform scaling on stable flex slots plus visual side-card push for active-card breathing room without oversized gaps between non-active cards, animated card grow/shrink during slide, static repeated card sets for infinite looping without visible image swaps, preloaded images, auto-rotation, manual arrow controls, and responsive sizing; currently hardcoded with existing project images until public cases are wired to SQLite.
+3. `CasesSection.astro` + `CasesCarousel.astro` — pixel gradient bg, "CASES" title (centered), vertically centered section content, height-driven desktop card sizing, fixed-height carousel viewport, aligned vertical cards carousel with gradient title bars, distance-based depth sizing around a larger focused center card using transform scaling on stable flex slots plus visual side-card push for active-card breathing room without oversized gaps between non-active cards, animated card grow/shrink during slide, repeated card sets with at least 11 rendered cards for infinite looping without visible image swaps even when there are few published cases, preloaded images, auto-rotation, manual arrow controls, and responsive sizing; cards come from published SQLite cases via `/api/cases` using each case `main_image_url`, with a local placeholder card fallback when no published case is available.
 4. `HistoriaSection.astro` — 2-col: text+CTA left, blob photo right (uses `banner_1.png`)
 5. `DiferenciaisSection.astro` — white bg, event collage left, title + 2×2 gradient cards right
 6. `ClientesSection.astro` — dark, gradient title, 24 logos in 8×3 grid

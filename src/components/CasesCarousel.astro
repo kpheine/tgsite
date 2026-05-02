@@ -1,58 +1,52 @@
 ---
-const cards = [
-  {
-    title: 'Ativações',
-    image: '/images/diferenciais-collage.png',
-    alt: 'Colagem de ativações de marca',
-  },
-  {
-    title: 'Convenções',
-    image: '/images/hero-bg.png',
-    alt: 'Evento corporativo com público e palco iluminado',
-  },
-  {
-    title: 'Lançamentos',
-    image: '/images/historia-photo.png',
-    alt: 'Ambiente de lançamento de produto',
-  },
-  {
-    title: 'Eventos',
-    image: '/images/sobre_hero.jpg',
-    alt: 'Show com luzes e efeitos especiais',
-  },
-  {
-    title: 'Experiências',
-    image: '/images/premios/collage.png',
-    alt: 'Experiências de marca em evento',
-  },
-];
+type CaseCard = {
+  id: number;
+  title: string;
+  client: string | null;
+  image: string;
+  alt: string;
+  desafio: string | null;
+  entrega: string | null;
+  resultado: string | null;
+};
 
-const cardSets = Array.from({ length: 5 }, () => cards).flat();
+type Props = {
+  cards: CaseCard[];
+};
+
+const { cards } = Astro.props;
+
+const minimumRenderedCards = 11;
+const minimumSetCount = cards.length > 0 ? Math.ceil(minimumRenderedCards / cards.length) : 0;
+const repeatedSetCount = Math.max(5, minimumSetCount) + (Math.max(5, minimumSetCount) % 2 === 0 ? 1 : 0);
+const cardSets = Array.from({ length: repeatedSetCount }, () => cards).flat();
 ---
 
-<div class="cases-carousel" data-cases-carousel data-cases-items={JSON.stringify(cards)}>
-  <div class="cases-carousel__viewport">
-    <div class="cases-carousel__track" data-cases-track>
-      {cardSets.map((card, index) => (
-        <article class="case-card" data-case-card data-card-index={index}>
-          <img src={card.image} alt={card.alt} loading={index >= cards.length && index < cards.length * 4 ? 'eager' : 'lazy'} />
-          <div class="case-card__title">
-            <h3>{card.title}</h3>
-          </div>
-        </article>
-      ))}
+{cards.length > 0 && (
+  <div class="cases-carousel" data-cases-carousel data-cases-items={JSON.stringify(cards)}>
+    <div class="cases-carousel__viewport">
+      <div class="cases-carousel__track" data-cases-track>
+        {cardSets.map((card, index) => (
+          <article class="case-card" data-case-card data-card-index={index}>
+            <img src={card.image} alt={card.alt} loading={index >= cards.length && index < cards.length * 4 ? 'eager' : 'lazy'} />
+            <div class="case-card__title">
+              <h3>{card.title}</h3>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+
+    <div class="cases-carousel__nav" aria-label="Navegação do carousel de cases">
+      <button class="cases-carousel__button" type="button" data-cases-prev aria-label="Case anterior">
+        <span aria-hidden="true">‹</span>
+      </button>
+      <button class="cases-carousel__button" type="button" data-cases-next aria-label="Próximo case">
+        <span aria-hidden="true">›</span>
+      </button>
     </div>
   </div>
-
-  <div class="cases-carousel__nav" aria-label="Navegação do carousel de cases">
-    <button class="cases-carousel__button" type="button" data-cases-prev aria-label="Case anterior">
-      <span aria-hidden="true">‹</span>
-    </button>
-    <button class="cases-carousel__button" type="button" data-cases-next aria-label="Próximo case">
-      <span aria-hidden="true">›</span>
-    </button>
-  </div>
-</div>
+)}
 
 <style>
   .cases-carousel {
@@ -309,7 +303,8 @@ const cardSets = Array.from({ length: 5 }, () => cards).flat();
       image.src = card.image;
     });
 
-    const middleSetStart = sourceCards.length * 2;
+    const renderedSetCount = Math.floor(slots.length / sourceCards.length);
+    const middleSetStart = sourceCards.length * Math.floor(renderedSetCount / 2);
 
     let current = middleSetStart;
     let pendingDirection = 0;

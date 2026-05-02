@@ -1,5 +1,33 @@
 ---
 import CasesCarousel from './CasesCarousel.astro';
+
+type PublicCase = {
+  id: number;
+  title: string;
+  client: string | null;
+  image: string;
+  alt: string;
+  desafio: string | null;
+  entrega: string | null;
+  resultado: string | null;
+};
+
+const placeholderCases: PublicCase[] = [
+  {
+    id: 0,
+    title: 'Cases',
+    client: null,
+    image: '/images/diferenciais-collage.png',
+    alt: 'Placeholder de cases',
+    desafio: null,
+    entrega: null,
+    resultado: null,
+  },
+];
+
+const response = await fetch(new URL('/api/cases', Astro.url));
+const publishedCases = response.ok ? await response.json() as PublicCase[] : [];
+const cases = publishedCases.length > 0 ? publishedCases : placeholderCases;
 ---
 <section class="cases-section" id="cases">
   <img
@@ -12,7 +40,7 @@ import CasesCarousel from './CasesCarousel.astro';
   <div class="cases-inner">
     <h2 class="cases-title">Cases</h2>
 
-    <CasesCarousel />
+    <CasesCarousel cards={cases} />
   </div>
 </section>
 
