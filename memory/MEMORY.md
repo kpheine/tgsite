@@ -68,6 +68,14 @@ All in `src/components/`:
 9. `WpiSection.astro` — dark, earth card + WPI/TG logos, tagline, 4 feature blobs
 10. `ContatoFooter.astro` — dark, title + CTA, gradient blob (screen blend), hr divider, Google Maps embed, footer
 
+## /wpi Page (complete)
+
+All in `src/components/` and `src/pages/wpi.astro`:
+1. Hero — full-bleed earth photo (`wpi_hero_bg.jpg`), WPI+TG logos, Bebas Neue heading
+2. `WpiPraticaSection.astro` — dark, "O que isso significa na prática?", 4 feature blobs with composite SVG icons, body text, Bebas Neue quote
+3. `WpiConexaoSection.astro` — dark, Bebas Neue gradient headline, 2-col: stats (stacked) + body left / animated world map SVG right
+4. `WpiVideoSection.astro` — dark, centered gradient heading "Aqui tem alcance.", subtitle, 16:9 gray video placeholder with "Vídeo WPI" label
+
 ## /sobre Page (in progress)
 
 All in `src/components/` and `src/pages/sobre.astro`:
@@ -91,6 +99,27 @@ All in `src/components/` and `src/pages/sobre.astro`:
 - When Figma returns wrong/placeholder images, user may upload their own to `public/images/` directly
 - Download multiple assets in parallel batches (curl in one Bash call) to save time
 - For sections with many logos/assets, create a dedicated subfolder under `public/images/` (e.g. `sobre_clientes/`)
+- **Complex multi-layer composites (400+ layers):** use `get_screenshot` on the parent node to download as a single flat PNG — never stack 400+ individual `<img>` tags
+- **User-exported SVGs:** user may export SVGs directly from Figma and drop them in the project root — check with `Glob **/*.svg` to find them, then move to `public/images/`
+
+## Figma Multi-Layer Icon Compositing
+
+When a Figma icon is split into N SVG layers (each at absolute canvas coordinates):
+1. Identify the parent node's canvas bounding box from its `inset` values
+2. Compute each layer's position relative to the parent using canvas pixel math (canvas ≈ 1440px wide, ~4300–4500px tall)
+3. Build a single composite SVG using nested `<svg x y width height viewBox>` elements — each layer's natural size in parent units = its viewBox dimensions
+4. Use `transform="translate(x, y)"` or nested `<svg>` for positioning; `preserveAspectRatio="none"` on layers is correct
+5. Label/name convention: the Figma node name (e.g. "mundo", "Mundo 2") matches the feature it belongs to
+
+## SVG Animation (internal CSS in `<img>` src)
+
+SVGs loaded via `<img src="...">` **do** run internal CSS animations (keyframes in `<style>` block inside the SVG).
+
+**Staggered arc animation pattern:**
+1. Wrap target elements in `<g id="connections">`
+2. Add `<style>` with `@keyframes` + `#connections path { animation: ... }`
+3. Use CSS `:nth-child` rules for per-arc delays
+4. **Critical:** use **negative delays** (e.g. `animation-delay: -0.44s`) — positive delays cause arcs to sit at `opacity: 1` before animating, creating a jarring white flash on load. Negative delays start each arc mid-cycle immediately.
 
 ## Figma Spacing Workflow
 
