@@ -4,6 +4,7 @@ interface Props {
   labelledBy?: string;
   ariaLabel?: string;
   variant?: 'centered' | 'fullscreen' | 'media';
+  className?: string;
   closeLabel?: string;
 }
 
@@ -12,13 +13,14 @@ const {
   labelledBy,
   ariaLabel,
   variant = 'centered',
+  className = '',
   closeLabel = 'Fechar popup',
 } = Astro.props;
 ---
 
 <dialog
   id={id}
-  class={`modal modal--${variant}`}
+  class:list={['modal', `modal--${variant}`, className]}
   aria-labelledby={labelledBy}
   aria-label={ariaLabel}
   data-modal
