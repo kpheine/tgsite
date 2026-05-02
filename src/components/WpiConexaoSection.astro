@@ -1,0 +1,136 @@
+---
+---
+
+<section class="wpi-conexao">
+  <h2 class="wpi-conexao__headline">
+    <span class="wpi-conexao__headline--white">Seguimos </span><span class="wpi-conexao__headline--gradient">100% independentes.</span>
+  </h2>
+
+  <div class="wpi-conexao__bottom">
+    <div class="wpi-conexao__left">
+      <div class="wpi-conexao__stats">
+        <div class="wpi-conexao__stat">
+          <p class="wpi-conexao__stat-label">mas conectados a mais de</p>
+          <p class="wpi-conexao__stat-value wpi-conexao__stat-value--orange">90 agências</p>
+        </div>
+        <div class="wpi-conexao__stat">
+          <p class="wpi-conexao__stat-label">em mais de</p>
+          <p class="wpi-conexao__stat-value wpi-conexao__stat-value--blue">50 países</p>
+        </div>
+      </div>
+
+      <p class="wpi-conexao__body">
+        Compartilhando inteligência<br>de mercado, tecnologias<br>e estratégias.
+      </p>
+    </div>
+
+    <div class="wpi-conexao__right">
+      <img src="/images/wpi/world-map.png" alt="Mapa de conexões globais" class="wpi-conexao__map" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .wpi-conexao {
+    background: #0d0d0d;
+    width: 100%;
+    padding: 100px 165px;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+
+  .wpi-conexao__bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+
+  .wpi-conexao__left {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  /* Headline */
+  .wpi-conexao__headline {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 8.33vw, 7.5rem);
+    line-height: 0.96;
+    margin: 0;
+  }
+
+  .wpi-conexao__headline--white {
+    color: #fff;
+  }
+
+  .wpi-conexao__headline--gradient {
+    background: linear-gradient(-63.74deg, #ea0e81 4.82%, #a343cb 49.11%, #216ef2 93.39%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Stats column */
+  .wpi-conexao__stats {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .wpi-conexao__stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .wpi-conexao__stat-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(1.2rem, 3.1vw, 2.795rem);
+    color: #fff;
+    line-height: 1;
+    margin: 0;
+  }
+
+  .wpi-conexao__stat-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 7.22vw, 6.5rem);
+    line-height: 0.96;
+    margin: 0;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .wpi-conexao__stat-value--orange {
+    background-image: linear-gradient(90deg, #781e87 0%, #781e87 20%, #bf1b91 44.23%, #f28900 85%, #f3a400 89%, #f5bf00 93%, #f6d000 97%, #f7d600 100%);
+  }
+
+  .wpi-conexao__stat-value--blue {
+    background-image: linear-gradient(-83.09deg, #ea0e81 4.82%, #a343cb 26.54%, #216ef2 66.14%, #253ead 80.19%, #6789d9 93.39%);
+  }
+
+  /* Body text */
+  .wpi-conexao__body {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: clamp(1.1rem, 2.39vw, 2.15rem);
+    color: #fff;
+    line-height: 1.4;
+    margin: 0;
+  }
+
+  /* Map */
+  .wpi-conexao__right {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .wpi-conexao__map {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+</style>
