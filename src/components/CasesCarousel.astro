@@ -1,0 +1,428 @@
+---
+const cards = [
+  {
+    title: 'Ativações',
+    image: '/images/diferenciais-collage.png',
+    alt: 'Colagem de ativações de marca',
+  },
+  {
+    title: 'Convenções',
+    image: '/images/hero-bg.png',
+    alt: 'Evento corporativo com público e palco iluminado',
+  },
+  {
+    title: 'Lançamentos',
+    image: '/images/historia-photo.png',
+    alt: 'Ambiente de lançamento de produto',
+  },
+  {
+    title: 'Eventos',
+    image: '/images/sobre_hero.jpg',
+    alt: 'Show com luzes e efeitos especiais',
+  },
+  {
+    title: 'Experiências',
+    image: '/images/premios/collage.png',
+    alt: 'Experiências de marca em evento',
+  },
+];
+
+const cardSets = Array.from({ length: 5 }, () => cards).flat();
+---
+
+<div class="cases-carousel" data-cases-carousel data-cases-items={JSON.stringify(cards)}>
+  <div class="cases-carousel__viewport">
+    <div class="cases-carousel__track" data-cases-track>
+      {cardSets.map((card, index) => (
+        <article class="case-card" data-case-card data-card-index={index}>
+          <img src={card.image} alt={card.alt} loading={index >= cards.length && index < cards.length * 4 ? 'eager' : 'lazy'} />
+          <div class="case-card__title">
+            <h3>{card.title}</h3>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+
+  <div class="cases-carousel__nav" aria-label="Navegação do carousel de cases">
+    <button class="cases-carousel__button" type="button" data-cases-prev aria-label="Case anterior">
+      <span aria-hidden="true">‹</span>
+    </button>
+    <button class="cases-carousel__button" type="button" data-cases-next aria-label="Próximo case">
+      <span aria-hidden="true">›</span>
+    </button>
+  </div>
+</div>
+
+<style>
+  .cases-carousel {
+    --card-height: clamp(390px, 52svh, min(620px, 34vw));
+    --card-width: calc(var(--card-height) * 0.68);
+    --card-gap: clamp(2.4rem, 4.4svh, 4.25rem);
+    --active-card-side-gap: clamp(2.6rem, 4.6svh, 4.4rem);
+    --center-shift: 0px;
+
+    position: relative;
+    width: calc(100vw - 12px);
+    left: 50%;
+    margin-left: calc(-50vw + 6px);
+    padding: 1rem 0 0;
+    overflow: hidden;
+  }
+
+  .cases-carousel__viewport {
+    width: 100%;
+    height: calc(var(--card-height) * 1.42);
+    overflow: hidden;
+    padding: calc(var(--card-height) * 0.11) 0 calc(var(--card-height) * 0.1);
+  }
+
+  .cases-carousel__track {
+    display: flex;
+    align-items: center;
+    gap: var(--card-gap);
+    height: 100%;
+    width: max-content;
+    padding: 0 max(1rem, calc((100vw - var(--card-width)) / 2));
+    transform: translate3d(var(--center-shift), 0, 0);
+    transition: transform 620ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    will-change: transform;
+  }
+
+  .case-card {
+    position: relative;
+    flex: 0 0 var(--card-width);
+    width: var(--card-width);
+    height: var(--card-height);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #111;
+    box-shadow: 0 28px 60px rgba(0, 0, 0, 0.45);
+    cursor: pointer;
+    transform: translateX(var(--card-push, 0px)) scale(var(--card-scale, 1));
+    transform-origin: center;
+    transition:
+      transform 620ms cubic-bezier(0.2, 0.7, 0.2, 1),
+      opacity 620ms ease,
+      filter 620ms ease,
+      box-shadow 220ms ease;
+    will-change: transform, opacity, filter;
+  }
+
+  .case-card:hover {
+    box-shadow: 0 36px 82px rgba(0, 0, 0, 0.58), 0 0 54px rgba(97, 244, 232, 0.28), 0 0 78px rgba(238, 41, 255, 0.18);
+  }
+
+  .cases-carousel.is-resetting .cases-carousel__track,
+  .cases-carousel.is-resetting .case-card {
+    transition: none;
+  }
+
+  .case-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(137deg, #35e9ff 0%, #ee29ff 48%, #fff200 100%);
+    pointer-events: none;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    transition: box-shadow 220ms ease, opacity 220ms ease;
+  }
+
+  .case-card:hover::before {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28), 0 0 34px rgba(53, 233, 255, 0.32), 0 0 42px rgba(238, 41, 255, 0.4);
+  }
+
+  .case-card:not(.is-active) {
+    opacity: var(--distance-opacity, 0.56);
+    filter: saturate(var(--distance-saturation, 0.78)) brightness(var(--distance-brightness, 0.72));
+  }
+
+  .case-card.is-active {
+    opacity: 1;
+    filter: saturate(1.1) contrast(1.02);
+    z-index: 2;
+  }
+
+  .case-card img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 520ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .case-card:hover img {
+    transform: scale(1.07);
+  }
+
+  .case-card__title {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.65rem 1rem 0.55rem;
+    background: linear-gradient(
+      94deg,
+      rgba(31, 220, 255, 0.78) 0%,
+      rgba(188, 22, 163, 0.76) 47%,
+      rgba(255, 216, 0, 0.82) 100%
+    );
+    box-shadow: 0 -24px 40px rgba(0, 0, 0, 0.2);
+    user-select: none;
+    -webkit-user-select: none;
+    transition: filter 220ms ease;
+  }
+
+  .case-card:hover .case-card__title {
+    filter: brightness(1.22) saturate(1.2);
+  }
+
+  .case-card__title::before {
+    content: '';
+    position: absolute;
+    inset: -42px 0 100%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.35), transparent);
+    pointer-events: none;
+  }
+
+  .case-card__title h3 {
+    position: relative;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(1.55rem, 2.2vw, 2rem);
+    font-weight: 400;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    text-transform: uppercase;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.35);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .cases-carousel__nav {
+    display: flex;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-top: 1.45rem;
+  }
+
+  .cases-carousel__button {
+    width: 31px;
+    height: 31px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+    font: 700 1.55rem/1 'Inter', sans-serif;
+    transition:
+      background-color 160ms ease,
+      color 160ms ease,
+      transform 160ms ease;
+  }
+
+  .cases-carousel__button:hover {
+    background: #fff;
+    color: #05020f;
+    transform: translateY(-1px);
+  }
+
+  .cases-carousel__button:focus-visible {
+    outline: 2px solid #61f4e8;
+    outline-offset: 4px;
+  }
+
+  .cases-carousel__button span {
+    display: block;
+    transform: translateY(-1px);
+  }
+
+  @media (max-width: 900px) {
+    .cases-carousel {
+      --card-width: clamp(205px, 58vw, 260px);
+      --card-height: clamp(335px, 84vw, 390px);
+      --card-gap: 1.25rem;
+      padding-top: 1.5rem;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .cases-carousel {
+      --card-width: min(76vw, 258px);
+      --card-height: 350px;
+      width: 100vw;
+      margin-left: -50vw;
+    }
+
+    .case-card__title {
+      min-height: 44px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cases-carousel__track,
+    .case-card,
+    .case-card::before,
+    .case-card img,
+    .case-card__title,
+    .cases-carousel__button {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const roots = document.querySelectorAll<HTMLElement>('[data-cases-carousel]');
+
+  roots.forEach((root) => {
+    const track = root.querySelector<HTMLElement>('[data-cases-track]');
+    const slots = Array.from(root.querySelectorAll<HTMLElement>('[data-case-card]'));
+    const prevButton = root.querySelector<HTMLButtonElement>('[data-cases-prev]');
+    const nextButton = root.querySelector<HTMLButtonElement>('[data-cases-next]');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    type CaseCard = {
+      title: string;
+      image: string;
+      alt: string;
+    };
+
+    const sourceCards = JSON.parse(root.dataset.casesItems ?? '[]') as CaseCard[];
+
+    if (!track || !prevButton || !nextButton || slots.length === 0 || sourceCards.length === 0) return;
+
+    sourceCards.forEach((card) => {
+      const image = new Image();
+      image.src = card.image;
+    });
+
+    const middleSetStart = sourceCards.length * 2;
+
+    let current = middleSetStart;
+    let pendingDirection = 0;
+    let isAnimating = false;
+    let autoRotateId: number | undefined;
+
+    function applySlotDepth(focusIndex: number) {
+      slots.forEach((item) => {
+        const cardIndex = Number(item.dataset.cardIndex ?? 0);
+        const distance = Math.abs(cardIndex - focusIndex);
+        const cappedDistance = Math.min(distance, 4);
+        const scale = [1.18, 1, 0.88, 0.78, 0.7][cappedDistance];
+        const opacity = [1, 0.9, 0.72, 0.58, 0.44][cappedDistance];
+        const brightness = [1, 0.9, 0.78, 0.66, 0.56][cappedDistance];
+        const saturation = [1.1, 0.96, 0.86, 0.78, 0.7][cappedDistance];
+        const pushDirection = Math.sign(cardIndex - focusIndex);
+        const push =
+          pushDirection === 0 ? '0px' : `calc(var(--active-card-side-gap) * ${pushDirection})`;
+
+        item.style.setProperty('--card-push', push);
+        item.style.setProperty('--card-scale', String(scale));
+        item.style.setProperty('--distance-opacity', String(opacity));
+        item.style.setProperty('--distance-brightness', String(brightness));
+        item.style.setProperty('--distance-saturation', String(saturation));
+        item.style.zIndex = String(10 - cappedDistance);
+        item.classList.toggle('is-active', cardIndex === focusIndex);
+      });
+    }
+
+    function getSlot(index: number) {
+      return slots.find((slot) => Number(slot.dataset.cardIndex ?? 0) === index);
+    }
+
+    function centerSlot(index: number, animate: boolean) {
+      const slot = getSlot(index);
+      if (!slot) return;
+
+      const viewport = root.querySelector<HTMLElement>('.cases-carousel__viewport');
+      const trackCenter = (viewport?.clientWidth ?? window.innerWidth) / 2;
+      const slotCenter = slot.offsetLeft + slot.offsetWidth / 2;
+      const shift = trackCenter - slotCenter;
+
+      track.style.transition = animate ? '' : 'none';
+      track.style.setProperty('--center-shift', `${shift}px`);
+
+      if (!animate) {
+        track.getBoundingClientRect();
+        track.style.transition = '';
+      }
+    }
+
+    function resetToIndex(index: number) {
+      root.classList.add('is-resetting');
+      current = index;
+      applySlotDepth(current);
+      centerSlot(current, false);
+      root.getBoundingClientRect();
+      window.requestAnimationFrame(() => {
+        root.classList.remove('is-resetting');
+      });
+    }
+
+    function advance(direction: number) {
+      if (isAnimating) return;
+
+      isAnimating = true;
+      pendingDirection = direction;
+      current += direction;
+      applySlotDepth(current);
+      track.getBoundingClientRect();
+      centerSlot(current, !reduceMotion.matches);
+
+      if (reduceMotion.matches) {
+        finishAdvance();
+      }
+    }
+
+    function startAutoRotate() {
+      window.clearInterval(autoRotateId);
+      if (reduceMotion.matches) return;
+      autoRotateId = window.setInterval(() => advance(1), 3600);
+    }
+
+    function rotateManually(direction: number) {
+      advance(direction);
+      startAutoRotate();
+    }
+
+    prevButton.addEventListener('click', () => rotateManually(-1));
+    nextButton.addEventListener('click', () => rotateManually(1));
+    track.addEventListener('transitionend', (event) => {
+      if (event.target === track && event.propertyName === 'transform') finishAdvance();
+    });
+    window.addEventListener('resize', () => resetToIndex(current));
+    reduceMotion.addEventListener('change', startAutoRotate);
+
+    function finishAdvance() {
+      if (!isAnimating) return;
+
+      pendingDirection = 0;
+      isAnimating = false;
+
+      if (current >= middleSetStart + sourceCards.length) {
+        resetToIndex(current - sourceCards.length);
+        return;
+      }
+
+      if (current < middleSetStart) {
+        resetToIndex(current + sourceCards.length);
+      }
+    }
+
+    resetToIndex(current);
+    startAutoRotate();
+  });
+</script>

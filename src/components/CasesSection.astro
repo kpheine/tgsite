@@ -1,4 +1,5 @@
 ---
+import CasesCarousel from './CasesCarousel.astro';
 ---
 <section class="cases-section" id="cases">
   <img
@@ -11,10 +12,7 @@
   <div class="cases-inner">
     <h2 class="cases-title">Cases</h2>
 
-    <!-- Carousel placeholder — to be implemented -->
-    <div class="carousel-placeholder" aria-label="Carousel de cases — em breve">
-      <span>Carousel</span>
-    </div>
+    <CasesCarousel />
   </div>
 </section>
 
@@ -24,6 +22,8 @@
     width: 100%;
     min-height: 100svh;
     overflow: hidden;
+    display: flex;
+    align-items: center;
   }
 
   .cases-bg {
@@ -39,10 +39,13 @@
   .cases-inner {
     position: relative;
     z-index: 1;
-    padding: 4rem 7.9% 5rem;
+    width: 100%;
+    min-height: 100svh;
+    padding: clamp(3rem, 6svh, 5rem) 7.9% clamp(3rem, 6svh, 5rem);
     display: flex;
     flex-direction: column;
-    gap: 3rem;
+    justify-content: center;
+    gap: clamp(1.6rem, 3.4svh, 3rem);
   }
 
   .cases-title {
@@ -56,19 +59,16 @@
     text-align: center;
   }
 
-  /* Carousel placeholder */
-  .carousel-placeholder {
-    width: 100%;
-    min-height: 420px;
-    border: 2px dashed rgba(255, 255, 255, 0.25);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: rgba(255, 255, 255, 0.4);
-    font-family: 'Inter', sans-serif;
-    font-size: 1rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+  @media (max-width: 700px) {
+    .cases-section {
+      min-height: auto;
+      display: block;
+    }
+
+    .cases-inner {
+      min-height: auto;
+      padding: 3rem 1rem 4rem;
+      gap: 2rem;
+    }
   }
 </style>

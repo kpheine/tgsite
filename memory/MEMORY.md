@@ -60,7 +60,7 @@
 All in `src/components/`:
 1. `Header.astro` — sticky, gradient nav, Contato pill, WhatsApp
 2. `HeroSection.astro` — full-bleed dark photo, gradient headline image, social + address
-3. `CasesSection.astro` — pixel gradient bg, "CASES" title (centered), carousel placeholder
+3. `CasesSection.astro` + `CasesCarousel.astro` — pixel gradient bg, "CASES" title (centered), vertically centered section content, height-driven desktop card sizing, fixed-height carousel viewport, aligned vertical cards carousel with gradient title bars, distance-based depth sizing around a larger focused center card using transform scaling on stable flex slots plus visual side-card push for active-card breathing room without oversized gaps between non-active cards, animated card grow/shrink during slide, static repeated card sets for infinite looping without visible image swaps, preloaded images, auto-rotation, manual arrow controls, and responsive sizing; currently hardcoded with existing project images until public cases are wired to SQLite.
 4. `HistoriaSection.astro` — 2-col: text+CTA left, blob photo right (uses `banner_1.png`)
 5. `DiferenciaisSection.astro` — white bg, event collage left, title + 2×2 gradient cards right
 6. `ClientesSection.astro` — dark, gradient title, 24 logos in 8×3 grid
