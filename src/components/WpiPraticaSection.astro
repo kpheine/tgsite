@@ -1,0 +1,121 @@
+---
+const features = [
+  { blob: "/images/wpi/connector.png",  icon: "/images/wpi/icon-insights.png",  label: "Insights\ninternacionais" },
+  { blob: "/images/wpi/connector.png",  icon: "/images/wpi/icon-parcerias.png", label: "Parcerias\nglobais" },
+  { blob: "/images/wpi/connector2.png", icon: "/images/wpi/icon-troca.png",     label: "Troca de\nexperiências" },
+  { blob: "/images/wpi/connector.png",  icon: "/images/wpi/icon-squads.png",    label: "Squads com\nespecialistas" },
+];
+---
+
+<section class="wpi-pratica">
+  <h2 class="wpi-pratica__title">O que isso significa na prática?</h2>
+  <div class="wpi-pratica__features">
+    {features.map((f) => (
+      <div class="wpi-pratica__feature">
+        <div class="wpi-pratica__icon-wrap">
+          <img src={f.blob} alt="" class="wpi-pratica__blob" aria-hidden="true" />
+          <img src={f.icon} alt="" class="wpi-pratica__icon" aria-hidden="true" />
+        </div>
+        <p class="wpi-pratica__label">{f.label}</p>
+      </div>
+    ))}
+  </div>
+
+  <p class="wpi-pratica__body">
+    Acesso a dados, referências e especialistas do mundo inteiro para ampliar estratégia, escala e resultado.
+  </p>
+
+  <h3 class="wpi-pratica__quote">
+    Porque quando a visão se expande,<br>o impacto cresce.
+  </h3>
+</section>
+
+<style>
+  .wpi-pratica {
+    background: #0d0d0d;
+    width: 100%;
+    padding: 100px 165px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 80px;
+  }
+
+  .wpi-pratica__title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 8.33vw, 7.5rem);
+    line-height: 0.9625;
+    color: #fff;
+    text-align: center;
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .wpi-pratica__features {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    width: 100%;
+    align-items: start;
+  }
+
+  .wpi-pratica__feature {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    text-align: center;
+  }
+
+  .wpi-pratica__icon-wrap {
+    position: relative;
+    width: 180px;
+    height: 180px;
+  }
+
+  .wpi-pratica__blob {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .wpi-pratica__icon {
+    position: absolute;
+    inset: 22%;
+    width: 56%;
+    height: 56%;
+    object-fit: contain;
+  }
+
+  .wpi-pratica__label {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(1.2rem, 2.9vw, 2.6rem);
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+    margin: 0;
+    white-space: pre-line;
+  }
+
+  .wpi-pratica__body {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: clamp(1.5rem, 2.08vw, 2.5rem);
+    color: #fff;
+    text-align: center;
+    line-height: 1.4;
+    margin: 0;
+    max-width: 900px;
+  }
+
+  .wpi-pratica__quote {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 4.69vw, 5.625rem);
+    color: #fff;
+    text-align: center;
+    line-height: 1;
+    margin: 0;
+  }
+</style>
