@@ -26,6 +26,7 @@ function saveNewImages(upload: ParsedCaseUpload, caseId: number) {
 function deleteCaseMedia(item: CaseRecord) {
   const images = db.prepare('SELECT * FROM imagens_case WHERE case_id = ?').all(item.id) as CaseImageRecord[];
 
+  deleteUploadedFile(item.main_image_url);
   deleteUploadedFile(item.video_url);
   for (const image of images) deleteUploadedFile(image.url);
 }
@@ -106,17 +107,25 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
   const videoUrl = upload.videoUrl;
   const removeVideo = fieldValue(upload, 'remove_video') === '1';
   const nextVideoUrl = videoUrl || (removeVideo ? null : item.video_url);
+  const nextMainImageUrl = upload.mainImageUrl || item.main_image_url;
+
+  if (!nextMainImageUrl) {
+    cleanupUploadedFiles(upload.uploadedUrls);
+    return new Response('A imagem principal é obrigatória', { status: 400 });
+  }
 
   try {
+    if (upload.mainImageUrl) deleteUploadedFile(item.main_image_url);
     if (videoUrl || removeVideo) deleteUploadedFile(item.video_url);
 
     db.prepare(`
       UPDATE cases
-      SET titulo = ?, cliente = ?, video_url = ?, desafio = ?, entrega = ?, resultado = ?, status = ?, updated_at = CURRENT_TIMESTAMP
+      SET titulo = ?, cliente = ?, main_image_url = ?, video_url = ?, desafio = ?, entrega = ?, resultado = ?, status = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `).run(
       titulo,
       textValue(upload, 'cliente'),
+      nextMainImageUrl,
       nextVideoUrl,
       textValue(upload, 'desafio'),
       textValue(upload, 'entrega'),

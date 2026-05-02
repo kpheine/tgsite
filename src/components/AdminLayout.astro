@@ -50,6 +50,7 @@ const { title, username } = Astro.props;
       </div>
     </div>
     <script>
+      import '../scripts/admin-main-image-upload';
       import '../scripts/admin-image-upload';
       import '../scripts/admin-case-order';
       import '../scripts/admin-case-status-toggle';
@@ -163,6 +164,7 @@ const { title, username } = Astro.props;
   .admin-case-order-panel__header p { margin: 0; }
   .admin-case-list { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
   .admin-case-card {
+    background: rgba(255, 255, 255, 0.04);
     aspect-ratio: 1 / 1;
     border: 1px solid var(--admin-line);
     border-radius: 18px;
@@ -173,6 +175,7 @@ const { title, username } = Astro.props;
     min-height: 220px;
     overflow: hidden;
     padding: 16px;
+    position: relative;
     transition: border-color 160ms ease, opacity 160ms ease, transform 160ms ease;
   }
   .admin-case-card:hover { border-color: rgba(143, 168, 255, 0.48); }
@@ -252,6 +255,10 @@ const { title, username } = Astro.props;
     position: relative;
     transition: border-color 160ms ease, opacity 160ms ease, transform 160ms ease;
   }
+  .admin-case-card__thumb { inset: 0; position: absolute; z-index: 0; }
+  .admin-case-card__thumb img { display: block; height: 100%; object-fit: cover; object-position: center; width: 100%; }
+  .admin-case-card__thumb::after { background: linear-gradient(180deg, rgba(0, 0, 0, 0.64), rgba(0, 0, 0, 0.88)); content: ''; inset: 0; position: absolute; }
+  .admin-case-card__topline, .admin-case-card__content, .admin-case-card__footer { position: relative; z-index: 1; }
   .admin-case-image-card.is-featured { border-color: #f4d94e; box-shadow: 0 0 0 1px rgba(244, 217, 78, 0.35); }
   .admin-case-image-card.is-removing { border-color: rgba(255, 117, 117, 0.7); opacity: 0.72; }
   .admin-case-image-card.is-dragging { border-color: var(--admin-accent); cursor: grabbing; opacity: 0.55; }
@@ -290,6 +297,55 @@ const { title, username } = Astro.props;
   .admin-image-action--restore { border-color: rgba(167, 255, 131, 0.5); color: var(--admin-good); }
   .admin-drag-handle { color: var(--admin-accent); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
   .admin-file-input { height: 1px; opacity: 0; overflow: hidden; position: absolute; width: 1px; }
+  .admin-main-image-current, .admin-main-image-preview {
+    border: 1px solid var(--admin-line);
+    border-radius: 18px;
+    display: grid;
+    gap: 12px;
+    overflow: hidden;
+    padding: 12px;
+  }
+  .admin-main-image-frame { aspect-ratio: 16 / 10; border-radius: 12px; overflow: hidden; position: relative; }
+  .admin-main-image-current img, .admin-main-image-preview img { aspect-ratio: 16 / 10; border-radius: 12px; display: block; object-fit: cover; width: 100%; }
+  .admin-main-image-frame img { height: 100%; }
+  .admin-main-image-replace {
+    align-items: center;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.68));
+    border: 1px dashed rgba(255, 255, 255, 0.5);
+    border-radius: 12px;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    font: 800 15px/1.35 Inter, system-ui, sans-serif;
+    inset: 0;
+    justify-content: center;
+    letter-spacing: 0.04em;
+    padding: 24px;
+    position: absolute;
+    text-align: center;
+    text-transform: uppercase;
+  }
+  .admin-main-image-replace:hover, .admin-main-image-current.is-drag-over .admin-main-image-replace { background: rgba(0, 0, 0, 0.72); border-color: var(--admin-accent); }
+  .admin-main-image-revert {
+    background: rgba(255, 117, 117, 0.94);
+    border: 0;
+    border-radius: 999px;
+    color: #120303;
+    cursor: pointer;
+    font: 800 12px/1 Inter, system-ui, sans-serif;
+    padding: 10px 13px;
+    position: absolute;
+    right: 12px;
+    text-transform: uppercase;
+    top: 12px;
+    z-index: 2;
+  }
+  .admin-main-image-revert:hover { background: #ff9090; }
+  .admin-main-image-revert[hidden] { display: none; }
+  .admin-main-image-current p, .admin-main-image-preview p { margin: 0; }
+  .admin-main-image-preview[hidden] { display: none; }
+  .admin-main-image-selection { align-items: center; display: flex; flex-wrap: wrap; gap: 8px; }
+  .admin-main-image-selection[hidden] { display: none; }
   .admin-upload-zone {
     align-items: center;
     border: 1px dashed rgba(143, 168, 255, 0.5);

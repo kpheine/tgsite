@@ -15,6 +15,7 @@ export type UploadKind = 'image' | 'video';
 
 export type ParsedCaseUpload = {
   fields: Map<string, string[]>;
+  mainImageUrl: string | null;
   imageUrls: string[];
   videoUrl: string | null;
   uploadedUrls: string[];
@@ -96,6 +97,7 @@ export async function parseCaseUploadRequest(request: Request): Promise<ParsedCa
   if (!request.body) throw new Error('Envio inválido.');
 
   const fields = new Map<string, string[]>();
+  let mainImageUrl: string | null = null;
   const imageUrls: string[] = [];
   const uploadedUrls: string[] = [];
   let videoUrl: string | null = null;
@@ -120,7 +122,7 @@ export async function parseCaseUploadRequest(request: Request): Promise<ParsedCa
     }
 
     const kind: UploadKind = name === 'video' ? 'video' : 'image';
-    if (kind === 'image' && name !== 'images') {
+    if (kind === 'image' && name !== 'images' && name !== 'main_image') {
       stream.resume();
       return;
     }
@@ -136,6 +138,7 @@ export async function parseCaseUploadRequest(request: Request): Promise<ParsedCa
     const uploadPromise = saveUploadStream(stream, info.filename, info.mimeType, kind).then((url) => {
       uploadedUrls.push(url);
       if (kind === 'video') videoUrl = url;
+      else if (name === 'main_image') mainImageUrl = url;
       else imageUrls.push(url);
     });
 
@@ -151,7 +154,7 @@ export async function parseCaseUploadRequest(request: Request): Promise<ParsedCa
     throw error;
   }
 
-  return { fields, imageUrls, videoUrl, uploadedUrls };
+  return { fields, mainImageUrl, imageUrls, videoUrl, uploadedUrls };
 }
 
 export function fieldValue(upload: ParsedCaseUpload, name: string) {

@@ -30,6 +30,23 @@ if (!user) return Astro.redirect(adminUrl('login'));
         <span data-status-toggle-label>Rascunho</span>
       </button>
     </div>
+    <div class="admin-field" data-main-image-upload>
+      <label for="main_image">Imagem principal do case</label>
+      <div class="admin-upload-zone" data-main-image-zone>
+        <input class="admin-file-input" id="main_image" name="main_image" type="file" accept="image/*" required data-main-image-input />
+        <div>
+          <strong>Solte a imagem principal aqui</strong>
+          <p class="admin-muted">Obrigatória. Será usada como thumbnail do case fora da galeria.</p>
+        </div>
+        <button class="admin-button" type="button" data-main-image-button>Selecionar imagem</button>
+      </div>
+      <div class="admin-main-image-preview" data-main-image-preview hidden>
+        <p class="admin-muted">Imagem principal selecionada</p>
+        <img src="" alt="" data-main-image-preview-img />
+        <strong data-main-image-name></strong>
+        <span class="admin-muted" data-main-image-size></span>
+      </div>
+    </div>
     <div class="admin-field" data-video-upload>
       <label for="video">Vídeo do case</label>
       <div class="admin-video-upload" data-video-zone>

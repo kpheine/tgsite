@@ -32,6 +32,9 @@ const statusLabels = { draft: 'Rascunho', published: 'Publicado' };
     <div class="admin-case-list" data-case-order-list>
       {cases.map((item) => (
         <article class="admin-case-card" data-case-card data-case-id={item.id} draggable="true">
+          <div class="admin-case-card__thumb" aria-hidden="true">
+            <img src={item.main_image_url} alt="" draggable="false" />
+          </div>
           <div class="admin-case-card__topline">
             <span class="admin-drag-handle" aria-hidden="true">Arraste</span>
             <span class={`admin-status admin-status--${item.status}`}>{statusLabels[item.status]}</span>

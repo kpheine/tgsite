@@ -36,6 +36,27 @@ const images = db.prepare('SELECT * FROM imagens_case WHERE case_id = ? ORDER BY
         <span data-status-toggle-label>{item.status === 'published' ? 'Publicado' : 'Rascunho'}</span>
       </button>
     </div>
+    <div class="admin-field" data-main-image-upload>
+      <label for="main_image">Imagem principal do case</label>
+      <div class="admin-main-image-current admin-main-image-current--replace" data-main-image-zone>
+        <p class="admin-muted">Imagem principal atual</p>
+        <div class="admin-main-image-frame">
+          <img src={item.main_image_url} alt="" data-main-image-current-img />
+          <button class="admin-main-image-replace" type="button" data-main-image-button>
+            Clique aqui ou arraste uma imagem para substituir
+          </button>
+          <button class="admin-main-image-revert" type="button" data-main-image-revert hidden>
+            Reverter troca
+          </button>
+        </div>
+        <input class="admin-file-input" id="main_image" name="main_image" type="file" accept="image/*" data-main-image-input />
+      </div>
+      <div class="admin-main-image-selection" data-main-image-preview hidden>
+        <strong data-main-image-name></strong>
+        <span class="admin-muted" data-main-image-size></span>
+      </div>
+      <p class="admin-muted">A substituição só será aplicada ao salvar alterações.</p>
+    </div>
     <div class="admin-field" data-video-upload>
       <label for="video">Vídeo do case</label>
       {item.video_url && (

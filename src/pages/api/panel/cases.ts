@@ -39,13 +39,19 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     return new Response('O título é obrigatório', { status: 400 });
   }
 
+  if (!upload.mainImageUrl) {
+    cleanupUploadedFiles(upload.uploadedUrls);
+    return new Response('A imagem principal é obrigatória', { status: 400 });
+  }
+
   try {
     const result = db.prepare(`
-      INSERT INTO cases (titulo, cliente, video_url, desafio, entrega, resultado, status, sort_order)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO cases (titulo, cliente, main_image_url, video_url, desafio, entrega, resultado, status, sort_order)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       titulo,
       textValue(upload, 'cliente'),
+      upload.mainImageUrl,
       upload.videoUrl,
       textValue(upload, 'desafio'),
       textValue(upload, 'entrega'),
