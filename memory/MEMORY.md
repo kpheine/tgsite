@@ -164,9 +164,16 @@ astro.config.mjs         — output: server, adapter: @astrojs/node (standalone)
 - **PremiosSection collage image** (`src/components/PremiosSection.astro`) — size/layout not quite right, needs further adjustment. Currently uses `5fr 7fr` grid with right bleed.
 - **Blob unification** — decorative blob images exist across multiple sections (home + `/sobre` stats). Needs audit and consolidation into a shared set. **Do not act on this until user explicitly asks.**
 
-## Pending Setup (next session)
+## Chrome DevTools MCP (active)
 
-- **Chrome DevTools MCP** — gives Claude visual + structural self-feedback on localhost (screenshots, computed CSS, element dims, console errors). Details in `./memory/browser-feedback.md`.
+Configured via `claude mcp add chrome-devtools --scope user -- npx -y chrome-devtools-mcp@latest`. Available as `mcp__chrome-devtools__*` tools. Enables:
+- Screenshots of localhost pages (self-serve, no user needed)
+- Computed CSS inspection (real applied values after cascade)
+- Element dimension checks
+- Console error / 404 detection
+- Page navigation between routes
+
+**Workflow:** implement → screenshot → inspect → fix → show result. Reduces visual back-and-forth with user.
 
 ## Roadmap
 
