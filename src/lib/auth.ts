@@ -4,7 +4,7 @@ import { db } from './db';
 import { getEnv } from './env';
 
 const SESSION_COOKIE = 'tg_admin_session';
-const SESSION_DAYS = 7;
+const SESSION_IDLE_MINUTES = 30;
 
 interface UserRecord {
   id: number;
@@ -37,6 +37,10 @@ function sqliteDateTime(date: Date) {
   return date.toISOString().slice(0, 19).replace('T', ' ');
 }
 
+function sessionExpiresAt() {
+  return sqliteDateTime(new Date(Date.now() + SESSION_IDLE_MINUTES * 60 * 1000));
+}
+
 export function login(username: string, password: string) {
   const cleanUsername = username.trim().toLowerCase();
   const user = db.prepare('SELECT * FROM users WHERE username = ?').get(cleanUsername) as UserRecord | undefined;
@@ -46,7 +50,7 @@ export function login(username: string, password: string) {
 
   const token = randomBytes(32).toString('hex');
   const tokenHash = hashToken(token);
-  const expiresAt = sqliteDateTime(new Date(Date.now() + SESSION_DAYS * 24 * 60 * 60 * 1000));
+  const expiresAt = sessionExpiresAt();
 
   db.prepare('INSERT INTO sessions (token_hash, user_id, expires_at) VALUES (?, ?, ?)').run(tokenHash, user.id, expiresAt);
   db.prepare('UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE id = ?').run(user.id);
@@ -76,6 +80,8 @@ export function getCurrentUser(cookies: any) {
   const token = cookies.get(SESSION_COOKIE)?.value;
   if (!token) return null;
 
+  const tokenHash = hashToken(token);
+
   const user = db.prepare(`
     SELECT users.id, users.username, users.role
     FROM sessions
@@ -84,7 +90,13 @@ export function getCurrentUser(cookies: any) {
       AND sessions.expires_at > CURRENT_TIMESTAMP
       AND users.support_enabled = 1
       AND (users.support_expires_at IS NULL OR users.support_expires_at > CURRENT_TIMESTAMP)
-  `).get(hashToken(token)) as Pick<UserRecord, 'id' | 'username' | 'role'> | undefined;
+  `).get(tokenHash) as Pick<UserRecord, 'id' | 'username' | 'role'> | undefined;
+
+  if (user) {
+    const expiresAt = sessionExpiresAt();
+    db.prepare('UPDATE sessions SET expires_at = ? WHERE token_hash = ?').run(expiresAt, tokenHash);
+    setSessionCookie(cookies, token, expiresAt);
+  }
 
   return user || null;
 }
