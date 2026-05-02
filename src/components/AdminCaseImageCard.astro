@@ -36,18 +36,11 @@ const articleAttrs = isExisting
     </>
   )}
 
-  <span class="admin-drag-handle" aria-hidden="true">Arraste para ordenar</span>
-
   {isExisting ? (
     <img src={url} alt="" draggable="false" />
   ) : (
     <img src="" alt="" draggable="false" data-upload-preview />
   )}
-
-  <div class="admin-case-image-card__meta" hidden={isExisting}>
-    <strong data-upload-name></strong>
-    <span class="admin-muted" data-upload-size></span>
-  </div>
 
   <div class="admin-case-image-card__actions">
     <button

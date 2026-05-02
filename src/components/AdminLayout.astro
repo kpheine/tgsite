@@ -292,9 +292,7 @@ const { title, username } = Astro.props;
     z-index: 1;
   }
   .admin-case-image-card.is-removing .admin-case-image-card__banner { background: rgba(255, 117, 117, 0.96); }
-  .admin-case-image-card__meta { display: grid; gap: 5px; min-width: 0; }
-  .admin-case-image-card__meta strong { color: #fff; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .admin-case-image-card__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .admin-case-image-card__actions { display: grid; gap: 8px; }
   .admin-image-action {
     border: 1px solid var(--admin-line);
     border-radius: 999px;
@@ -304,11 +302,11 @@ const { title, username } = Astro.props;
     font: 800 12px/1 Inter, system-ui, sans-serif;
     padding: 9px 12px;
     text-transform: uppercase;
+    width: 100%;
   }
   .admin-image-action--feature.is-active { border-color: #f4d94e; color: #f4d94e; }
   .admin-image-action--remove { border-color: rgba(255, 117, 117, 0.5); color: var(--admin-danger); }
   .admin-image-action--restore { border-color: rgba(167, 255, 131, 0.5); color: var(--admin-good); }
-  .admin-drag-handle { color: var(--admin-accent); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
   .admin-file-input { height: 1px; opacity: 0; overflow: hidden; position: absolute; width: 1px; }
   .admin-main-image-current, .admin-main-image-preview {
     border: 1px solid var(--admin-line);

@@ -7,11 +7,6 @@ type PendingUpload = {
 
 const imageInputFiles = new WeakMap<HTMLInputElement, PendingUpload[]>();
 
-function formatFileSize(bytes: number) {
-  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
-  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
-}
-
 function syncFileInput(input: HTMLInputElement, uploads: PendingUpload[]) {
   const transfer = new DataTransfer();
   for (const upload of uploads) transfer.items.add(upload.file);
@@ -64,11 +59,6 @@ function createUploadCard(template: HTMLTemplateElement, upload: PendingUpload) 
 
   image.src = upload.previewUrl;
   image.alt = '';
-
-  const name = card.querySelector<HTMLElement>('[data-upload-name]');
-  const size = card.querySelector<HTMLElement>('[data-upload-size]');
-  if (name) name.textContent = upload.file.name;
-  if (size) size.textContent = formatFileSize(upload.file.size);
 
   const removeButton = card.querySelector<HTMLButtonElement>('[data-remove-upload]');
   if (removeButton) removeButton.dataset.removeUpload = upload.id;
