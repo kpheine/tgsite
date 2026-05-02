@@ -1,0 +1,74 @@
+---
+---
+
+<section class="wpi-video">
+  <h2 class="wpi-video__heading">
+    <span class="wpi-video__heading--gradient">Aqui tem </span><span class="wpi-video__heading--white">alcance.</span>
+  </h2>
+
+  <p class="wpi-video__subtitle">
+    Aqui tem o mundo trabalhando a favor do seu projeto.
+  </p>
+
+  <div class="wpi-video__player">
+    <span class="wpi-video__label">Vídeo WPI</span>
+  </div>
+</section>
+
+<style>
+  .wpi-video {
+    background: #0d0d0d;
+    width: 100%;
+    padding: 100px 165px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+  }
+
+  .wpi-video__heading {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 6.11vw, 5.5rem);
+    line-height: 1;
+    text-align: center;
+    margin: 0;
+  }
+
+  .wpi-video__heading--gradient {
+    background: linear-gradient(90deg, #781e87 0%, #781e87 20%, #bf1b91 33.65%, #f28900 51.44%, #f3a400 89%, #f5bf00 93%, #f6d000 97%, #f7d600 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .wpi-video__heading--white {
+    color: #fff;
+  }
+
+  .wpi-video__subtitle {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: clamp(1rem, 2.22vw, 2rem);
+    color: #fff;
+    text-align: center;
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .wpi-video__player {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #979797;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .wpi-video__label {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(2rem, 5.71vw, 5.14rem);
+    color: #fff;
+    text-align: center;
+  }
+</style>
