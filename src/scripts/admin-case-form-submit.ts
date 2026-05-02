@@ -74,6 +74,7 @@ function submitCaseForm(form: HTMLFormElement) {
 
   const request = new XMLHttpRequest();
   activeRequest = request;
+  form.dispatchEvent(new CustomEvent('case-form-save-start'));
   setFormDisabled(form, true);
   showModal();
 
@@ -96,21 +97,25 @@ function submitCaseForm(form: HTMLFormElement) {
     setProgress(100);
 
     if (request.status >= 200 && request.status < 400) {
+      form.dispatchEvent(new CustomEvent('case-form-save-success'));
       setModalCopy('Processando alterações...', 'Salvando o case no painel.');
       redirectAfterSuccess(request, form);
       return;
     }
 
+    form.dispatchEvent(new CustomEvent('case-form-save-error'));
     setFormDisabled(form, false);
     showError(getFailureMessage(request));
   });
 
   request.addEventListener('error', () => {
+    form.dispatchEvent(new CustomEvent('case-form-save-error'));
     setFormDisabled(form, false);
     showError('Verifique sua conexão e tente novamente.');
   });
 
   request.addEventListener('abort', () => {
+    form.dispatchEvent(new CustomEvent('case-form-save-error'));
     setFormDisabled(form, false);
     showError('O envio foi interrompido. Tente salvar novamente.');
   });
