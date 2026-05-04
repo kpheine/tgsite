@@ -65,38 +65,6 @@ function columnExists(table: string, column: string) {
   return db.prepare(`PRAGMA table_info(${table})`).all().some((item: any) => item.name === column);
 }
 
-if (!columnExists('cases', 'main_image_url')) {
-  db.exec(`
-    DROP TABLE IF EXISTS imagens_case;
-    DROP TABLE IF EXISTS cases;
-
-    CREATE TABLE cases (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      titulo TEXT NOT NULL,
-      cliente TEXT,
-      main_image_url TEXT NOT NULL,
-      video_url TEXT,
-      desafio TEXT,
-      entrega TEXT,
-      resultado TEXT,
-      status TEXT NOT NULL DEFAULT 'draft',
-      sort_order INTEGER NOT NULL DEFAULT 0,
-      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE imagens_case (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      case_id INTEGER NOT NULL,
-      sort_order INTEGER NOT NULL DEFAULT 0,
-      url TEXT NOT NULL,
-      destaque INTEGER NOT NULL DEFAULT 0,
-      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (case_id) REFERENCES cases(id) ON DELETE CASCADE
-    );
-  `);
-}
-
 if (!columnExists('users', 'username')) {
   db.prepare('ALTER TABLE users ADD COLUMN username TEXT').run();
   db.prepare('UPDATE users SET username = lower(email) WHERE username IS NULL').run();

@@ -58,6 +58,7 @@
 ## Sections Built (Phase 1 complete)
 
 All in `src/components/`:
+
 1. `Header.astro` — sticky, gradient nav, Contato pill, WhatsApp
 2. `HeroSection.astro` — full-bleed dark photo, gradient headline image, social + address
 3. `CasesSection.astro` + `CasesCarousel.astro` + `CaseModal.astro` — pixel gradient bg, "CASES" title (centered), vertically centered section content, height-driven desktop card sizing, fixed-height carousel viewport, aligned vertical cards carousel with three case-stable gradient variants for borders/title bars, distance-based depth sizing around a larger focused center card using transform scaling on stable flex slots plus visual side-card push for active-card breathing room without oversized gaps between non-active cards, animated card grow/shrink during slide, repeated card sets with at least 11 rendered cards for infinite looping without visible image swaps even when there are few published cases, preloaded images, auto-rotation, manual arrow controls, responsive sizing, and one shared case modal in `CaseModal.astro` that swaps case content in place instead of closing/opening between cases; cards come from published SQLite cases via `/api/cases` using each case `main_image_url`, with a local placeholder card fallback when no published case is available.
@@ -65,13 +66,14 @@ All in `src/components/`:
 5. `DiferenciaisSection.astro` — white bg, event collage left, title + 2×2 gradient cards right
 6. `ClientesSection.astro` — dark, gradient title, 24 logos in 8×3 grid
 7. `DepoimentosSection.astro` — dark, gradient title, 3-card carousel with JS sliding
-8. `PremiosSection.astro` — dark, 2-col: text+award logos left, collage right *(layout needs revisit)*
+8. `PremiosSection.astro` — dark, 2-col: text+award logos left, collage right _(layout needs revisit)_
 9. `WpiSection.astro` — dark, earth card + WPI/TG logos, tagline, 4 feature blobs
 10. `ContatoFooter.astro` — dark, title + CTA, gradient blob (screen blend), hr divider, Google Maps embed, footer
 
 ## /wpi Page (complete)
 
 All in `src/components/` and `src/pages/wpi.astro`:
+
 1. Hero — full-bleed earth photo (`wpi_hero_bg.jpg`), WPI+TG logos, Bebas Neue heading
 2. `WpiPraticaSection.astro` — dark, "O que isso significa na prática?", 4 feature blobs with composite SVG icons, body text, Bebas Neue quote
 3. `WpiConexaoSection.astro` — dark, Bebas Neue gradient headline, 2-col: stats (stacked) + body left / animated world map SVG right
@@ -80,6 +82,7 @@ All in `src/components/` and `src/pages/wpi.astro`:
 ## /sobre Page (in progress)
 
 All in `src/components/` and `src/pages/sobre.astro`:
+
 1. `sobre.astro` — page shell: Header + sections + ContatoFooter
 2. Hero — full-bleed event photo (`sobre_hero.jpg`), Bebas Neue heading overlay
 3. `SobreStatsSection.astro` — dark, Bebas Neue heading, "Já foram mais de", 4-col stats with gradient blobs + dividers, tagline
@@ -106,6 +109,7 @@ All in `src/components/` and `src/pages/sobre.astro`:
 ## Figma Multi-Layer Icon Compositing
 
 When a Figma icon is split into N SVG layers (each at absolute canvas coordinates):
+
 1. Identify the parent node's canvas bounding box from its `inset` values
 2. Compute each layer's position relative to the parent using canvas pixel math (canvas ≈ 1440px wide, ~4300–4500px tall)
 3. Build a single composite SVG using nested `<svg x y width height viewBox>` elements — each layer's natural size in parent units = its viewBox dimensions
@@ -117,6 +121,7 @@ When a Figma icon is split into N SVG layers (each at absolute canvas coordinate
 SVGs loaded via `<img src="...">` **do** run internal CSS animations (keyframes in `<style>` block inside the SVG).
 
 **Staggered arc animation pattern:**
+
 1. Wrap target elements in `<g id="connections">`
 2. Add `<style>` with `@keyframes` + `#connections path { animation: ... }`
 3. Use CSS `:nth-child` rules for per-arc delays
@@ -145,6 +150,7 @@ background: linear-gradient(to right, #colorA, #colorB);
 -webkit-text-fill-color: transparent;
 background-clip: text;
 ```
+
 - Works for partial gradient (e.g. first two words gradient, rest white): wrap each part in a `<span>`
 - Preserve exact gradient angle and stop percentages verbatim from Figma output
 
@@ -184,7 +190,7 @@ docker-compose.yml       — port 4321, data/uploads volumes, reads .env
 astro.config.mjs         — output: server, adapter: @astrojs/node (standalone)
 ```
 
-- Case uploads use UUID v4 filenames. Main thumbnail images, gallery images, and videos are hard-linked to cases for simplicity: deleting a case deletes its media DB rows and local files from `./uploads/`. Admin case create/edit/delete DB mutations run inside SQLite transactions; old/replaced media files are deleted only after the DB transaction succeeds, while newly uploaded files are cleaned up if the DB write fails. Admin case upload endpoints parse multipart requests with `busboy` so large videos stream directly to disk instead of buffering the full file in memory. During alpha, if an existing SQLite database is missing `cases.main_image_url`, the app destructively recreates the case tables instead of preserving old case records.
+- Case uploads use UUID v4 filenames. Main thumbnail images, gallery images, and videos are hard-linked to cases for simplicity: deleting a case deletes its media DB rows and local files from `./uploads/`. Admin case create/edit/delete DB mutations run inside SQLite transactions; old/replaced media files are deleted only after the DB transaction succeeds, while newly uploaded files are cleaned up if the DB write fails. Admin case upload endpoints parse multipart requests with `busboy` so large videos stream directly to disk instead of buffering the full file in memory.
 
 - Public case API/components share the case response shape through `src/lib/public-cases.ts` (`PublicCase`, `PublicCaseImage`) to keep `/api/cases`, `CasesSection`, `CasesCarousel`, and `CaseModal` aligned.
 
@@ -202,6 +208,7 @@ astro.config.mjs         — output: server, adapter: @astrojs/node (standalone)
 ## Chrome DevTools MCP (active)
 
 Configured via `claude mcp add chrome-devtools --scope user -- npx -y chrome-devtools-mcp@latest`. Available as `mcp__chrome-devtools__*` tools. Enables:
+
 - Screenshots of localhost pages (self-serve, no user needed)
 - Computed CSS inspection (real applied values after cascade)
 - Element dimension checks
@@ -213,6 +220,7 @@ Configured via `claude mcp add chrome-devtools --scope user -- npx -y chrome-dev
 ## Roadmap
 
 Full phased plan in `./memory/ROADMAP.md`. Phases:
+
 1. UI blocks from Figma (one at a time, always ask for link)
 2. Local SQLite content storage
 3. Admin panel (SSR, CRUD, image/video upload)
