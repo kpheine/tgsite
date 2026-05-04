@@ -1,0 +1,278 @@
+---
+import Modal from './Modal.astro';
+---
+
+<Modal id="contact-modal" ariaLabel="Contato" className="contact-modal">
+  <div class="contact-modal__content">
+    <section class="contact-modal__form-area" aria-labelledby="contact-modal-title">
+      <h2 id="contact-modal-title" class="contact-modal__title">Fale com a gente.</h2>
+
+      <form class="contact-modal__form">
+        <div class="contact-modal__row">
+          <label class="contact-modal__field">
+            <span class="sr-only">Nome</span>
+            <input type="text" name="nome" placeholder="Nome" autocomplete="given-name" />
+          </label>
+
+          <label class="contact-modal__field">
+            <span class="sr-only">Sobrenome</span>
+            <input type="text" name="sobrenome" placeholder="Sobrenome" autocomplete="family-name" />
+          </label>
+        </div>
+
+        <label class="contact-modal__field">
+          <span class="sr-only">Email</span>
+          <input type="email" name="email" placeholder="Email" autocomplete="email" />
+        </label>
+
+        <label class="contact-modal__field">
+          <span class="sr-only">Telefone</span>
+          <input type="tel" name="telefone" placeholder="Telefone" autocomplete="tel" />
+        </label>
+
+        <label class="contact-modal__field">
+          <span class="sr-only">Mensagem</span>
+          <textarea name="mensagem" placeholder="Mensagem" rows="4"></textarea>
+        </label>
+
+        <div class="contact-modal__actions">
+          <button class="contact-modal__submit" type="button">Enviar</button>
+          <a href="https://wa.me/" class="contact-modal__whatsapp" target="_blank" rel="noopener noreferrer" aria-label="Falar pelo WhatsApp">
+            <img src="/images/whatsapp.svg" alt="" aria-hidden="true" />
+          </a>
+        </div>
+      </form>
+    </section>
+
+    <div class="contact-modal__brand" aria-hidden="true">
+      <img src="/images/tg-logo.png" alt="" />
+    </div>
+  </div>
+</Modal>
+
+<style>
+  :global(.contact-modal) {
+    width: min(858px, calc(100vw - 2rem));
+    border-radius: 16px;
+  }
+
+  :global(.contact-modal .modal__panel) {
+    overflow: hidden;
+    border: 1px solid rgba(80, 36, 100, 0.36);
+    background:
+      radial-gradient(circle at 4% 5%, rgba(105, 42, 148, 0.16), transparent 33%),
+      linear-gradient(110deg, #1b1624 0%, #08090c 51%, #101018 100%);
+    box-shadow: 0 26px 80px rgba(0, 0, 0, 0.72);
+    padding: 48px 49px 46px;
+  }
+
+  :global(.contact-modal .modal__close) {
+    top: 15px;
+    right: 14px;
+    width: 18px;
+    height: 18px;
+    color: #f4f4f7;
+    font-size: 30px;
+    line-height: 18px;
+  }
+
+  .contact-modal__content {
+    display: grid;
+    grid-template-columns: minmax(0, 375px) minmax(260px, 1fr);
+    align-items: center;
+    gap: 32px;
+    min-height: 374px;
+  }
+
+  .contact-modal__title {
+    color: #f5f3f7;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3.25rem, 5vw, 4.25rem);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 0.98;
+    margin: 0 0 38px;
+    text-transform: uppercase;
+  }
+
+  .contact-modal__form {
+    display: grid;
+    gap: 9px;
+  }
+
+  .contact-modal__row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .contact-modal__field {
+    display: block;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  .contact-modal__field input,
+  .contact-modal__field textarea {
+    width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.17);
+    border-radius: 4px;
+    background: linear-gradient(135deg, rgba(33, 28, 40, 0.9), rgba(22, 23, 28, 0.88));
+    color: #f3f3f6;
+    font: 400 12px/1.2 'Inter', system-ui, sans-serif;
+    outline: none;
+    padding: 0 11px;
+    transition: border-color 160ms ease, box-shadow 160ms ease;
+  }
+
+  .contact-modal__field input {
+    height: 34px;
+  }
+
+  .contact-modal__field textarea {
+    height: 86px;
+    padding-top: 11px;
+    resize: none;
+  }
+
+  .contact-modal__field input::placeholder,
+  .contact-modal__field textarea::placeholder {
+    color: rgba(231, 231, 238, 0.62);
+  }
+
+  .contact-modal__field input:focus,
+  .contact-modal__field textarea:focus {
+    border-color: rgba(98, 229, 255, 0.72);
+    box-shadow: 0 0 0 2px rgba(98, 229, 255, 0.12);
+  }
+
+  .contact-modal__actions {
+    display: grid;
+    grid-template-columns: minmax(0, 291px) 49px;
+    align-items: center;
+    gap: 37px;
+    margin-top: 1px;
+  }
+
+  .contact-modal__submit {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 47px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+    font: 800 18px/1 'Inter', system-ui, sans-serif;
+    overflow: hidden;
+    text-transform: uppercase;
+    transition: filter 160ms ease, transform 160ms ease;
+  }
+
+  .contact-modal__submit::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 2px;
+    background: linear-gradient(100deg, #3157d6 0%, #23d6ec 49%, #ec148f 100%);
+    pointer-events: none;
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+  }
+
+  .contact-modal__submit:hover,
+  .contact-modal__whatsapp:hover {
+    filter: brightness(1.25);
+  }
+
+  .contact-modal__whatsapp {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 49px;
+    height: 49px;
+    transition: filter 160ms ease, transform 160ms ease;
+  }
+
+  .contact-modal__whatsapp img {
+    width: 49px;
+    height: 49px;
+    object-fit: contain;
+  }
+
+  .contact-modal__brand {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 248px;
+  }
+
+  .contact-modal__brand img {
+    display: block;
+    width: min(344px, 100%);
+    height: auto;
+    filter: saturate(1.18) contrast(1.06);
+  }
+
+  @media (max-width: 760px) {
+    :global(.contact-modal .modal__panel) {
+      min-height: 100dvh;
+      padding: 58px 24px 34px;
+    }
+
+    .contact-modal__content {
+      grid-template-columns: 1fr;
+      gap: 32px;
+      min-height: 0;
+    }
+
+    .contact-modal__title {
+      margin-bottom: 28px;
+    }
+
+    .contact-modal__actions {
+      grid-template-columns: minmax(0, 1fr) 49px;
+      gap: 18px;
+    }
+
+    .contact-modal__brand {
+      min-height: 180px;
+      order: -1;
+    }
+
+    .contact-modal__brand img {
+      width: min(190px, 72vw);
+    }
+  }
+
+  @media (max-width: 460px) {
+    .contact-modal__row {
+      grid-template-columns: 1fr;
+    }
+
+    .contact-modal__actions {
+      grid-template-columns: 1fr;
+    }
+
+    .contact-modal__whatsapp {
+      justify-self: center;
+    }
+  }
+</style>
