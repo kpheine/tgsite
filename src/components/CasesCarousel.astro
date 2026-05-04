@@ -23,7 +23,9 @@ const { cards } = Astro.props;
 const minimumRenderedCards = 11;
 const minimumSetCount = cards.length > 0 ? Math.ceil(minimumRenderedCards / cards.length) : 0;
 const repeatedSetCount = Math.max(5, minimumSetCount) + (Math.max(5, minimumSetCount) % 2 === 0 ? 1 : 0);
-const cardSets = Array.from({ length: repeatedSetCount }, () => cards).flat();
+const cardSets = Array.from({ length: repeatedSetCount }, () =>
+  cards.map((card, cardIndex) => ({ card, gradientIndex: cardIndex % 3 }))
+).flat();
 
 ---
 
@@ -31,12 +33,13 @@ const cardSets = Array.from({ length: repeatedSetCount }, () => cards).flat();
   <div class="cases-carousel" data-cases-carousel data-cases-items={JSON.stringify(cards)}>
     <div class="cases-carousel__viewport">
       <div class="cases-carousel__track" data-cases-track>
-        {cardSets.map((card, index) => (
+        {cardSets.map(({ card, gradientIndex }, index) => (
           <button
             class="case-card"
             type="button"
             data-case-card
             data-card-index={index}
+            data-gradient-index={gradientIndex}
             data-modal-open="case-modal"
             data-case-modal-id={card.id}
             aria-label={`Abrir case ${card.title}`}
@@ -107,6 +110,15 @@ const cardSets = Array.from({ length: repeatedSetCount }, () => cards).flat();
     border-radius: 8px;
     overflow: hidden;
     background: #111;
+    --case-border-gradient: linear-gradient(137deg, #35e9ff 0%, #ee29ff 48%, #fff200 100%);
+    --case-title-gradient: linear-gradient(
+      94deg,
+      rgba(31, 220, 255, 0.78) 0%,
+      rgba(188, 22, 163, 0.76) 47%,
+      rgba(255, 216, 0, 0.82) 100%
+    );
+    --case-glow-primary: rgba(53, 233, 255, 0.32);
+    --case-glow-secondary: rgba(238, 41, 255, 0.4);
     box-shadow: 0 28px 60px rgba(0, 0, 0, 0.45);
     color: inherit;
     cursor: pointer;
@@ -123,7 +135,31 @@ const cardSets = Array.from({ length: repeatedSetCount }, () => cards).flat();
   }
 
   .case-card:hover {
-    box-shadow: 0 36px 82px rgba(0, 0, 0, 0.58), 0 0 54px rgba(97, 244, 232, 0.28), 0 0 78px rgba(238, 41, 255, 0.18);
+    box-shadow: 0 36px 82px rgba(0, 0, 0, 0.58), 0 0 54px var(--case-glow-primary), 0 0 78px var(--case-glow-secondary);
+  }
+
+  .case-card[data-gradient-index='1'] {
+    --case-border-gradient: linear-gradient(137deg, #fff200 0%, #bc16a3 54%, #ff6b00 100%);
+    --case-title-gradient: linear-gradient(
+      94deg,
+      rgba(255, 231, 0, 0.84) 0%,
+      rgba(174, 20, 149, 0.78) 55%,
+      rgba(255, 107, 0, 0.84) 100%
+    );
+    --case-glow-primary: rgba(255, 231, 0, 0.28);
+    --case-glow-secondary: rgba(255, 107, 0, 0.26);
+  }
+
+  .case-card[data-gradient-index='2'] {
+    --case-border-gradient: linear-gradient(137deg, #fff200 0%, #ff8a00 48%, #ee29ff 100%);
+    --case-title-gradient: linear-gradient(
+      94deg,
+      rgba(94, 32, 128, 0.72) 0%,
+      rgba(210, 26, 162, 0.76) 45%,
+      rgba(255, 216, 0, 0.86) 100%
+    );
+    --case-glow-primary: rgba(255, 216, 0, 0.28);
+    --case-glow-secondary: rgba(238, 41, 255, 0.3);
   }
 
   .case-card:focus-visible {
@@ -143,7 +179,7 @@ const cardSets = Array.from({ length: repeatedSetCount }, () => cards).flat();
     z-index: 2;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(137deg, #35e9ff 0%, #ee29ff 48%, #fff200 100%);
+    background: var(--case-border-gradient);
     pointer-events: none;
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
@@ -152,7 +188,7 @@ const cardSets = Array.from({ length: repeatedSetCount }, () => cards).flat();
   }
 
   .case-card:hover::before {
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28), 0 0 34px rgba(53, 233, 255, 0.32), 0 0 42px rgba(238, 41, 255, 0.4);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28), 0 0 34px var(--case-glow-primary), 0 0 42px var(--case-glow-secondary);
   }
 
   .case-card:not(.is-active) {
@@ -189,12 +225,7 @@ const cardSets = Array.from({ length: repeatedSetCount }, () => cards).flat();
     align-items: center;
     justify-content: center;
     padding: 0.65rem 1rem 0.55rem;
-    background: linear-gradient(
-      94deg,
-      rgba(31, 220, 255, 0.78) 0%,
-      rgba(188, 22, 163, 0.76) 47%,
-      rgba(255, 216, 0, 0.82) 100%
-    );
+    background: var(--case-title-gradient);
     box-shadow: 0 -24px 40px rgba(0, 0, 0, 0.2);
     user-select: none;
     -webkit-user-select: none;
