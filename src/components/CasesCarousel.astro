@@ -334,7 +334,11 @@ const cardSets = Array.from({ length: repeatedSetCount }, () =>
     const nextButton = root.querySelector<HTMLButtonElement>('[data-cases-next]');
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-    type CarouselSourceCase = Pick<PublicCase, 'title' | 'image' | 'alt'>;
+    type CarouselSourceCase = {
+      title: string;
+      image: string;
+      alt: string;
+    };
 
     const sourceCards = JSON.parse(root.dataset.casesItems ?? '[]') as CarouselSourceCase[];
 
