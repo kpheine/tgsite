@@ -1,21 +1,9 @@
 ---
 import CaseModal from './CaseModal.astro';
-
-type CaseCard = {
-  id: number;
-  title: string;
-  client: string | null;
-  image: string;
-  video: string | null;
-  alt: string;
-  desafio: string | null;
-  entrega: string | null;
-  resultado: string | null;
-  images: { url: string; destaque: boolean }[];
-};
+import type { PublicCase } from '../lib/public-cases';
 
 type Props = {
-  cards: CaseCard[];
+  cards: PublicCase[];
 };
 
 const { cards } = Astro.props;
@@ -346,13 +334,9 @@ const cardSets = Array.from({ length: repeatedSetCount }, () =>
     const nextButton = root.querySelector<HTMLButtonElement>('[data-cases-next]');
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-    type CaseCard = {
-      title: string;
-      image: string;
-      alt: string;
-    };
+    type CarouselSourceCase = Pick<PublicCase, 'title' | 'image' | 'alt'>;
 
-    const sourceCards = JSON.parse(root.dataset.casesItems ?? '[]') as CaseCard[];
+    const sourceCards = JSON.parse(root.dataset.casesItems ?? '[]') as CarouselSourceCase[];
 
     if (!track || !prevButton || !nextButton || slots.length === 0 || sourceCards.length === 0) return;
 

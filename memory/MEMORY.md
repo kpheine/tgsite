@@ -186,6 +186,8 @@ astro.config.mjs         — output: server, adapter: @astrojs/node (standalone)
 
 - Case uploads use UUID v4 filenames. Main thumbnail images, gallery images, and videos are hard-linked to cases for simplicity: deleting a case deletes its media DB rows and local files from `./uploads/`. Admin case upload endpoints parse multipart requests with `busboy` so large videos stream directly to disk instead of buffering the full file in memory. During alpha, if an existing SQLite database is missing `cases.main_image_url`, the app destructively recreates the case tables instead of preserving old case records.
 
+- Public case API/components share the case response shape through `src/lib/public-cases.ts` (`PublicCase`, `PublicCaseImage`) to keep `/api/cases`, `CasesSection`, `CasesCarousel`, and `CaseModal` aligned.
+
 - `npm run dev` → dev server at localhost:4321
 - `npm run check` → Astro TypeScript/template validation (`@astrojs/check`)
 - `npm run build` → production build verification

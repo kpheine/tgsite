@@ -1,21 +1,9 @@
 ---
 import Modal from './Modal.astro';
-
-type CaseCard = {
-  id: number;
-  title: string;
-  client: string | null;
-  image: string;
-  video: string | null;
-  alt: string;
-  desafio: string | null;
-  entrega: string | null;
-  resultado: string | null;
-  images: { url: string; destaque: boolean }[];
-};
+import type { PublicCase } from '../lib/public-cases';
 
 type Props = {
-  cards: CaseCard[];
+  cards: PublicCase[];
 };
 
 const { cards } = Astro.props;
@@ -23,13 +11,13 @@ const modalId = 'case-modal';
 const defaultCard = cards[0];
 
 const getAdjacentCase = (index: number, direction: -1 | 1) => cards[(index + direction + cards.length) % cards.length];
-const getDetailCards = (card: CaseCard) => [
+const getDetailCards = (card: PublicCase) => [
   { title: 'Desafio', text: card.desafio?.trim(), variant: 'challenge' },
   { title: 'Entrega', text: card.entrega?.trim(), variant: 'delivery' },
   { title: 'Resultado', text: card.resultado?.trim(), variant: 'result' },
 ].filter((item): item is { title: string; text: string; variant: string } => Boolean(item.text));
 
-const getRelatedCases = (card: CaseCard) => cards
+const getRelatedCases = (card: PublicCase) => cards
   .filter((item) => item.id !== card.id)
   .map((item) => ({ item, sort: Math.random() }))
   .sort((a, b) => a.sort - b.sort)

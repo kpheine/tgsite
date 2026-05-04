@@ -1,23 +1,6 @@
 import type { APIRoute } from 'astro';
 import { db, type CaseImageRecord, type CaseRecord } from '../../lib/db';
-
-type PublicCaseImage = {
-  url: string;
-  destaque: boolean;
-};
-
-type PublicCase = {
-  id: number;
-  title: string;
-  client: string | null;
-  image: string;
-  video: string | null;
-  alt: string;
-  desafio: string | null;
-  entrega: string | null;
-  resultado: string | null;
-  images: PublicCaseImage[];
-};
+import type { PublicCase } from '../../lib/public-cases';
 
 export const GET: APIRoute = () => {
   const cases = db.prepare(`
