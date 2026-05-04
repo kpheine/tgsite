@@ -1,0 +1,653 @@
+---
+import Modal from './Modal.astro';
+
+type CaseCard = {
+  id: number;
+  title: string;
+  client: string | null;
+  image: string;
+  video: string | null;
+  alt: string;
+  desafio: string | null;
+  entrega: string | null;
+  resultado: string | null;
+  images: { url: string; destaque: boolean }[];
+};
+
+type Props = {
+  cards: CaseCard[];
+};
+
+const { cards } = Astro.props;
+const modalId = 'case-modal';
+const defaultCard = cards[0];
+
+const getAdjacentCase = (index: number, direction: -1 | 1) => cards[(index + direction + cards.length) % cards.length];
+const getDetailCards = (card: CaseCard) => [
+  { title: 'Desafio', text: card.desafio?.trim(), variant: 'challenge' },
+  { title: 'Entrega', text: card.entrega?.trim(), variant: 'delivery' },
+  { title: 'Resultado', text: card.resultado?.trim(), variant: 'result' },
+].filter((item): item is { title: string; text: string; variant: string } => Boolean(item.text));
+
+const getRelatedCases = (card: CaseCard) => cards
+  .filter((item) => item.id !== card.id)
+  .map((item) => ({ item, sort: Math.random() }))
+  .sort((a, b) => a.sort - b.sort)
+  .slice(0, 3)
+  .map(({ item }) => item);
+---
+
+{defaultCard && (
+  <Modal
+    id={modalId}
+    ariaLabel={`Case ${defaultCard.title}`}
+    className="case-modal"
+    closeLabel={`Fechar case ${defaultCard.title}`}
+  >
+    <div class="case-modal__topbar">
+      <div class="case-modal__nav" aria-label="Navegação entre cases publicados">
+        <button
+          class="case-modal__arrow"
+          type="button"
+          data-case-modal-target-id={cards.length > 1 ? getAdjacentCase(0, -1).id : defaultCard.id}
+          aria-label="Case publicado anterior"
+        >
+          <span aria-hidden="true">←</span>
+        </button>
+        <button
+          class="case-modal__arrow"
+          type="button"
+          data-case-modal-target-id={cards.length > 1 ? getAdjacentCase(0, 1).id : defaultCard.id}
+          aria-label="Próximo case publicado"
+        >
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
+    </div>
+
+    <article class="case-modal__body">
+      <div class="case-modal__content-stage" data-case-modal-stage>
+        {cards.map((card, index) => {
+          const detailCards = getDetailCards(card);
+          const galleryImages = card.images ?? [];
+          const nonFeaturedGalleryCount = galleryImages.filter((image) => !image.destaque).length;
+          const lastNonFeaturedGalleryIndex = galleryImages.findLastIndex((image) => !image.destaque);
+          const previousCase = getAdjacentCase(index, -1);
+          const nextCase = getAdjacentCase(index, 1);
+          const relatedCases = getRelatedCases(card);
+
+          return (
+            <div
+              class="case-modal__case"
+              data-case-modal-content
+              data-case-id={card.id}
+              data-case-title={card.title}
+              data-previous-case-id={previousCase.id}
+              data-next-case-id={nextCase.id}
+              hidden={index !== 0}
+            >
+              <div class="case-modal__content">
+                {card.video && (
+                  <video class="case-modal__video" src={card.video} controls playsinline preload="metadata"></video>
+                )}
+
+                <header class="case-modal__header">
+                  {card.client && <p class="case-modal__client">{card.client}</p>}
+                  <h3 class="case-modal__title">{card.title}</h3>
+                </header>
+
+                {detailCards.length > 0 && (
+                  <section class="case-modal__details" aria-label="Detalhes do case">
+                    {detailCards.map((item) => (
+                      <article class:list={['case-modal__detail-card', `case-modal__detail-card--${item.variant}`]}>
+                        <h4>{item.title}</h4>
+                        <p>{item.text}</p>
+                      </article>
+                    ))}
+                  </section>
+                )}
+
+                {galleryImages.length > 0 && (
+                  <section class="case-modal__gallery" aria-label={`Galeria de imagens do case ${card.title}`}>
+                    {galleryImages.map((image, imageIndex) => (
+                      <figure class:list={[
+                        'case-modal__gallery-item',
+                        image.destaque && 'case-modal__gallery-item--featured',
+                        !image.destaque && nonFeaturedGalleryCount % 2 === 1 && imageIndex === lastNonFeaturedGalleryIndex && 'case-modal__gallery-item--orphan',
+                      ]}>
+                        <img
+                          src={image.url}
+                          alt={`${card.title} - imagem ${imageIndex + 1}`}
+                          loading="lazy"
+                        />
+                      </figure>
+                    ))}
+                  </section>
+                )}
+
+                {relatedCases.length > 0 && (
+                  <section class="case-modal__related" aria-labelledby={`${modalId}-${card.id}-related-title`}>
+                    <h3 id={`${modalId}-${card.id}-related-title`} class="case-modal__related-title">Mais trabalhos</h3>
+
+                    <div class="case-modal__related-grid">
+                      {relatedCases.map((relatedCase) => (
+                        <button
+                          class="case-modal__related-card"
+                          type="button"
+                          data-case-modal-target-id={relatedCase.id}
+                          aria-label={`Abrir case ${relatedCase.title}`}
+                        >
+                          <img src={relatedCase.image} alt={relatedCase.alt} loading="lazy" />
+                        </button>
+                      ))}
+                    </div>
+                  </section>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </article>
+  </Modal>
+)}
+
+<style>
+  :global(.case-modal) {
+    width: min(1280px, calc(100vw - 2rem));
+    height: calc(100dvh - 2rem);
+    max-height: calc(100dvh - 2rem);
+    border-radius: 24px;
+    overflow: hidden;
+  }
+
+  :global(.case-modal .modal__panel) {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #fff;
+    border: 0;
+    color: #151515;
+    overflow: hidden;
+    padding: 0 52px 60px 62px;
+  }
+
+  :global(.case-modal .case-modal__body) {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+    margin-right: -22px;
+    padding: 0 22px 0 0;
+    scrollbar-color: rgba(0, 0, 0, 1) transparent;
+    scrollbar-width: thin;
+  }
+
+  :global(.case-modal .case-modal__body::-webkit-scrollbar) {
+    width: 10px;
+  }
+
+  :global(.case-modal .case-modal__body::-webkit-scrollbar-track) {
+    background: transparent;
+    margin: 18px 0;
+  }
+
+  :global(.case-modal .case-modal__body::-webkit-scrollbar-thumb) {
+    border: 3px solid #fff;
+    border-radius: 999px;
+    background: rgba(13, 13, 13, 0.38);
+  }
+
+  :global(.case-modal .case-modal__body::-webkit-scrollbar-thumb:hover) {
+    background: rgba(13, 13, 13, 0.58);
+  }
+
+  :global(.case-modal .modal__close) {
+    top: 18px;
+    right: 18px;
+    width: 34px;
+    height: 34px;
+    color: #151515;
+    font: 500 2.8rem/0.75 'Inter', sans-serif;
+  }
+
+  :global(.case-modal .modal__close:hover) {
+    color: #3157d6;
+  }
+
+  .case-modal__topbar {
+    flex: 0 0 clamp(60px, 7svh, 72px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-right: 10px;
+  }
+
+  .case-modal__nav {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .case-modal__arrow {
+    width: 31px;
+    height: 31px;
+    border: 1.5px solid #151515;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: #151515;
+    cursor: pointer;
+    font: 600 1rem/1 'Inter', sans-serif;
+    transition:
+      background-color 160ms ease,
+      color 160ms ease,
+      transform 160ms ease;
+  }
+
+  .case-modal__arrow:hover {
+    background: #151515;
+    color: #fff;
+    transform: translateY(-1px);
+  }
+
+  .case-modal__arrow:focus-visible {
+    outline: 2px solid #3157d6;
+    outline-offset: 3px;
+  }
+
+  .case-modal__content-stage {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity 180ms ease,
+      transform 180ms ease;
+  }
+
+  .case-modal__content-stage.is-switching {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  .case-modal__case[hidden] {
+    display: none;
+  }
+
+  .case-modal__content {
+    display: grid;
+    justify-items: center;
+    gap: clamp(2rem, 4.5vw, 3.5rem);
+    width: 100%;
+  }
+
+  .case-modal__video {
+    display: block;
+    width: 100%;
+    max-width: 1078px;
+    max-height: min(63svh, 610px);
+    background: #111;
+    object-fit: contain;
+  }
+
+  .case-modal__header {
+    display: grid;
+    justify-items: center;
+    gap: clamp(1rem, 2.3vw, 1.55rem);
+    text-align: center;
+  }
+
+  .case-modal__client {
+    font: 800 clamp(1rem, 1.8vw, 1.45rem)/1.1 'Inter', sans-serif;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    color: #101010;
+  }
+
+  .case-modal__title {
+    max-width: 980px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3.75rem, 6vw, 5rem);
+    font-weight: 400;
+    line-height: 0.96;
+    text-align: center;
+    text-transform: uppercase;
+    color: #050505;
+  }
+
+  .case-modal__details {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: clamp(1.35rem, 2.9vw, 2.3rem);
+    width: 100%;
+    max-width: 1098px;
+  }
+
+  .case-modal__detail-card {
+    flex: 0 1 calc((100% - (clamp(1.35rem, 2.9vw, 2.3rem) * 2)) / 3);
+    min-height: clamp(260px, 24vw, 306px);
+    border-radius: 16px;
+    color: #fff;
+    padding: clamp(1.8rem, 2.2vw, 2.13rem) clamp(1.6rem, 2.1vw, 1.68rem);
+    text-align: left;
+  }
+
+  .case-modal__detail-card--challenge {
+    background: linear-gradient(135deg, #fb8700 0%, #df3564 48%, #8a168f 100%);
+  }
+
+  .case-modal__detail-card--delivery {
+    background: linear-gradient(135deg, #ef0b87 0%, #8f48d4 47%, #1978ee 100%);
+  }
+
+  .case-modal__detail-card--result {
+    background: linear-gradient(135deg, #1978ee 0%, #6658df 48%, #ee0e85 100%);
+  }
+
+  .case-modal__detail-card h4 {
+    margin: 0 0 clamp(1.15rem, 2vw, 1.5rem);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2rem, 2.4vw, 2.6rem);
+    font-weight: 400;
+    line-height: 0.95;
+    text-transform: uppercase;
+  }
+
+  .case-modal__detail-card p {
+    margin: 0;
+    white-space: pre-line;
+    font: 400 clamp(0.98rem, 1.3vw, 1.05rem)/1.18 'Inter', sans-serif;
+    letter-spacing: -0.015em;
+  }
+
+  .case-modal__gallery {
+    --gallery-gap: clamp(0.75rem, 1.35vw, 1rem);
+
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-flow: dense;
+    gap: var(--gallery-gap);
+    width: 100%;
+    max-width: 1098px;
+  }
+
+  .case-modal__gallery-item {
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    background: #f2f2f2;
+    aspect-ratio: 536 / 294;
+  }
+
+  .case-modal__gallery-item--featured {
+    grid-column: 1 / -1;
+    aspect-ratio: 1098 / 536;
+  }
+
+  .case-modal__gallery-item--orphan {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc((100% - var(--gallery-gap)) / 2);
+  }
+
+  .case-modal__gallery-item img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .case-modal__related {
+    display: grid;
+    justify-items: center;
+    gap: clamp(1.3rem, 2.4vw, 1.9rem);
+    width: 100%;
+    max-width: 1098px;
+    padding-top: clamp(0.4rem, 1.3vw, 1rem);
+  }
+
+  .case-modal__related-title {
+    margin: 0;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 5vw, 4.3rem);
+    font-weight: 400;
+    line-height: 0.95;
+    text-align: center;
+    text-transform: uppercase;
+    color: #050505;
+  }
+
+  .case-modal__related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(0, min(322px, 100%)));
+    justify-content: center;
+    gap: clamp(1rem, 1.75vw, 1.55rem);
+    width: 100%;
+  }
+
+  .case-modal__related-card {
+    display: block;
+    min-width: 0;
+    border: 0;
+    overflow: hidden;
+    background: #f2f2f2;
+    aspect-ratio: 322 / 316;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .case-modal__related-card img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 260ms ease, filter 260ms ease;
+  }
+
+  .case-modal__related-card:hover img {
+    filter: brightness(1.05) saturate(1.08);
+    transform: scale(1.04);
+  }
+
+  .case-modal__related-card:focus-visible {
+    outline: 3px solid #3157d6;
+    outline-offset: 4px;
+  }
+
+  @media (max-width: 900px) {
+    :global(.case-modal) {
+      width: min(100vw - 1rem, 1280px);
+      height: calc(100dvh - 1rem);
+      max-height: calc(100dvh - 1rem);
+      border-radius: 20px;
+    }
+
+    :global(.case-modal .case-modal__body) {
+      margin-right: -0.5rem;
+      padding: 0 0.5rem 0 0;
+    }
+
+    :global(.case-modal .modal__panel) {
+      padding: 8px 1.25rem 2rem;
+    }
+
+    .case-modal__topbar {
+      flex-basis: 60px;
+      padding: 0 3.75rem 0 0;
+    }
+
+    .case-modal__video {
+      max-height: 56svh;
+    }
+
+    .case-modal__details {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .case-modal__detail-card {
+      flex-basis: auto;
+      width: 100%;
+      min-height: 220px;
+    }
+
+    .case-modal__gallery {
+      grid-template-columns: 1fr;
+    }
+
+    .case-modal__gallery-item,
+    .case-modal__gallery-item--featured {
+      grid-column: auto;
+      aspect-ratio: 4 / 3;
+    }
+
+    .case-modal__gallery-item--orphan {
+      width: 100%;
+    }
+
+    .case-modal__related-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .case-modal__related-card {
+      aspect-ratio: 4 / 3;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .case-modal__title {
+      font-size: clamp(3rem, 15vw, 4rem);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .case-modal__arrow,
+    .case-modal__related-card img,
+    .case-modal__content-stage {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const caseModalIdAttribute = 'data-case-modal-id';
+  const caseModalTargetIdAttribute = 'data-case-modal-target-id';
+  const caseModalContentAttribute = 'data-case-modal-content';
+  const caseModalSwitchMs = 180;
+  const caseModal = document.getElementById('case-modal');
+
+  if (caseModal instanceof HTMLDialogElement) {
+    const stage = caseModal.querySelector<HTMLElement>('[data-case-modal-stage]');
+    const body = caseModal.querySelector<HTMLElement>('.case-modal__body');
+    const closeButton = caseModal.querySelector<HTMLButtonElement>('[data-modal-close]');
+    const previousButton = caseModal.querySelector<HTMLButtonElement>('.case-modal__arrow:first-child');
+    const nextButton = caseModal.querySelector<HTMLButtonElement>('.case-modal__arrow:last-child');
+    let activeCase = caseModal.querySelector<HTMLElement>(`[${caseModalContentAttribute}]:not([hidden])`);
+    let switchTimer: number | undefined;
+
+    function getSwitchDuration() {
+      return window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : caseModalSwitchMs;
+    }
+
+    function pauseVideos(container: ParentNode = caseModal) {
+      container.querySelectorAll('video').forEach((video) => video.pause());
+    }
+
+    function syncModalControls(nextCase: HTMLElement) {
+      const title = nextCase.dataset.caseTitle ?? 'case';
+      const previousCaseId = nextCase.dataset.previousCaseId;
+      const nextCaseId = nextCase.dataset.nextCaseId;
+
+      caseModal.setAttribute('aria-label', `Case ${title}`);
+      closeButton?.setAttribute('aria-label', `Fechar case ${title}`);
+
+      if (previousButton && previousCaseId) {
+        previousButton.dataset.caseModalTargetId = previousCaseId;
+      }
+
+      if (nextButton && nextCaseId) {
+        nextButton.dataset.caseModalTargetId = nextCaseId;
+      }
+    }
+
+    function showCase(caseId: string, animate: boolean) {
+      const nextCase = caseModal.querySelector<HTMLElement>(`[${caseModalContentAttribute}][data-case-id="${CSS.escape(caseId)}"]`);
+
+      if (!nextCase || nextCase === activeCase || !stage) {
+        return;
+      }
+
+      if (switchTimer) {
+        window.clearTimeout(switchTimer);
+        switchTimer = undefined;
+      }
+
+      pauseVideos(activeCase ?? caseModal);
+
+      const applySwitch = () => {
+        activeCase?.setAttribute('hidden', '');
+        nextCase.removeAttribute('hidden');
+        activeCase = nextCase;
+        if (body) {
+          body.scrollTop = 0;
+        }
+        syncModalControls(nextCase);
+
+        requestAnimationFrame(() => {
+          stage.classList.remove('is-switching');
+          previousButton?.focus();
+        });
+      };
+
+      if (!animate || getSwitchDuration() === 0) {
+        stage.classList.remove('is-switching');
+        applySwitch();
+        return;
+      }
+
+      stage.classList.add('is-switching');
+      switchTimer = window.setTimeout(() => {
+        switchTimer = undefined;
+        applySwitch();
+      }, getSwitchDuration());
+    }
+
+    document.addEventListener('click', (event) => {
+      const target = event.target;
+
+      if (!(target instanceof Element)) return;
+
+      const openTrigger = target.closest<HTMLElement>(`[data-modal-open="case-modal"][${caseModalIdAttribute}]`);
+      if (!openTrigger) return;
+
+      const caseId = openTrigger.getAttribute(caseModalIdAttribute);
+      if (!caseId) return;
+
+      showCase(caseId, false);
+    }, true);
+
+    document.addEventListener('click', (event) => {
+      const target = event.target;
+
+      if (!(target instanceof Element)) return;
+
+      const trigger = target.closest<HTMLElement>(`[${caseModalTargetIdAttribute}]`);
+      if (!trigger || !caseModal.contains(trigger)) return;
+
+      const targetCaseId = trigger.getAttribute(caseModalTargetIdAttribute);
+      if (!targetCaseId) return;
+
+      event.preventDefault();
+      showCase(targetCaseId, true);
+    });
+
+    document.addEventListener('close', (event) => {
+      const target = event.target;
+
+      if (target !== caseModal) return;
+
+      pauseVideos();
+      stage?.classList.remove('is-switching');
+    }, true);
+  }
+</script>

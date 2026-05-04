@@ -1,15 +1,17 @@
 ---
-import Modal from './Modal.astro';
+import CaseModal from './CaseModal.astro';
 
 type CaseCard = {
   id: number;
   title: string;
   client: string | null;
   image: string;
+  video: string | null;
   alt: string;
   desafio: string | null;
   entrega: string | null;
   resultado: string | null;
+  images: { url: string; destaque: boolean }[];
 };
 
 type Props = {
@@ -23,8 +25,6 @@ const minimumSetCount = cards.length > 0 ? Math.ceil(minimumRenderedCards / card
 const repeatedSetCount = Math.max(5, minimumSetCount) + (Math.max(5, minimumSetCount) % 2 === 0 ? 1 : 0);
 const cardSets = Array.from({ length: repeatedSetCount }, () => cards).flat();
 
-const getCaseModalId = (id: number) => `case-modal-${id}`;
-const getCaseModalTitleId = (id: number) => `case-modal-title-${id}`;
 ---
 
 {cards.length > 0 && (
@@ -37,7 +37,8 @@ const getCaseModalTitleId = (id: number) => `case-modal-title-${id}`;
             type="button"
             data-case-card
             data-card-index={index}
-            data-modal-open={getCaseModalId(card.id)}
+            data-modal-open="case-modal"
+            data-case-modal-id={card.id}
             aria-label={`Abrir case ${card.title}`}
           >
             <img src={card.image} alt={card.alt} loading={index >= cards.length && index < cards.length * 4 ? 'eager' : 'lazy'} />
@@ -60,47 +61,7 @@ const getCaseModalTitleId = (id: number) => `case-modal-title-${id}`;
   </div>
 )}
 
-{cards.map((card) => (
-  <Modal
-    id={getCaseModalId(card.id)}
-    labelledBy={getCaseModalTitleId(card.id)}
-    className="case-modal"
-    closeLabel={`Fechar case ${card.title}`}
-  >
-    <article class="case-modal-content">
-      <div class="case-modal-content__media">
-        <img src={card.image} alt={card.alt} loading="lazy" />
-      </div>
-
-      <div class="case-modal-content__body">
-        <p class="case-modal-content__eyebrow">Case</p>
-        <h2 id={getCaseModalTitleId(card.id)}>{card.title}</h2>
-        {card.client && <p class="case-modal-content__client">Cliente: {card.client}</p>}
-
-        <div class="case-modal-content__sections">
-          {card.desafio && (
-            <section>
-              <h3>Desafio</h3>
-              <p>{card.desafio}</p>
-            </section>
-          )}
-          {card.entrega && (
-            <section>
-              <h3>Entrega</h3>
-              <p>{card.entrega}</p>
-            </section>
-          )}
-          {card.resultado && (
-            <section>
-              <h3>Resultado</h3>
-              <p>{card.resultado}</p>
-            </section>
-          )}
-        </div>
-      </div>
-    </article>
-  </Modal>
-))}
+<CaseModal cards={cards} />
 
 <style>
   .cases-carousel {
@@ -307,98 +268,6 @@ const getCaseModalTitleId = (id: number) => `case-modal-title-${id}`;
     transform: translateY(-1px);
   }
 
-  :global(.case-modal) {
-    width: min(1040px, calc(100vw - 2rem));
-  }
-
-  :global(.case-modal .modal__panel) {
-    background: #fff;
-    border: 0;
-    color: #151515;
-    padding: clamp(1.25rem, 3.4vw, 2.75rem);
-  }
-
-  :global(.case-modal .modal__close) {
-    color: #151515;
-  }
-
-  :global(.case-modal .modal__close:hover) {
-    color: #3157d6;
-  }
-
-  .case-modal-content {
-    display: grid;
-    grid-template-columns: minmax(260px, 0.9fr) minmax(0, 1.1fr);
-    gap: clamp(1.5rem, 4vw, 3rem);
-    align-items: start;
-  }
-
-  .case-modal-content__media {
-    border-radius: 18px;
-    overflow: hidden;
-    background: #f2f2f2;
-  }
-
-  .case-modal-content__media img {
-    display: block;
-    width: 100%;
-    aspect-ratio: 4 / 5;
-    object-fit: cover;
-  }
-
-  .case-modal-content__body {
-    padding-right: clamp(0rem, 3vw, 1.5rem);
-  }
-
-  .case-modal-content__eyebrow {
-    margin-bottom: 0.35rem;
-    color: #3157d6;
-    font: 700 0.78rem/1.2 'Inter', sans-serif;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-  }
-
-  .case-modal-content h2 {
-    margin: 0;
-    color: #0d0d0d;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(3rem, 7vw, 5.5rem);
-    font-weight: 400;
-    line-height: 0.9;
-    text-transform: uppercase;
-  }
-
-  .case-modal-content__client {
-    margin-top: 0.75rem;
-    color: #4d4d4d;
-    font: 700 0.95rem/1.4 'Inter', sans-serif;
-  }
-
-  .case-modal-content__sections {
-    display: grid;
-    gap: 1.35rem;
-    margin-top: clamp(1.5rem, 4vw, 2.5rem);
-  }
-
-  .case-modal-content__sections section {
-    border-top: 1px solid rgba(13, 13, 13, 0.16);
-    padding-top: 1rem;
-  }
-
-  .case-modal-content__sections h3 {
-    margin-bottom: 0.45rem;
-    color: #0d0d0d;
-    font: 800 0.9rem/1.2 'Inter', sans-serif;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .case-modal-content__sections p {
-    color: #333;
-    font: 400 1rem/1.7 'Inter', sans-serif;
-    white-space: pre-line;
-  }
-
   @media (max-width: 900px) {
     .cases-carousel {
       --card-width: clamp(205px, 58vw, 260px);
@@ -407,13 +276,6 @@ const getCaseModalTitleId = (id: number) => `case-modal-title-${id}`;
       padding-top: 1.5rem;
     }
 
-    .case-modal-content {
-      grid-template-columns: 1fr;
-    }
-
-    .case-modal-content__media img {
-      aspect-ratio: 16 / 10;
-    }
   }
 
   @media (max-width: 520px) {
@@ -427,6 +289,7 @@ const getCaseModalTitleId = (id: number) => `case-modal-title-${id}`;
     .case-card__title {
       min-height: 44px;
     }
+
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -438,6 +301,7 @@ const getCaseModalTitleId = (id: number) => `case-modal-title-${id}`;
     .cases-carousel__button {
       transition: none;
     }
+
   }
 </style>
 

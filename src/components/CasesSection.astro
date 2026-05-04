@@ -6,10 +6,12 @@ type PublicCase = {
   title: string;
   client: string | null;
   image: string;
+  video: string | null;
   alt: string;
   desafio: string | null;
   entrega: string | null;
   resultado: string | null;
+  images: { url: string; destaque: boolean }[];
 };
 
 const placeholderCases: PublicCase[] = [
@@ -18,10 +20,12 @@ const placeholderCases: PublicCase[] = [
     title: 'Cases',
     client: null,
     image: '/images/diferenciais-collage.png',
+    video: null,
     alt: 'Placeholder de cases',
     desafio: null,
     entrega: null,
     resultado: null,
+    images: [],
   },
 ];
 
