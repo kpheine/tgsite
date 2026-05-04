@@ -21,7 +21,7 @@
 - [x] Media served from `uploads/` Docker volume
 
 ## Phase 4 — Live Data
-- [ ] Replace hardcoded case data with SQLite queries in the portfolio section
+- [x] Replace hardcoded case data with SQLite-backed published cases in the portfolio section
 
 ## Phase 5 — Production Readiness
 - [ ] `docker compose up` tested end-to-end
