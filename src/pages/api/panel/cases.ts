@@ -44,7 +44,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     return new Response('A imagem principal é obrigatória', { status: 400 });
   }
 
-  try {
+  const createCase = db.transaction(() => {
     const result = db.prepare(`
       INSERT INTO cases (titulo, cliente, main_image_url, video_url, desafio, entrega, resultado, status, sort_order)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -61,6 +61,10 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     );
 
     saveImages(upload, Number(result.lastInsertRowid));
+  });
+
+  try {
+    createCase();
   } catch (error) {
     cleanupUploadedFiles(upload.uploadedUrls);
     throw error;

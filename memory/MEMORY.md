@@ -184,7 +184,7 @@ docker-compose.yml       — port 4321, data/uploads volumes, reads .env
 astro.config.mjs         — output: server, adapter: @astrojs/node (standalone)
 ```
 
-- Case uploads use UUID v4 filenames. Main thumbnail images, gallery images, and videos are hard-linked to cases for simplicity: deleting a case deletes its media DB rows and local files from `./uploads/`. Admin case upload endpoints parse multipart requests with `busboy` so large videos stream directly to disk instead of buffering the full file in memory. During alpha, if an existing SQLite database is missing `cases.main_image_url`, the app destructively recreates the case tables instead of preserving old case records.
+- Case uploads use UUID v4 filenames. Main thumbnail images, gallery images, and videos are hard-linked to cases for simplicity: deleting a case deletes its media DB rows and local files from `./uploads/`. Admin case create/edit/delete DB mutations run inside SQLite transactions; old/replaced media files are deleted only after the DB transaction succeeds, while newly uploaded files are cleaned up if the DB write fails. Admin case upload endpoints parse multipart requests with `busboy` so large videos stream directly to disk instead of buffering the full file in memory. During alpha, if an existing SQLite database is missing `cases.main_image_url`, the app destructively recreates the case tables instead of preserving old case records.
 
 - Public case API/components share the case response shape through `src/lib/public-cases.ts` (`PublicCase`, `PublicCaseImage`) to keep `/api/cases`, `CasesSection`, `CasesCarousel`, and `CaseModal` aligned.
 

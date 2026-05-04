@@ -23,16 +23,24 @@ function saveNewImages(upload: ParsedCaseUpload, caseId: number) {
   }
 }
 
-function deleteCaseMedia(item: CaseRecord) {
-  const images = db.prepare('SELECT * FROM imagens_case WHERE case_id = ?').all(item.id) as CaseImageRecord[];
+function getCaseMediaUrls(item: CaseRecord) {
+  const images = db.prepare('SELECT url FROM imagens_case WHERE case_id = ?').all(item.id) as Pick<CaseImageRecord, 'url'>[];
+  return [item.main_image_url, item.video_url, ...images.map((image) => image.url)];
+}
 
-  deleteUploadedFile(item.main_image_url);
-  deleteUploadedFile(item.video_url);
-  for (const image of images) deleteUploadedFile(image.url);
+function deleteCommittedMedia(urls: Array<string | null>) {
+  for (const url of urls) {
+    try {
+      deleteUploadedFile(url);
+    } catch {
+      // The DB transaction has already committed; stale files can be cleaned manually if needed.
+    }
+  }
 }
 
 function removeSelectedImages(upload: ParsedCaseUpload, caseId: number) {
   const removedIds = new Set<number>();
+  const removedUrls: string[] = [];
   const selectImage = db.prepare('SELECT * FROM imagens_case WHERE id = ? AND case_id = ?');
   const deleteImage = db.prepare('DELETE FROM imagens_case WHERE id = ? AND case_id = ?');
 
@@ -43,12 +51,12 @@ function removeSelectedImages(upload: ParsedCaseUpload, caseId: number) {
     const image = selectImage.get(imageId, caseId) as CaseImageRecord | undefined;
     if (!image) continue;
 
-    deleteUploadedFile(image.url);
     deleteImage.run(imageId, caseId);
     removedIds.add(imageId);
+    removedUrls.push(image.url);
   }
 
-  return removedIds;
+  return { removedIds, removedUrls };
 }
 
 function updateExistingImages(upload: ParsedCaseUpload, caseId: number, removedIds: Set<number>) {
@@ -83,8 +91,11 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
   if (!contentType.includes('multipart/form-data')) {
     const formData = await request.formData();
     if (formData.get('_action') === 'delete') {
-      deleteCaseMedia(item);
-      db.prepare('DELETE FROM cases WHERE id = ?').run(caseId);
+      const mediaUrls = getCaseMediaUrls(item);
+      db.transaction(() => {
+        db.prepare('DELETE FROM cases WHERE id = ?').run(caseId);
+      })();
+      deleteCommittedMedia(mediaUrls);
       return new Response(null, { status: 303, headers: { Location: adminUrl('cases') } });
     }
 
@@ -93,8 +104,11 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
 
   const upload = await parseCaseUploadRequest(request);
   if (fieldValue(upload, '_action') === 'delete') {
-    deleteCaseMedia(item);
-    db.prepare('DELETE FROM cases WHERE id = ?').run(caseId);
+    const mediaUrls = getCaseMediaUrls(item);
+    db.transaction(() => {
+      db.prepare('DELETE FROM cases WHERE id = ?').run(caseId);
+    })();
+    deleteCommittedMedia(mediaUrls);
     return new Response(null, { status: 303, headers: { Location: adminUrl('cases') } });
   }
 
@@ -114,10 +128,7 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
     return new Response('A imagem principal é obrigatória', { status: 400 });
   }
 
-  try {
-    if (upload.mainImageUrl) deleteUploadedFile(item.main_image_url);
-    if (videoUrl || removeVideo) deleteUploadedFile(item.video_url);
-
+  const updateCase = db.transaction(() => {
     db.prepare(`
       UPDATE cases
       SET titulo = ?, cliente = ?, main_image_url = ?, video_url = ?, desafio = ?, entrega = ?, resultado = ?, status = ?, updated_at = CURRENT_TIMESTAMP
@@ -134,13 +145,25 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
       caseId,
     );
 
-    const removedImageIds = removeSelectedImages(upload, caseId);
-    updateExistingImages(upload, caseId, removedImageIds);
+    const removedImages = removeSelectedImages(upload, caseId);
+    updateExistingImages(upload, caseId, removedImages.removedIds);
     saveNewImages(upload, caseId);
+    return removedImages.removedUrls;
+  });
+
+  let removedImageUrls: string[];
+  try {
+    removedImageUrls = updateCase();
   } catch (error) {
     cleanupUploadedFiles(upload.uploadedUrls);
     throw error;
   }
+
+  deleteCommittedMedia([
+    ...(upload.mainImageUrl ? [item.main_image_url] : []),
+    ...(videoUrl || removeVideo ? [item.video_url] : []),
+    ...removedImageUrls,
+  ]);
 
   return new Response(null, { status: 303, headers: { Location: adminUrl('cases') } });
 };
