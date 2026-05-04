@@ -145,3 +145,5 @@ function initVideoUpload(root: HTMLElement) {
 }
 
 document.querySelectorAll<HTMLElement>('[data-video-upload]').forEach(initVideoUpload);
+
+export {};

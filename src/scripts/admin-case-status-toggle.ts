@@ -15,3 +15,5 @@ function initStatusToggle(root: HTMLElement) {
 }
 
 document.querySelectorAll<HTMLElement>('[data-status-toggle-field]').forEach(initStatusToggle);
+
+export {};

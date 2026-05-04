@@ -84,3 +84,5 @@ document.addEventListener('submit', (event) => {
 
   if (!confirmUnsavedChanges()) event.preventDefault();
 });
+
+export {};

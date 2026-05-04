@@ -227,3 +227,5 @@ function initImageUpload(root: HTMLElement) {
 }
 
 document.querySelectorAll<HTMLElement>('[data-image-upload]').forEach(initImageUpload);
+
+export {};

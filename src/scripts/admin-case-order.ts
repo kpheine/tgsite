@@ -86,3 +86,5 @@ function initCaseOrder(panel: HTMLElement) {
 }
 
 document.querySelectorAll<HTMLElement>('[data-case-order-panel]').forEach(initCaseOrder);
+
+export {};

@@ -6,3 +6,5 @@ document.querySelectorAll<HTMLFormElement>('form[data-case-delete-form]').forEac
     event.preventDefault();
   });
 });
+
+export {};

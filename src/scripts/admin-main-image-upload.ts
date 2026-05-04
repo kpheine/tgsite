@@ -80,3 +80,5 @@ function initMainImageUpload(root: HTMLElement) {
 }
 
 document.querySelectorAll<HTMLElement>('[data-main-image-upload]').forEach(initMainImageUpload);
+
+export {};

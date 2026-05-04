@@ -365,7 +365,6 @@ const cardSets = Array.from({ length: repeatedSetCount }, () =>
     const middleSetStart = sourceCards.length * Math.floor(renderedSetCount / 2);
 
     let current = middleSetStart;
-    let pendingDirection = 0;
     let isAnimating = false;
     let autoRotateId: number | undefined;
 
@@ -429,7 +428,6 @@ const cardSets = Array.from({ length: repeatedSetCount }, () =>
       if (isAnimating) return;
 
       isAnimating = true;
-      pendingDirection = direction;
       current += direction;
       applySlotDepth(current);
       track.getBoundingClientRect();
@@ -462,7 +460,6 @@ const cardSets = Array.from({ length: repeatedSetCount }, () =>
     function finishAdvance() {
       if (!isAnimating) return;
 
-      pendingDirection = 0;
       isAnimating = false;
 
       if (current >= middleSetStart + sourceCards.length) {

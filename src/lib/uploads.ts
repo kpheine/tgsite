@@ -79,7 +79,9 @@ async function saveUploadStream(stream: NodeJS.ReadableStream, name: string, mim
   stream.on('data', (chunk: Buffer) => {
     bytesWritten += chunk.length;
     if (bytesWritten > maxSize) {
-      stream.destroy(new Error(`${kind === 'image' ? 'A imagem' : 'O vídeo'} excede o limite de ${uploadLimitLabel(kind)}.`));
+      if ('destroy' in stream && typeof stream.destroy === 'function') {
+        stream.destroy(new Error(`${kind === 'image' ? 'A imagem' : 'O vídeo'} excede o limite de ${uploadLimitLabel(kind)}.`));
+      }
     }
   });
 

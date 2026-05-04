@@ -42,6 +42,18 @@ docker compose up --build
 
 SQLite data is persisted in `./data/site.db`, and uploaded images/videos are persisted in `./uploads/` on the host machine via Docker volume bind mounts.
 
+## Verification
+
+Before handing off or packaging a release, run:
+
+```bash
+npm run check
+npm run build
+docker compose up --build
+```
+
+`npm run check` runs Astro's TypeScript/template validation. `npm run build` verifies the production build. `docker compose up --build` verifies the production-like container starts with the same local SQLite/upload storage model used for deployment.
+
 ## Environment variables
 
 Copy `.env.example` to `.env` and set:
