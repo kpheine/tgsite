@@ -183,7 +183,8 @@ src/
   pages/uploads/[...path].ts — serves media from local uploads volume
   scripts/admin-video-upload.ts — admin case video upload/drop preview/removal behavior
   scripts/modal-manager.ts — delegated open/close behavior for all modals
-  styles/global.css      — CSS reset + custom properties (dark theme, accent: #e8ff00)
+  styles/global.css      — public CSS reset + modal styles
+  styles/admin.css       — global admin dashboard/form/media/upload styles imported by AdminLayout
 Dockerfile               — multi-stage, Node 20 Alpine + native build deps, runs dist/server/entry.mjs
 docker-compose.yml       — port 4321, data/uploads volumes, reads .env
 .env.example             — ADMIN_PATH, ADMIN_USERNAME, ADMIN_PASSWORD, SESSION_SECRET, HOST, PORT
@@ -193,6 +194,8 @@ astro.config.mjs         — output: server, adapter: @astrojs/node (standalone)
 - Case uploads use UUID v4 filenames. Main thumbnail images, gallery images, and videos are hard-linked to cases for simplicity: deleting a case deletes its media DB rows and local files from `./uploads/`. Admin case create/edit/delete DB mutations run inside SQLite transactions; old/replaced media files are deleted only after the DB transaction succeeds, while newly uploaded files are cleaned up if the DB write fails. Admin case upload endpoints parse multipart requests with `busboy` so large videos stream directly to disk instead of buffering the full file in memory.
 
 - Public case API/components share the case response shape through `src/lib/public-cases.ts` (`PublicCase`, `PublicCaseImage`) to keep `/api/cases`, `CasesSection`, `CasesCarousel`, and `CaseModal` aligned.
+
+- Admin dashboard styling lives in `src/styles/admin.css`; `src/components/AdminLayout.astro` owns only the admin shell markup, upload modal markup, script imports, and stylesheet import.
 
 - `npm run dev` → dev server at localhost:4321
 - `npm run check` → Astro TypeScript/template validation (`@astrojs/check`)
