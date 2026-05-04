@@ -1,4 +1,4 @@
-import { createWriteStream, existsSync, mkdirSync, unlinkSync, writeFileSync } from 'node:fs';
+import { createWriteStream, existsSync, mkdirSync, unlinkSync } from 'node:fs';
 import { extname, resolve, sep } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { Readable } from 'node:stream';
@@ -50,23 +50,6 @@ function uploadDestination(name: string, kind: UploadKind) {
     filePath,
     url: `/uploads/${folder}/${filename}`,
   };
-}
-
-export async function saveUpload(file: File, kind: UploadKind) {
-  const isImage = kind === 'image';
-  const maxSize = isImage ? MAX_IMAGE_BYTES : MAX_VIDEO_BYTES;
-
-  assertAllowedUpload(kind, file.type);
-
-  if (file.size > maxSize) {
-    throw new Error(`${kind === 'image' ? 'A imagem' : 'O vídeo'} excede o limite de ${uploadLimitLabel(kind)}.`);
-  }
-
-  const { filePath, url } = uploadDestination(file.name, kind);
-
-  writeFileSync(filePath, Buffer.from(await file.arrayBuffer()));
-
-  return url;
 }
 
 async function saveUploadStream(stream: NodeJS.ReadableStream, name: string, mimeType: string, kind: UploadKind) {
