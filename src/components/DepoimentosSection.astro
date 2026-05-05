@@ -1,35 +1,35 @@
 ---
 const cards = [
   {
-    gradient: "linear-gradient(-51.34deg, rgb(120,30,135) 0%, rgb(191,27,145) 22%, rgb(242,137,0) 96%, rgb(247,214,0) 121%)",
+    variant: 'sunset',
     title: "Título aqui",
     quote: '"This summit opened my eyes to the future of AI and how it will shape industries."',
     name: "Nome Sobrenome",
     role: "Marketing, BASF",
   },
   {
-    gradient: "linear-gradient(-68.78deg, rgb(33,110,242) 22%, rgb(163,67,203) 62%, rgb(234,14,129) 89%)",
+    variant: 'blue',
     title: "Título aqui",
     quote: '"Incredible speakers, top-tier networking, and cutting-edge discussions all in one place."',
     name: "Nome Sobrenome",
     role: "Marketing, EDP",
   },
   {
-    gradient: "linear-gradient(117.28deg, rgb(33,110,242) 30%, rgb(163,67,203) 73%, rgb(234,14,129) 94%)",
+    variant: 'pink',
     title: "Título aqui",
     quote: '"From hands-on workshops to visionary talks, this summit is a must-attend for AI professionals."',
     name: "Nome Sobrenome",
     role: "Marketing, Volkswagen",
   },
   {
-    gradient: "linear-gradient(-51.34deg, rgb(120,30,135) 0%, rgb(191,27,145) 22%, rgb(242,137,0) 96%, rgb(247,214,0) 121%)",
+    variant: 'sunset',
     title: "Título aqui",
     quote: '"An unforgettable experience that challenged everything we thought we knew about strategy."',
     name: "Nome Sobrenome",
     role: "Marketing, Claro",
   },
   {
-    gradient: "linear-gradient(-68.78deg, rgb(33,110,242) 22%, rgb(163,67,203) 62%, rgb(234,14,129) 89%)",
+    variant: 'blue',
     title: "Título aqui",
     quote: '"The connections made here translated directly into business results within months."',
     name: "Nome Sobrenome",
@@ -61,7 +61,7 @@ const cards = [
     <div class="carousel-viewport">
       <div class="carousel-track" id="dep-track">
         {cards.map((card) => (
-          <div class="dep-card" style={`background: ${card.gradient}`}>
+          <div class:list={['dep-card', `dep-card--${card.variant}`]}>
             <h3 class="card-title">{card.title}</h3>
             <p class="card-quote">{card.quote}</p>
             <div class="card-attr">
@@ -207,6 +207,18 @@ const cards = [
     flex-direction: column;
     gap: 1rem;
     min-height: 307px;
+  }
+
+  .dep-card--sunset {
+    background: linear-gradient(-51.34deg, rgb(120, 30, 135) 0%, rgb(191, 27, 145) 22%, rgb(242, 137, 0) 96%, rgb(247, 214, 0) 121%);
+  }
+
+  .dep-card--blue {
+    background: linear-gradient(-68.78deg, rgb(33, 110, 242) 22%, rgb(163, 67, 203) 62%, rgb(234, 14, 129) 89%);
+  }
+
+  .dep-card--pink {
+    background: linear-gradient(117.28deg, rgb(33, 110, 242) 30%, rgb(163, 67, 203) 73%, rgb(234, 14, 129) 94%);
   }
 
   .card-title {

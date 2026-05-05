@@ -26,7 +26,7 @@ const images = db.prepare('SELECT * FROM imagens_case WHERE case_id = ? ORDER BY
 
   <AdminCaseForm item={item} images={images} />
 
-  <form class="admin-form" method="post" action={`/api/panel/cases/${item.id}`} style="margin-top: 18px;" data-case-delete-form>
+  <form class="admin-form admin-form--delete" method="post" action={`/api/panel/cases/${item.id}`} data-case-delete-form>
     <input type="hidden" name="_action" value="delete" />
     <p class="admin-muted">Excluir remove o case, suas imagens e seu vídeo do banco e do disco.</p>
     <button class="admin-button admin-button--danger" type="submit">Excluir case</button>
