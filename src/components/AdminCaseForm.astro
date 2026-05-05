@@ -1,0 +1,166 @@
+---
+import AdminCaseImageCard from './AdminCaseImageCard.astro';
+import { adminUrl } from '../lib/auth';
+import type { CaseImageRecord, CaseRecord } from '../lib/db';
+
+interface Props {
+  item?: CaseRecord;
+  images?: CaseImageRecord[];
+}
+
+const { item, images = [] } = Astro.props;
+const isEdit = Boolean(item);
+const action = item ? `/api/panel/cases/${item.id}` : '/api/panel/cases';
+const status = item?.status ?? 'draft';
+const hasVideo = Boolean(item?.video_url);
+---
+
+<form class="admin-form" method="post" action={action} enctype="multipart/form-data" data-case-form>
+  <div class="admin-form-row">
+    <div class="admin-field"><label for="titulo">Título</label><input class="admin-input" id="titulo" name="titulo" value={item?.titulo ?? ''} required /></div>
+    <div class="admin-field"><label for="cliente">Cliente</label><input class="admin-input" id="cliente" name="cliente" value={item?.cliente || ''} /></div>
+  </div>
+  <div class="admin-field" data-status-toggle-field>
+    <label for="status">Status</label>
+    <input id="status" name="status" type="hidden" value={status} data-status-toggle-input />
+    <button class="admin-status-toggle" type="button" data-status-toggle aria-pressed={status === 'published' ? 'true' : 'false'}>
+      <span data-status-toggle-label>{status === 'published' ? 'Publicado' : 'Rascunho'}</span>
+      <small>Clique aqui para mudar o status</small>
+    </button>
+  </div>
+  <div class="admin-field" data-main-image-upload>
+    <label for="main_image">Imagem principal do case</label>
+    {item ? (
+      <>
+        <div class="admin-main-image-current admin-main-image-current--replace" data-main-image-zone>
+          <p class="admin-muted">Imagem principal atual</p>
+          <div class="admin-main-image-frame">
+            <img src={item.main_image_url} alt="" data-main-image-current-img />
+            <button class="admin-main-image-replace" type="button" data-main-image-button>
+              Clique aqui ou arraste uma imagem para substituir
+            </button>
+            <button class="admin-main-image-revert" type="button" data-main-image-revert hidden>
+              Reverter troca
+            </button>
+          </div>
+          <input class="admin-file-input" id="main_image" name="main_image" type="file" accept="image/*" data-main-image-input />
+        </div>
+        <div class="admin-main-image-selection" data-main-image-preview hidden>
+          <strong data-main-image-name></strong>
+          <span class="admin-muted" data-main-image-size></span>
+        </div>
+        <p class="admin-muted">A substituição só será aplicada ao salvar alterações.</p>
+      </>
+    ) : (
+      <>
+        <div class="admin-upload-zone" data-main-image-zone>
+          <input class="admin-file-input" id="main_image" name="main_image" type="file" accept="image/*" required data-main-image-input />
+          <div>
+            <strong>Solte a imagem principal aqui</strong>
+            <p class="admin-muted">Obrigatória. Será usada como thumbnail do case fora da galeria.</p>
+          </div>
+          <button class="admin-button" type="button" data-main-image-button>Selecionar imagem</button>
+        </div>
+        <div class="admin-main-image-preview" data-main-image-preview hidden>
+          <p class="admin-muted">Imagem principal selecionada</p>
+          <img src="" alt="" data-main-image-preview-img />
+          <strong data-main-image-name></strong>
+          <span class="admin-muted" data-main-image-size></span>
+        </div>
+      </>
+    )}
+  </div>
+  <div class="admin-field" data-video-upload>
+    <label for="video">Vídeo do case</label>
+    {item?.video_url && (
+      <div class="admin-video-current" data-current-video-card>
+        <div class="admin-case-image-card__banner" data-current-video-banner hidden>Será removido</div>
+        <div class="admin-video-preview__header">
+          <div>
+            <p class="admin-muted">Vídeo atual</p>
+            <strong>Este vídeo será mantido se nenhum novo vídeo for selecionado.</strong>
+          </div>
+          <button class="admin-image-action admin-image-action--remove" type="button" data-remove-current-video>Remover vídeo atual</button>
+        </div>
+        <button class="admin-video-lazy" type="button" data-current-video-load data-video-src={item.video_url}>
+          <span class="admin-video-lazy__icon" aria-hidden="true">▶</span>
+          <span>
+            <strong>Carregar vídeo atual</strong>
+            <span>Clique para pré-visualizar sem baixar automaticamente.</span>
+          </span>
+        </button>
+        <video controls playsinline preload="none" data-current-video-player hidden></video>
+        <input type="hidden" name="remove_video" value="1" data-remove-current-video-input disabled />
+      </div>
+    )}
+    {isEdit && (
+      <div class="admin-video-preview" data-video-preview hidden>
+        <div class="admin-video-preview__header">
+          <div>
+            <p class="admin-muted">Novo vídeo selecionado</p>
+            <strong data-video-name></strong>
+            <span class="admin-muted" data-video-size></span>
+            <span class="admin-muted" data-video-type></span>
+          </div>
+          <div class="admin-video-actions">
+            <button class="admin-image-action" type="button" data-video-button>Trocar vídeo</button>
+            <button class="admin-image-action admin-image-action--remove" type="button" data-video-remove-selection>Remover seleção</button>
+          </div>
+        </div>
+        <video controls playsinline data-video-preview-player></video>
+      </div>
+    )}
+    <div class="admin-video-upload" data-video-zone>
+      <input class="admin-file-input" id="video" name="video" type="file" accept="video/*" data-video-input />
+      <div>
+        <strong>{hasVideo ? 'Solte um novo vídeo aqui' : 'Solte o vídeo aqui'}</strong>
+        <p class="admin-muted">MP4, WebM ou MOV até 2GB. {isEdit ? (hasVideo ? 'Um novo arquivo substitui o vídeo atual ao salvar.' : 'A prévia aparece antes de salvar o case.') : 'A prévia aparece antes de criar o case.'}</p>
+      </div>
+      <button class="admin-button" type="button" data-video-button>Selecionar vídeo</button>
+    </div>
+    <p class="admin-alert admin-alert--compact" data-video-message hidden></p>
+    {!isEdit && <div class="admin-video-preview" data-video-preview hidden>
+      <div class="admin-video-preview__header">
+        <div>
+          <p class="admin-muted">Vídeo selecionado</p>
+          <strong data-video-name></strong>
+          <span class="admin-muted" data-video-size></span>
+          <span class="admin-muted" data-video-type></span>
+        </div>
+        <div class="admin-video-actions">
+          <button class="admin-image-action" type="button" data-video-button>Trocar vídeo</button>
+          <button class="admin-image-action admin-image-action--remove" type="button" data-video-remove-selection>Remover seleção</button>
+        </div>
+      </div>
+      <video controls playsinline data-video-preview-player></video>
+    </div>}
+  </div>
+  <div class="admin-field"><label for="desafio">Desafio</label><textarea class="admin-textarea" id="desafio" name="desafio">{item?.desafio || ''}</textarea></div>
+  <div class="admin-field"><label for="entrega">Entrega</label><textarea class="admin-textarea" id="entrega" name="entrega">{item?.entrega || ''}</textarea></div>
+  <div class="admin-field"><label for="resultado">Resultado</label><textarea class="admin-textarea" id="resultado" name="resultado">{item?.resultado || ''}</textarea></div>
+
+  <div class="admin-field" data-image-upload>
+    <label for="images">{isEdit ? 'Adicionar imagens' : 'Imagens do case'}</label>
+    <div class="admin-upload-zone" data-upload-zone>
+      <input class="admin-file-input" id="images" name="images" type="file" accept="image/*" multiple data-upload-input />
+      <div>
+        <strong>{isEdit ? 'Solte novas imagens aqui' : 'Solte as imagens aqui'}</strong>
+        <p class="admin-muted">{isEdit ? 'As imagens selecionadas entram na grade abaixo. Arraste qualquer card para definir a ordem final.' : 'As imagens selecionadas aparecem na grade abaixo para remoção e ordenação antes do envio.'}</p>
+      </div>
+      <button class="admin-button" type="button" data-upload-button>Selecionar imagens</button>
+    </div>
+    <template data-upload-card-template><AdminCaseImageCard mode="upload-template" /></template>
+    {isEdit && <label>Imagens do case</label>}
+    {isEdit && images.length === 0 && <p class="admin-muted">Nenhuma imagem adicionada ainda.</p>}
+    <div class="admin-image-list" data-image-list>
+      {images.map((image) => (
+        <AdminCaseImageCard mode="existing" id={image.id} url={image.url} destaque={image.destaque === 1} order={image.sort_order} />
+      ))}
+    </div>
+  </div>
+  {!isEdit && <p class="admin-muted">Depois de selecionar as imagens, arraste os cards para definir a ordem de exibição.</p>}
+  <div class="admin-actions">
+    <button class="admin-button admin-button--primary" type="submit">{isEdit ? 'Salvar alterações' : 'Criar case'}</button>
+    <a class="admin-button" href={adminUrl('cases')}>{isEdit ? 'Voltar' : 'Cancelar'}</a>
+  </div>
+</form>

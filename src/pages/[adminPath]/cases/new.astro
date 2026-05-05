@@ -1,6 +1,6 @@
 ---
 import AdminLayout from '../../../components/AdminLayout.astro';
-import AdminCaseImageCard from '../../../components/AdminCaseImageCard.astro';
+import AdminCaseForm from '../../../components/AdminCaseForm.astro';
 import { adminUrl, isAdminPath, requireUser } from '../../../lib/auth';
 
 if (!isAdminPath(Astro.params.adminPath)) {
@@ -18,80 +18,5 @@ if (!user) return Astro.redirect(adminUrl('login'));
     </div>
   </header>
 
-  <form class="admin-form" method="post" action="/api/panel/cases" enctype="multipart/form-data" data-case-form>
-    <div class="admin-form-row">
-      <div class="admin-field"><label for="titulo">Título</label><input class="admin-input" id="titulo" name="titulo" required /></div>
-      <div class="admin-field"><label for="cliente">Cliente</label><input class="admin-input" id="cliente" name="cliente" /></div>
-    </div>
-    <div class="admin-field" data-status-toggle-field>
-      <label for="status">Status</label>
-      <input id="status" name="status" type="hidden" value="draft" data-status-toggle-input />
-      <button class="admin-status-toggle" type="button" data-status-toggle aria-pressed="false">
-        <span data-status-toggle-label>Rascunho</span>
-        <small>Clique aqui para mudar o status</small>
-      </button>
-    </div>
-    <div class="admin-field" data-main-image-upload>
-      <label for="main_image">Imagem principal do case</label>
-      <div class="admin-upload-zone" data-main-image-zone>
-        <input class="admin-file-input" id="main_image" name="main_image" type="file" accept="image/*" required data-main-image-input />
-        <div>
-          <strong>Solte a imagem principal aqui</strong>
-          <p class="admin-muted">Obrigatória. Será usada como thumbnail do case fora da galeria.</p>
-        </div>
-        <button class="admin-button" type="button" data-main-image-button>Selecionar imagem</button>
-      </div>
-      <div class="admin-main-image-preview" data-main-image-preview hidden>
-        <p class="admin-muted">Imagem principal selecionada</p>
-        <img src="" alt="" data-main-image-preview-img />
-        <strong data-main-image-name></strong>
-        <span class="admin-muted" data-main-image-size></span>
-      </div>
-    </div>
-    <div class="admin-field" data-video-upload>
-      <label for="video">Vídeo do case</label>
-      <div class="admin-video-upload" data-video-zone>
-        <input class="admin-file-input" id="video" name="video" type="file" accept="video/*" data-video-input />
-        <div>
-          <strong>Solte o vídeo aqui</strong>
-          <p class="admin-muted">MP4, WebM ou MOV até 2GB. A prévia aparece antes de criar o case.</p>
-        </div>
-        <button class="admin-button" type="button" data-video-button>Selecionar vídeo</button>
-      </div>
-      <p class="admin-alert admin-alert--compact" data-video-message hidden></p>
-      <div class="admin-video-preview" data-video-preview hidden>
-        <div class="admin-video-preview__header">
-          <div>
-            <p class="admin-muted">Vídeo selecionado</p>
-            <strong data-video-name></strong>
-            <span class="admin-muted" data-video-size></span>
-            <span class="admin-muted" data-video-type></span>
-          </div>
-          <div class="admin-video-actions">
-            <button class="admin-image-action" type="button" data-video-button>Trocar vídeo</button>
-            <button class="admin-image-action admin-image-action--remove" type="button" data-video-remove-selection>Remover seleção</button>
-          </div>
-        </div>
-        <video controls playsinline data-video-preview-player></video>
-      </div>
-    </div>
-    <div class="admin-field"><label for="desafio">Desafio</label><textarea class="admin-textarea" id="desafio" name="desafio"></textarea></div>
-    <div class="admin-field"><label for="entrega">Entrega</label><textarea class="admin-textarea" id="entrega" name="entrega"></textarea></div>
-    <div class="admin-field"><label for="resultado">Resultado</label><textarea class="admin-textarea" id="resultado" name="resultado"></textarea></div>
-    <div class="admin-field" data-image-upload>
-      <label for="images">Imagens do case</label>
-      <div class="admin-upload-zone" data-upload-zone>
-        <input class="admin-file-input" id="images" name="images" type="file" accept="image/*" multiple data-upload-input />
-        <div>
-          <strong>Solte as imagens aqui</strong>
-          <p class="admin-muted">As imagens selecionadas aparecem na grade abaixo para remoção e ordenação antes do envio.</p>
-        </div>
-        <button class="admin-button" type="button" data-upload-button>Selecionar imagens</button>
-      </div>
-      <template data-upload-card-template><AdminCaseImageCard mode="upload-template" /></template>
-      <div class="admin-image-list" data-image-list></div>
-    </div>
-    <p class="admin-muted">Depois de selecionar as imagens, arraste os cards para definir a ordem de exibição.</p>
-    <div class="admin-actions"><button class="admin-button admin-button--primary" type="submit">Criar case</button><a class="admin-button" href={adminUrl('cases')}>Cancelar</a></div>
-  </form>
+  <AdminCaseForm />
 </AdminLayout>

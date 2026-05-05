@@ -171,6 +171,7 @@ background-clip: text;
 ```
 src/
   components/AdminLayout.astro — standalone dashboard shell for private content management
+  components/AdminCaseForm.astro — shared admin case create/edit form markup
   components/Modal.astro    — reusable layout-agnostic modal shell using native <dialog>
   layouts/Layout.astro   — base HTML shell, imports global.css, Google Fonts (Inter)
   lib/auth.ts            — admin path helpers, username login/session cookie utilities
@@ -194,6 +195,8 @@ astro.config.mjs         — output: server, adapter: @astrojs/node (standalone)
 - Case uploads use UUID v4 filenames. Main thumbnail images, gallery images, and videos are hard-linked to cases for simplicity: deleting a case deletes its media DB rows and local files from `./uploads/`. Admin case create/edit/delete DB mutations run inside SQLite transactions; old/replaced media files are deleted only after the DB transaction succeeds, while newly uploaded files are cleaned up if the DB write fails. Admin case upload endpoints parse multipart requests with `busboy` so large videos stream directly to disk instead of buffering the full file in memory.
 
 - Public case API/components share the case response shape through `src/lib/public-cases.ts` (`PublicCase`, `PublicCaseImage`) to keep `/api/cases`, `CasesSection`, `CasesCarousel`, and `CaseModal` aligned.
+
+- Admin case create/edit pages share the main form markup through `src/components/AdminCaseForm.astro`; edit-only delete remains in `src/pages/[adminPath]/cases/[id].astro`.
 
 - Admin dashboard styling lives in `src/styles/admin.css`; `src/components/AdminLayout.astro` owns only the admin shell markup, upload modal markup, script imports, and stylesheet import.
 
