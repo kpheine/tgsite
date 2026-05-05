@@ -43,6 +43,65 @@ main {
   min-height: 100dvh;
 }
 
+/* ─── Shared Public Buttons ──────────────────────────────────────────────── */
+.site-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--site-button-padding, 1.25rem 2.5rem);
+  border: 0;
+  border-radius: 33px;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  font: 700 var(--site-button-font-size, 1.1rem)/1 'Inter', system-ui, sans-serif;
+  letter-spacing: var(--site-button-letter-spacing, 0.06em);
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: filter 0.15s ease, background-color 0.15s ease;
+}
+
+.site-button:hover {
+  background-color: rgba(103, 137, 217, 0.15);
+  filter: brightness(1.15);
+}
+
+.site-button:focus-visible {
+  outline: 2px solid #61f4e8;
+  outline-offset: 4px;
+}
+
+.site-button--gradient {
+  overflow: hidden;
+}
+
+.site-button--gradient::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px solid #6789d9;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+@supports (-webkit-mask: linear-gradient(#fff 0 0)) {
+  .site-button--gradient::before {
+    border: 0;
+    padding: 2px;
+    background: linear-gradient(100deg, #3157d6 0%, #23d6ec 49%, #ec148f 100%);
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+  }
+}
+
 /* ─── Modal Framework ─────────────────────────────────────────────────────── */
 .modal {
   width: min(960px, calc(100vw - 2rem));

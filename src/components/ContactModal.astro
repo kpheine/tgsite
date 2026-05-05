@@ -36,7 +36,7 @@ import Modal from './Modal.astro';
         </label>
 
         <div class="contact-modal__actions">
-          <button class="contact-modal__submit" type="button">Enviar</button>
+          <button class="site-button site-button--gradient contact-modal__submit" type="button">Enviar</button>
           <a href="https://wa.me/" class="contact-modal__whatsapp" target="_blank" rel="noopener noreferrer" aria-label="Falar pelo WhatsApp">
             <img src="/images/whatsapp.svg" alt="" aria-hidden="true" />
           </a>
@@ -162,41 +162,13 @@ import Modal from './Modal.astro';
   }
 
   .contact-modal__submit {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 47px;
-    border: 0;
+    --site-button-padding: 0.9rem 2.5rem;
+    --site-button-font-size: 18px;
+    --site-button-letter-spacing: 0;
     border-radius: 999px;
-    background: transparent;
-    color: #fff;
-    cursor: pointer;
-    font: 800 18px/1 'Inter', system-ui, sans-serif;
-    overflow: hidden;
-    text-transform: uppercase;
-    transition: filter 160ms ease, transform 160ms ease;
+    font-weight: 800;
   }
 
-  .contact-modal__submit::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 2px;
-    background: linear-gradient(100deg, #3157d6 0%, #23d6ec 49%, #ec148f 100%);
-    pointer-events: none;
-    -webkit-mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    mask-composite: exclude;
-  }
-
-  .contact-modal__submit:hover,
   .contact-modal__whatsapp:hover {
     filter: brightness(1.25);
   }

@@ -51,8 +51,9 @@
 ## Button Style (consistent across site)
 
 - Pill shape: `border-radius: 33px`, `height: 59-60px`
-- Outlined: `border: 2px solid #6789d9`, transparent bg, white text, Inter Bold, uppercase
-- Hover: `background-color: rgba(103, 137, 217, 0.15)`
+- Public CTA buttons use shared global classes `site-button site-button--gradient` from `src/styles/global.css`: transparent pill, white Inter Bold uppercase text, padding-driven height, solid `#6789d9` fallback border on `::before`, and blue/cyan/pink gradient border on the same pseudo-element via CSS mask for supported browsers
+- Component-local CTA classes should only keep layout exceptions (e.g. `align-self`, custom CSS variables like `--site-button-padding`, or `white-space`), not duplicate base button styling
+- Hover: `background-color: rgba(103, 137, 217, 0.15)` plus subtle brightness lift
 - Carousel nav: gradient fill = active; `::before` mask gradient ring = inactive/disabled
 
 ## Sections Built (Phase 1 complete)
