@@ -1,3 +1,9 @@
+/* ─── Background pan animation ────────────────────────────────────────────── */
+@keyframes bg-pan-x {
+  from { background-position-x: 0px; }
+  to   { background-position-x: 1920px; }
+}
+
 /* ─── Reset ───────────────────────────────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;

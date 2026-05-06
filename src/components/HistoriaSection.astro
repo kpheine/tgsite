@@ -3,14 +3,6 @@
 ---
 
 <section class="historia-section" id="historia">
-  <!-- Pixel gradient background -->
-  <img
-    src="/images/historia-bg.png"
-    alt=""
-    class="historia-bg"
-    aria-hidden="true"
-  />
-
   <div class="historia-inner">
     <!-- Left: text content -->
     <div class="historia-text">
@@ -49,19 +41,13 @@
     width: 100%;
     min-height: 100svh;
     background-color: #0d0d0d;
+    background-image: url('/images/degrade-pixels.png');
+    background-size: auto;
+    background-repeat: repeat-x;
+    background-position: 0 center;
+    background-blend-mode: hard-light;
+    animation: bg-pan-x 240s linear infinite reverse;
     overflow: hidden;
-  }
-
-  /* Pixel gradient background — white-at-top, dark-at-bottom, 80% opacity */
-  .historia-bg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 278%;
-    object-fit: cover;
-    object-position: top center;
-    opacity: 0.8;
-    pointer-events: none;
   }
 
   /* Two-column inner layout */

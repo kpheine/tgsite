@@ -13,7 +13,7 @@
       </h2>
 
       <div class="contato-actions">
-        <a href="tel:+551151053333" class="site-button site-button--gradient btn-fale">Fale com a gente</a>
+        <button type="button" class="site-button site-button--gradient btn-fale" data-modal-open="contact-modal">Fale com a gente</button>
         <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
           <img src="/images/footer/zap.svg" alt="" class="zap-icon" aria-hidden="true" />
         </a>
@@ -69,6 +69,12 @@
 <style>
   .contato-section {
     background-color: #0d0d0d;
+    background-image: url('/images/degrade-pixels.png');
+    background-size: auto;
+    background-repeat: repeat-x;
+    background-position: 0 center;
+    background-blend-mode: hard-light;
+    animation: bg-pan-x 240s linear infinite;
     width: 100%;
   }
 
