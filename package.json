@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
+    "dev:reset": "node scripts/dev-reset.mjs",
     "check": "astro check",
     "build": "astro build",
     "preview": "astro preview"

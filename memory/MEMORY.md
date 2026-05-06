@@ -178,7 +178,7 @@ src/
   layouts/Layout.astro   — base HTML shell, imports global.css, Google Fonts (Inter)
   lib/auth.ts            — admin path helpers, username login/session cookie utilities
   lib/bytes.ts           — shared pure byte label formatter used by server and browser upload code
-  lib/db.ts              — SQLite connection, schema, env admin/support user seeding (`cases`, `imagens_case`)
+  lib/db.ts              — SQLite connection, fresh-schema creation, schema version guard, env admin/support user seeding (`cases`, `imagens_case`)
   lib/env.ts             — server env helper for Astro import.meta.env + process.env fallback
   lib/upload-limits.ts   — env-driven admin media size limits and generated display labels
   lib/uploads.ts         — image/video upload validation and filesystem writes
@@ -191,6 +191,7 @@ src/
   scripts/modal-manager.ts — delegated open/close behavior for all modals
   styles/global.css      — public CSS reset + modal styles
   styles/admin.css       — global admin dashboard/form/media/upload styles imported by AdminLayout
+scripts/dev-reset.mjs    — dev-only local SQLite/uploads reset command used by `npm run dev:reset`
 Dockerfile               — multi-stage, Node 20 Alpine + native build deps, runs dist/server/entry.mjs
 docker-compose.yml       — port 4321, data/uploads volumes, reads .env
 .env.example             — ADMIN_PATH, ADMIN_USERNAME, ADMIN_PASSWORD, SESSION_SECRET, HOST, PORT, UPLOAD_MAX_IMAGE_BYTES, UPLOAD_MAX_VIDEO_BYTES
@@ -206,6 +207,7 @@ astro.config.mjs         — output: server, adapter: @astrojs/node (standalone)
 - Admin dashboard styling lives in `src/styles/admin.css`; `src/components/AdminLayout.astro` owns only the admin shell markup, upload modal markup, script imports, and stylesheet import.
 
 - `npm run dev` → dev server at localhost:4321
+- `npm run dev:reset` → development-only reset for `./data/site.db`, SQLite WAL/SHM files, and all files under `./uploads/`; refuses to run with `NODE_ENV=production`, asks for confirmation unless passed `-- --yes`, and preserves the `data/` and `uploads/` directories. Run this after pulling DB schema changes during heavy development.
 - `npm run check` → Astro TypeScript/template validation (`@astrojs/check`)
 - `npm run build` → production build verification
 - `docker compose up --build` → production container at localhost:4321

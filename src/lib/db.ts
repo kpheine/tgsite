@@ -1,108 +1,81 @@
 import Database from 'better-sqlite3';
 import { hashSync } from 'bcryptjs';
-import { mkdirSync } from 'node:fs';
+import { existsSync, mkdirSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { dirname, resolve } from 'node:path';
 import { getEnv } from './env';
 
 export const SUPPORT_ADMIN_USERNAME = 'support-admin';
+const DB_SCHEMA_VERSION = 1;
 
 const dbPath = resolve(process.cwd(), 'data/site.db');
 mkdirSync(dirname(dbPath), { recursive: true });
+const shouldCreateSchema = !existsSync(dbPath);
 
 export const db = new Database(dbPath);
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 
-db.exec(`
-  CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT NOT NULL UNIQUE,
-    password_hash TEXT NOT NULL,
-    role TEXT NOT NULL DEFAULT 'admin',
-    support_enabled INTEGER NOT NULL DEFAULT 1,
-    support_expires_at TEXT,
-    last_login_at TEXT,
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-  );
+if (shouldCreateSchema) {
+  db.exec(`
+    CREATE TABLE users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT NOT NULL UNIQUE,
+      password_hash TEXT NOT NULL,
+      role TEXT NOT NULL DEFAULT 'admin',
+      support_enabled INTEGER NOT NULL DEFAULT 1,
+      support_expires_at TEXT,
+      last_login_at TEXT,
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
 
-  CREATE TABLE IF NOT EXISTS sessions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    token_hash TEXT NOT NULL UNIQUE,
-    user_id INTEGER NOT NULL,
-    expires_at TEXT NOT NULL,
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-  );
+    CREATE TABLE sessions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      token_hash TEXT NOT NULL UNIQUE,
+      user_id INTEGER NOT NULL,
+      expires_at TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
 
-  CREATE TABLE IF NOT EXISTS cases (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    titulo TEXT NOT NULL,
-    cliente TEXT,
-    main_image_url TEXT NOT NULL,
-    video_url TEXT,
-    desafio TEXT,
-    entrega TEXT,
-    resultado TEXT,
-    status TEXT NOT NULL DEFAULT 'draft',
-    sort_order INTEGER NOT NULL DEFAULT 0,
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-  );
+    CREATE TABLE cases (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      titulo TEXT NOT NULL,
+      cliente TEXT,
+      main_image_url TEXT NOT NULL,
+      video_url TEXT,
+      desafio TEXT,
+      entrega TEXT,
+      resultado TEXT,
+      status TEXT NOT NULL DEFAULT 'draft',
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
 
-  CREATE TABLE IF NOT EXISTS imagens_case (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    case_id INTEGER NOT NULL,
-    sort_order INTEGER NOT NULL DEFAULT 0,
-    url TEXT NOT NULL,
-    destaque INTEGER NOT NULL DEFAULT 0,
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (case_id) REFERENCES cases(id) ON DELETE CASCADE
-  );
-`);
+    CREATE TABLE imagens_case (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      case_id INTEGER NOT NULL,
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      url TEXT NOT NULL,
+      destaque INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (case_id) REFERENCES cases(id) ON DELETE CASCADE
+    );
+  `);
 
-function columnExists(table: string, column: string) {
-  return db.prepare(`PRAGMA table_info(${table})`).all().some((item: any) => item.name === column);
+  db.pragma(`user_version = ${DB_SCHEMA_VERSION}`);
+} else {
+  const schemaVersion = db.pragma('user_version', { simple: true });
+
+  if (schemaVersion !== DB_SCHEMA_VERSION) {
+    throw new Error(
+      `Local database schema is outdated. Run "npm run dev:reset" to recreate ./data/site.db for development.`,
+    );
+  }
 }
-
-if (!columnExists('cases', 'main_image_url')) {
-  db.prepare("ALTER TABLE cases ADD COLUMN main_image_url TEXT NOT NULL DEFAULT ''").run();
-}
-
-if (!columnExists('users', 'username')) {
-  db.prepare('ALTER TABLE users ADD COLUMN username TEXT').run();
-  db.prepare('UPDATE users SET username = lower(email) WHERE username IS NULL').run();
-  db.prepare('CREATE UNIQUE INDEX IF NOT EXISTS users_username_unique ON users(username)').run();
-}
-
-if (!columnExists('users', 'support_enabled')) {
-  db.prepare('ALTER TABLE users ADD COLUMN support_enabled INTEGER NOT NULL DEFAULT 1').run();
-}
-
-if (!columnExists('users', 'support_expires_at')) {
-  db.prepare('ALTER TABLE users ADD COLUMN support_expires_at TEXT').run();
-}
-
-if (!columnExists('users', 'last_login_at')) {
-  db.prepare('ALTER TABLE users ADD COLUMN last_login_at TEXT').run();
-}
-
-db.prepare('UPDATE users SET support_enabled = 1 WHERE support_enabled IS NULL').run();
-
-const hasLegacyEmailColumn = columnExists('users', 'email');
 
 function insertUser(username: string, passwordHash: string, role: string, supportEnabled: 0 | 1) {
-  if (hasLegacyEmailColumn) {
-    db.prepare('INSERT INTO users (email, username, password_hash, role, support_enabled) VALUES (?, ?, ?, ?, ?)').run(
-      `${username}@local.invalid`,
-      username,
-      passwordHash,
-      role,
-      supportEnabled,
-    );
-    return;
-  }
-
   db.prepare('INSERT INTO users (username, password_hash, role, support_enabled) VALUES (?, ?, ?, ?)').run(
     username,
     passwordHash,
