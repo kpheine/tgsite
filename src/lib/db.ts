@@ -65,6 +65,10 @@ function columnExists(table: string, column: string) {
   return db.prepare(`PRAGMA table_info(${table})`).all().some((item: any) => item.name === column);
 }
 
+if (!columnExists('cases', 'main_image_url')) {
+  db.prepare("ALTER TABLE cases ADD COLUMN main_image_url TEXT NOT NULL DEFAULT ''").run();
+}
+
 if (!columnExists('users', 'username')) {
   db.prepare('ALTER TABLE users ADD COLUMN username TEXT').run();
   db.prepare('UPDATE users SET username = lower(email) WHERE username IS NULL').run();
