@@ -19,11 +19,6 @@
         </a>
       </div>
     </div>
-
-    <!-- Decorative gradient blob -->
-    <div class="contato-blob" aria-hidden="true">
-      <img src="/images/footer/blob.png" alt="" />
-    </div>
   </div>
 
   <!-- Divider -->
@@ -31,6 +26,11 @@
 
   <!-- Map -->
   <div class="contato-map">
+    <!-- Decorative gradient blob — upper half in contact area, lower half behind map -->
+    <div class="contato-blob" aria-hidden="true">
+      <img src="/images/footer/blob.png" alt="" />
+    </div>
+
     <iframe
       class="map-iframe"
       src="https://maps.google.com/maps?q=Av.+Engenheiro+Luis+Carlos+Berrini,+1700,+São+Paulo,+SP,+Brasil&t=&z=15&ie=UTF8&iwloc=&output=embed"
@@ -68,6 +68,7 @@
 
 <style>
   .contato-section {
+    position: relative;
     background-color: #0d0d0d;
     background-image: url('/images/degrade-pixels.png');
     background-size: auto;
@@ -85,8 +86,8 @@
     grid-template-columns: 1fr 1fr;
     align-items: center;
     padding: 5rem 165px 0;
-    overflow: hidden;
     min-height: 520px;
+    z-index: 1;
   }
 
   .contato-left {
@@ -138,12 +139,14 @@
     object-fit: contain;
   }
 
-  /* Gradient blob — right side, overflows top */
+  /* Gradient blob — anchored to top of map, upper half floats into contact area */
   .contato-blob {
     position: absolute;
-    right: -2%;
-    top: 10%;
-    width: 38%;
+    right: 165px;
+    top: 0;
+    transform: translateY(-50%);
+    width: 40%;
+    z-index: 0;
     pointer-events: none;
   }
 
@@ -156,6 +159,8 @@
 
   /* ── Divider ─────────────────────────────────── */
   .contato-divider {
+    position: relative;
+    z-index: 1;
     border: none;
     border-top: 1px solid #fff;
     margin: 30px 165px;
@@ -163,10 +168,13 @@
 
   /* ── Map ─────────────────────────────────────── */
   .contato-map {
+    position: relative;
     padding: 0 165px;
   }
 
   .map-iframe {
+    position: relative;
+    z-index: 1;
     width: 100%;
     height: 400px;
     border: none;
