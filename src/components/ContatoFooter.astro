@@ -47,19 +47,25 @@
       <img src="/images/footer/tg-logo.png" alt="TG Agency" class="footer-tg-logo" />
     </div>
 
-    <div class="footer-contact">
-      <p class="footer-phone">+55 11 5105 3333</p>
-      <address class="footer-address">
-        Av. Eng. Luis Carlos Berrini, 1700<br />
-        16º andar – CEP 04571935<br />
-        São Paulo – SP – Brasil
-      </address>
-    </div>
+    <div class="footer-right">
+      <div class="footer-contact">
+        <p class="footer-phone">+55 11 5105 3333</p>
+        <address class="footer-address">
+          Av. Eng. Luis Carlos Berrini, 1700<br />
+          16º andar – CEP 04571935<br />
+          São Paulo – SP – Brasil
+        </address>
+      </div>
 
-    <div class="footer-social">
-      <div class="social-wrap">
-        <img src="/images/footer/social-blob.png" alt="" class="social-blob" aria-hidden="true" />
-        <img src="/images/footer/social-icon.svg" alt="Redes sociais" class="social-icon" />
+      <div class="footer-social">
+        <a href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="social-item">
+          <img src="/images/footer/social-blob.png" alt="" class="social-item__blob" aria-hidden="true" />
+          <img src="/images/footer/linkedin-icon.svg" alt="LinkedIn" class="social-item__icon" />
+        </a>
+        <a href="#" aria-label="Redes sociais" class="social-item">
+          <img src="/images/footer/social-blob.png" alt="" class="social-item__blob" aria-hidden="true" />
+          <img src="/images/footer/play-icon.svg" alt="Redes sociais" class="social-item__icon" />
+        </a>
       </div>
     </div>
   </footer>
@@ -192,10 +198,17 @@
   }
 
   .footer-tg-logo {
-    height: 64px;
+    height: 100px;
     width: auto;
     object-fit: contain;
     display: block;
+  }
+
+  .footer-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1.25rem;
   }
 
   .footer-contact {
@@ -221,16 +234,22 @@
   }
 
   .footer-social {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .social-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
     flex-shrink: 0;
   }
 
-  .social-wrap {
-    position: relative;
-    width: 64px;
-    height: 64px;
-  }
-
-  .social-blob {
+  .social-item__blob {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -238,11 +257,11 @@
     object-fit: contain;
   }
 
-  .social-icon {
-    position: absolute;
-    inset: 20%;
-    width: 60%;
-    height: 60%;
+  .social-item__icon {
+    position: relative;
+    width: 55%;
+    height: 55%;
     object-fit: contain;
   }
+
 </style>
