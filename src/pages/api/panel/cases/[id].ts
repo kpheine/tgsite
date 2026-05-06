@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { adminUrl, requireUser } from '../../../../lib/auth';
 import { db, type CaseImageRecord, type CaseRecord } from '../../../../lib/db';
-import { cleanupUploadedFiles, deleteUploadedFile, fieldValue, fieldValues, parseCaseUploadRequest, type ParsedCaseUpload } from '../../../../lib/uploads';
+import { cleanupUploadedFiles, deleteUploadedFile, fieldValue, fieldValues, parseCaseUploadRequest, UploadValidationError, type ParsedCaseUpload } from '../../../../lib/uploads';
 
 function textValue(upload: ParsedCaseUpload, name: string) {
   return fieldValue(upload, name).trim() || null;
@@ -102,7 +102,17 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
     return new Response('Envio inválido', { status: 400 });
   }
 
-  const upload = await parseCaseUploadRequest(request);
+  let upload: ParsedCaseUpload;
+  try {
+    upload = await parseCaseUploadRequest(request);
+  } catch (error) {
+    if (error instanceof UploadValidationError) {
+      return new Response(error.message, { status: 400 });
+    }
+
+    throw error;
+  }
+
   if (fieldValue(upload, '_action') === 'delete') {
     const mediaUrls = getCaseMediaUrls(item);
     db.transaction(() => {

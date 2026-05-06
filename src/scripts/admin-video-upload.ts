@@ -1,4 +1,4 @@
-const MAX_VIDEO_BYTES = 2 * 1024 * 1024 * 1024;
+import { formatBytesLabel, getByteLimit } from './admin-upload-limits';
 
 function formatFileSize(bytes: number) {
   if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
@@ -40,6 +40,8 @@ function initVideoUpload(root: HTMLElement) {
 
   let previewUrl: string | null = null;
   const removeSelectionText = removeSelection?.textContent || 'Remover seleção';
+  const maxVideoBytes = getByteLimit(root, 'maxVideoBytes', 2 * 1024 * 1024 * 1024);
+  const maxVideoLabel = formatBytesLabel(maxVideoBytes);
 
   function clearSelection() {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
@@ -70,9 +72,9 @@ function initVideoUpload(root: HTMLElement) {
       return;
     }
 
-    if (file.size > MAX_VIDEO_BYTES) {
+    if (file.size > maxVideoBytes) {
       clearSelection();
-      setMessage(message, 'O vídeo excede o limite de 2GB.');
+      setMessage(message, `O vídeo excede o limite de ${maxVideoLabel}.`);
       return;
     }
 
