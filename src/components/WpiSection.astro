@@ -1,9 +1,9 @@
 ---
 const features = [
-  { icon: "/images/wpi/icon-insights.png",  label: "Insights\ninternacionais" },
-  { icon: "/images/wpi/icon-parcerias.png", label: "Parcerias\nglobais" },
-  { icon: "/images/wpi/icon-troca.png",     label: "Troca de\nexperiências" },
-  { icon: "/images/wpi/icon-squads.png",    label: "Squads com\nespecialistas" },
+  { icon: "/images/wpi/icon-insights.svg",  label: "Insights\ninternacionais" },
+  { icon: "/images/wpi/icon-parcerias.svg", label: "Parcerias\nglobais" },
+  { icon: "/images/wpi/icon-troca.svg",     label: "Troca de\nexperiências" },
+  { icon: "/images/wpi/icon-squads.svg",    label: "Squads com\nespecialistas" },
 ];
 ---
 
@@ -230,13 +230,27 @@ const features = [
     height: 100px;
   }
 
+  @keyframes blob-float {
+    0%   { transform: scale(1)    rotate(0deg)   translate(0px, 0px); }
+    25%  { transform: scale(1.04) rotate(4deg)   translate(2px, -3px); }
+    50%  { transform: scale(0.97) rotate(-2deg)  translate(-2px, 2px); }
+    75%  { transform: scale(1.03) rotate(3deg)   translate(1px, -2px); }
+    100% { transform: scale(1)    rotate(0deg)   translate(0px, 0px); }
+  }
+
   .feature-blob {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: contain;
+    animation: blob-float 6s ease-in-out infinite;
+    transform-origin: center;
   }
+
+  .feature:nth-child(2) .feature-blob { animation-delay: -1.5s; animation-duration: 7s; }
+  .feature:nth-child(3) .feature-blob { animation-delay: -3s;   animation-duration: 5.5s; }
+  .feature:nth-child(4) .feature-blob { animation-delay: -4.5s; animation-duration: 6.5s; }
 
   .feature-icon {
     position: absolute;
