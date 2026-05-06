@@ -1,5 +1,5 @@
 import Database from 'better-sqlite3';
-import { hashSync } from 'bcryptjs';
+import { compareSync, hashSync } from 'bcryptjs';
 import { existsSync, mkdirSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { dirname, resolve } from 'node:path';
@@ -7,6 +7,7 @@ import { getEnv } from './env';
 
 export const SUPPORT_ADMIN_USERNAME = 'support-admin';
 const DB_SCHEMA_VERSION = 1;
+const DEFAULT_ADMIN_PASSWORD = 'change-this-password';
 
 const dbPath = resolve(process.cwd(), 'data/site.db');
 mkdirSync(dirname(dbPath), { recursive: true });
@@ -108,33 +109,38 @@ export interface CaseImageRecord {
   created_at: string;
 }
 
-function seedAdminUser() {
-  const existing = db.prepare("SELECT id FROM users WHERE role = 'admin' LIMIT 1").get();
-  if (existing) return;
-
-  const username = getEnv('ADMIN_USERNAME', 'admin');
+function syncPrimaryAdminFromEnv() {
+  const username = getEnv('ADMIN_USERNAME', 'admin').trim().toLowerCase() || 'admin';
   const password = getEnv('ADMIN_PASSWORD');
 
-  if (!username || !password) return;
+  if (!password) {
+    throw new Error('ADMIN_PASSWORD is required. Set a strong admin password in .env before starting the app.');
+  }
 
-  insertUser(
-    username.trim().toLowerCase(),
-    hashSync(password, 12),
-    'admin',
-    1,
-  );
-}
+  if (password === DEFAULT_ADMIN_PASSWORD) {
+    throw new Error('ADMIN_PASSWORD must be changed from the default value in .env before starting the app.');
+  }
 
-function syncAdminUsernameFromEnv() {
-  const username = getEnv('ADMIN_USERNAME', 'admin').trim().toLowerCase();
-  const admin = db.prepare("SELECT id, username FROM users WHERE role = 'admin' ORDER BY id ASC LIMIT 1").get() as
-    | { id: number; username: string | null }
+  const admin = db.prepare("SELECT id, username, password_hash FROM users WHERE role = 'admin' ORDER BY id ASC LIMIT 1").get() as
+    | { id: number; username: string | null; password_hash: string }
     | undefined;
-  if (!admin || admin.username === username) return;
 
-  const usernameTaken = db.prepare('SELECT id FROM users WHERE username = ? AND id != ?').get(username, admin.id);
-  if (!usernameTaken) {
+  if (!admin) {
+    insertUser(username, hashSync(password, 12), 'admin', 1);
+    return;
+  }
+
+  if (admin.username !== username) {
+    const usernameTaken = db.prepare('SELECT id FROM users WHERE username = ? AND id != ?').get(username, admin.id);
+    if (usernameTaken) {
+      throw new Error(`ADMIN_USERNAME "${username}" is already used by another account. Choose a different admin username.`);
+    }
+
     db.prepare('UPDATE users SET username = ? WHERE id = ?').run(username, admin.id);
+  }
+
+  if (!compareSync(password, admin.password_hash)) {
+    db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').run(hashSync(password, 12), admin.id);
   }
 }
 
@@ -151,6 +157,5 @@ function ensureSupportUser() {
   );
 }
 
-seedAdminUser();
-syncAdminUsernameFromEnv();
+syncPrimaryAdminFromEnv();
 ensureSupportUser();
