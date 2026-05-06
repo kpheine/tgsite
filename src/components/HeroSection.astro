@@ -30,9 +30,9 @@
   </div>
 
   <!-- Scroll indicator arrow -->
-  <div class="scroll-arrow" aria-hidden="true">
+  <button class="scroll-arrow" aria-label="Rolar para baixo" onclick="document.getElementById('cases').scrollIntoView({behavior:'smooth'})">
     <img src="/images/hero-vector.svg" alt="" width="23" height="29" />
-  </div>
+  </button>
 </section>
 
 <style>
@@ -96,13 +96,21 @@
     text-align: right;
   }
 
-  /* Scroll-up arrow — bottom center */
+  /* Scroll-down arrow — bottom center */
   .scroll-arrow {
     position: absolute;
     bottom: 4%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%) rotate(180deg);
     opacity: 0.6;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .scroll-arrow:hover {
+    opacity: 1;
   }
 
   @media (max-width: 768px) {
