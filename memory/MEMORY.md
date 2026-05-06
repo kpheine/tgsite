@@ -22,6 +22,7 @@
 - Admin case create/edit forms warn before tab close, internal navigation, or non-case form submits when unsaved changes exist (`src/scripts/admin-unsaved-case-warning.ts`). Case delete forms require a browser confirmation before submitting (`src/scripts/admin-case-delete-confirm.ts`).
 - Existing case videos in the admin edit form are click-to-load placeholders, so opening the edit page does not immediately request the current video. Uploaded media is served with byte-range streaming from `src/pages/uploads/[...path].ts` for efficient video playback after the user clicks.
 - Server env reads go through `src/lib/env.ts`, which checks Astro `import.meta.env` first and falls back to `process.env`; this keeps `.env` working in `npm run dev` and Docker/process env working in production.
+- Docker/Astro SSR host validation uses build-time `ALLOWED_HOSTS` (default `localhost,127.0.0.1`) passed through Compose build args into `astro.config.mjs`; set it to the production domain(s) before building a deployed image. `SESSION_COOKIE_SECURE` controls whether admin session cookies require HTTPS, defaulting to secure in production unless overridden for local Docker HTTP testing.
 - Popup framework: native HTML `<dialog>` wrapped by `src/components/Modal.astro`, controlled by `src/scripts/modal-manager.ts`; content is layout-agnostic and can come from Astro components, structured API data, Markdown-rendered HTML, or sanitized raw HTML. Open/close transitions are handled with `.is-open` / `.is-closing` classes plus a short close delay so native dialogs can animate out. Modal scroll lock measures the active scrollbar width and compensates with body padding only when needed to avoid layout shifts without forcing a permanent gutter. `Modal.astro` supports a `className` hook for per-modal styling. `src/components/ContactModal.astro` owns the public header contact popup UI: dark rounded two-column form, Bebas Neue "FALE COM A GENTE." title, TG brand mark, WhatsApp CTA, and responsive stacked mobile layout. Public case carousel cards open one shared white case modal with a large padded container, fixed topbar containing only previous/next arrows between published cases, in-place fade transitions between case content, a separate scrollable body whose scrollbar is offset right while preserving content width, optional video playback only when `video_url` exists, client label when present, large Bebas Neue case title, conditional cards for non-empty `desafio`, `entrega`, and `resultado` fields with distinct gradients per card (centered 3-card-width flex row on desktop, stacked full-width cards on tablet/mobile), and an ordered case image gallery where `destaque` images span full width while regular images use a two-column desktop grid and stack on mobile.
 
 ## Project Context
@@ -192,8 +193,9 @@ src/
   styles/global.css      — public CSS reset + modal styles
   styles/admin.css       — global admin dashboard/form/media/upload styles imported by AdminLayout
 scripts/dev-reset.mjs    — dev-only local SQLite/uploads reset command used by `npm run dev:reset`
-Dockerfile               — multi-stage, Node 20 Alpine + native build deps, runs dist/server/entry.mjs
-docker-compose.yml       — port 4321, data/uploads volumes, reads .env
+  Dockerfile               — multi-stage, Node 20 Alpine + native build deps, runs dist/server/entry.mjs
+  docker-compose.yml       — port 4321, data/uploads volumes, reads .env
+  .dockerignore            — excludes host node_modules/dist/data/uploads so native dependencies are built for Linux inside Docker and bind-mounted content is not copied into the image
 .env.example             — ADMIN_PATH, ADMIN_USERNAME, ADMIN_PASSWORD, SESSION_SECRET, HOST, PORT, UPLOAD_MAX_IMAGE_BYTES, UPLOAD_MAX_VIDEO_BYTES
 astro.config.mjs         — output: server, adapter: @astrojs/node (standalone)
 ```

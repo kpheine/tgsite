@@ -49,6 +49,11 @@ function hashToken(token: string) {
   return createHash('sha256').update(`${sessionSecret}:${token}`).digest('hex');
 }
 
+function isSessionCookieSecure() {
+  const configured = getEnv('SESSION_COOKIE_SECURE', import.meta.env.PROD ? 'true' : 'false').trim().toLowerCase();
+  return configured === 'true' || configured === '1';
+}
+
 function sqliteDateTime(date: Date) {
   return date.toISOString().slice(0, 19).replace('T', ' ');
 }
@@ -79,7 +84,7 @@ export function setSessionCookie(cookies: any, token: string, expiresAt: string)
     path: '/',
     httpOnly: true,
     sameSite: 'lax',
-    secure: import.meta.env.PROD,
+    secure: isSessionCookieSecure(),
     expires: new Date(`${expiresAt.replace(' ', 'T')}Z`),
   });
 }

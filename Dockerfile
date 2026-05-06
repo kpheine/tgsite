@@ -1,5 +1,7 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
+ARG ALLOWED_HOSTS=localhost,127.0.0.1
+ENV ALLOWED_HOSTS=$ALLOWED_HOSTS
 RUN apk add --no-cache python3 make g++
 COPY package*.json ./
 RUN npm ci

@@ -1,6 +1,6 @@
 ---
 import CasesCarousel from './CasesCarousel.astro';
-import type { PublicCase } from '../lib/public-cases';
+import { getPublicCases, type PublicCase } from '../lib/public-cases';
 
 const placeholderCases: PublicCase[] = [
   {
@@ -17,8 +17,7 @@ const placeholderCases: PublicCase[] = [
   },
 ];
 
-const response = await fetch(new URL('/api/cases', Astro.url));
-const publishedCases = response.ok ? await response.json() as PublicCase[] : [];
+const publishedCases = getPublicCases();
 const cases = publishedCases.length > 0 ? publishedCases : placeholderCases;
 ---
 <section class="cases-section" id="cases">
