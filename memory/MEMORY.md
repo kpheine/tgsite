@@ -93,6 +93,7 @@ All in `src/components/` and `src/pages/sobre.astro`:
 
 ## Git Workflow Preference
 
+- **Always create a new branch** before committing feature/responsive work (e.g. `feature/mobile-responsive`)
 - **Commit locally** after each change
 - **Push only when user explicitly asks** ("commit and push")
 - Do NOT auto-push after every commit

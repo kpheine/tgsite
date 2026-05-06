@@ -115,4 +115,27 @@ const logos = [
     filter: brightness(0) invert(1);
     opacity: 0.85;
   }
+
+  @media (max-width: 768px) {
+    .clientes-inner {
+      padding: 3rem 1.5rem;
+      gap: 2rem;
+    }
+
+    .logos-grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem 0.75rem;
+    }
+
+    .logo-img {
+      height: 32px;
+      max-width: 100%;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .logos-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
 </style>

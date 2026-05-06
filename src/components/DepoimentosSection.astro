@@ -204,7 +204,7 @@ const cards = [
     will-change: transform;
   }
 
-  /* Cards — 3 visible at once */
+  /* Cards — 3 visible at once on desktop, 1 on mobile */
   .dep-card {
     flex: 0 0 calc((100% - 2 * 1.25rem) / 3);
     border-radius: 46px;
@@ -259,6 +259,19 @@ const cards = [
     color: #fff;
     line-height: 1.5;
   }
+
+  @media (max-width: 768px) {
+    .dep-inner {
+      padding: 3rem 1.5rem 0;
+      gap: 1.75rem;
+    }
+
+    .dep-card {
+      flex: 0 0 100%;
+      min-height: auto;
+      border-radius: 28px;
+    }
+  }
 </style>
 
 <script>
@@ -268,11 +281,16 @@ const cards = [
 
   const cards = track.querySelectorAll('.dep-card');
   const total = cards.length;
-  const visible = 3;
-  const maxIndex = total - visible;
   let current = 0;
 
+  function getVisible() {
+    return window.innerWidth <= 768 ? 1 : 3;
+  }
+
   function updateCarousel() {
+    const visible = getVisible();
+    const maxIndex = Math.max(0, total - visible);
+    if (current > maxIndex) current = maxIndex;
     const cardWidth = (track.parentElement as HTMLElement).offsetWidth;
     const gap = 20; // 1.25rem at 16px
     const step = (cardWidth + gap) / visible;
@@ -286,9 +304,10 @@ const cards = [
   });
 
   nextBtn.addEventListener('click', () => {
+    const maxIndex = Math.max(0, total - getVisible());
     if (current < maxIndex) { current++; updateCarousel(); }
   });
 
-  window.addEventListener('resize', updateCarousel);
+  window.addEventListener('resize', () => { current = 0; updateCarousel(); });
   updateCarousel();
 </script>

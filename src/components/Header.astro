@@ -7,7 +7,7 @@ import ContactModal from './ContactModal.astro';
       <img src="/images/tg-logo.png" alt="TG" class="logo" />
     </a>
 
-    <nav class="nav" aria-label="Principal">
+    <nav class="nav" id="main-nav" aria-label="Principal">
       <a href="#cases">Cases</a>
       <a href="#historia">Nossa história</a>
       <a href="#noticias">Notícias TG</a>
@@ -19,6 +19,11 @@ import ContactModal from './ContactModal.astro';
       <a href="https://wa.me/" class="whatsapp-link" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
         <img src="/images/whatsapp.svg" alt="" aria-hidden="true" />
       </a>
+      <button type="button" class="hamburger" aria-label="Abrir menu" aria-expanded="false" aria-controls="main-nav">
+        <span class="hamburger__bar"></span>
+        <span class="hamburger__bar"></span>
+        <span class="hamburger__bar"></span>
+      </button>
     </div>
   </div>
 </header>
@@ -98,4 +103,97 @@ import ContactModal from './ContactModal.astro';
     height: 44px;
     width: auto;
   }
+
+  /* Hamburger — hidden on desktop */
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+  }
+
+  .hamburger__bar {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #fff;
+    border-radius: 2px;
+    transition: transform 0.22s ease, opacity 0.22s ease;
+  }
+
+  /* Animated X state */
+  .hamburger[aria-expanded="true"] .hamburger__bar:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .hamburger[aria-expanded="true"] .hamburger__bar:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+
+  .hamburger[aria-expanded="true"] .hamburger__bar:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  @media (max-width: 768px) {
+    .nav {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(8, 8, 8, 0.97);
+      backdrop-filter: blur(14px);
+      z-index: 200;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      padding: 2rem;
+    }
+
+    .nav.is-open {
+      display: flex;
+    }
+
+    .nav a {
+      font-size: 2.5rem;
+    }
+
+    .hamburger {
+      display: flex;
+      z-index: 201;
+    }
+
+    .btn-contato {
+      --site-button-padding: 0.7rem 1.5rem;
+      --site-button-font-size: 0.9rem;
+    }
+
+    .whatsapp-link img {
+      height: 36px;
+    }
+  }
 </style>
+
+<script>
+  const hamburger = document.querySelector<HTMLButtonElement>('.hamburger');
+  const nav = document.querySelector<HTMLElement>('#main-nav');
+
+  hamburger?.addEventListener('click', () => {
+    const isOpen = nav?.classList.toggle('is-open') ?? false;
+    hamburger.setAttribute('aria-expanded', String(isOpen));
+  });
+
+  nav?.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement).tagName === 'A') {
+      nav.classList.remove('is-open');
+      hamburger?.setAttribute('aria-expanded', 'false');
+    }
+  });
+</script>

@@ -255,4 +255,21 @@ const features = [
     line-height: 1.3;
     white-space: pre-line;
   }
+
+  @media (max-width: 768px) {
+    .wpi-section {
+      padding: 3.5rem 1.5rem;
+      gap: 2.5rem;
+    }
+
+    .wpi-top {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .wpi-features {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+  }
 </style>
