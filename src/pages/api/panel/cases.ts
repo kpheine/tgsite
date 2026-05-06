@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { adminUrl, requireUser } from '../../../lib/auth';
 import { db } from '../../../lib/db';
-import { cleanupUploadedFiles, fieldValue, fieldValues, parseCaseUploadRequest, type ParsedCaseUpload } from '../../../lib/uploads';
+import { cleanupUploadedFiles, fieldValue, fieldValues, parseCaseUploadRequest, UploadValidationError, type ParsedCaseUpload } from '../../../lib/uploads';
 
 function saveImages(upload: ParsedCaseUpload, caseId: number) {
   let sortOrder = 0;
@@ -32,7 +32,17 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     return new Response(null, { status: 303, headers: { Location: adminUrl('login') } });
   }
 
-  const upload = await parseCaseUploadRequest(request);
+  let upload: ParsedCaseUpload;
+  try {
+    upload = await parseCaseUploadRequest(request);
+  } catch (error) {
+    if (error instanceof UploadValidationError) {
+      return new Response(error.message, { status: 400 });
+    }
+
+    throw error;
+  }
+
   const titulo = fieldValue(upload, 'titulo').trim();
   if (!titulo) {
     cleanupUploadedFiles(upload.uploadedUrls);

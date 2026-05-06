@@ -4,12 +4,13 @@ import { randomUUID } from 'node:crypto';
 import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import Busboy from 'busboy';
-
-const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
-export const MAX_VIDEO_BYTES = 2 * 1024 * 1024 * 1024;
+import { formatBytesLabel } from './bytes';
+import { MAX_IMAGE_BYTES, MAX_VIDEO_BYTES } from './upload-limits';
 
 const allowedImages = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 const allowedVideos = new Set(['video/mp4', 'video/webm', 'video/quicktime']);
+
+export class UploadValidationError extends Error {}
 
 export type UploadKind = 'image' | 'video';
 
@@ -24,15 +25,14 @@ export type ParsedCaseUpload = {
 const uploadRoot = resolve(process.cwd(), 'uploads');
 
 function uploadLimitLabel(kind: UploadKind) {
-  const bytes = kind === 'image' ? MAX_IMAGE_BYTES : MAX_VIDEO_BYTES;
-  return bytes >= 1024 * 1024 * 1024 ? `${Math.round(bytes / 1024 / 1024 / 1024)}GB` : `${Math.round(bytes / 1024 / 1024)}MB`;
+  return formatBytesLabel(kind === 'image' ? MAX_IMAGE_BYTES : MAX_VIDEO_BYTES);
 }
 
 function assertAllowedUpload(kind: UploadKind, mimeType: string) {
   const allowed = kind === 'image' ? allowedImages : allowedVideos;
 
   if (!allowed.has(mimeType)) {
-    throw new Error(`Tipo de ${kind === 'image' ? 'imagem' : 'vídeo'} não suportado.`);
+    throw new UploadValidationError(`Tipo de ${kind === 'image' ? 'imagem' : 'vídeo'} não suportado.`);
   }
 }
 
@@ -63,7 +63,7 @@ async function saveUploadStream(stream: NodeJS.ReadableStream, name: string, mim
     bytesWritten += chunk.length;
     if (bytesWritten > maxSize) {
       if ('destroy' in stream && typeof stream.destroy === 'function') {
-        stream.destroy(new Error(`${kind === 'image' ? 'A imagem' : 'O vídeo'} excede o limite de ${uploadLimitLabel(kind)}.`));
+        stream.destroy(new UploadValidationError(`${kind === 'image' ? 'A imagem' : 'O vídeo'} excede o limite de ${uploadLimitLabel(kind)}.`));
       }
     }
   });

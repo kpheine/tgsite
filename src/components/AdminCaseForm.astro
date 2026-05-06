@@ -2,6 +2,8 @@
 import AdminCaseImageCard from './AdminCaseImageCard.astro';
 import { adminUrl } from '../lib/auth';
 import type { CaseImageRecord, CaseRecord } from '../lib/db';
+import { formatBytesLabel } from '../lib/bytes';
+import { MAX_IMAGE_BYTES, MAX_VIDEO_BYTES } from '../lib/upload-limits';
 
 interface Props {
   item?: CaseRecord;
@@ -13,6 +15,8 @@ const isEdit = Boolean(item);
 const action = item ? `/api/panel/cases/${item.id}` : '/api/panel/cases';
 const status = item?.status ?? 'draft';
 const hasVideo = Boolean(item?.video_url);
+const maxImageLabel = formatBytesLabel(MAX_IMAGE_BYTES);
+const maxVideoLabel = formatBytesLabel(MAX_VIDEO_BYTES);
 ---
 
 <form class="admin-form" method="post" action={action} enctype="multipart/form-data" data-case-form>
@@ -28,7 +32,7 @@ const hasVideo = Boolean(item?.video_url);
       <small>Clique aqui para mudar o status</small>
     </button>
   </div>
-  <div class="admin-field" data-main-image-upload>
+  <div class="admin-field" data-main-image-upload data-max-image-bytes={MAX_IMAGE_BYTES}>
     <label for="main_image">Imagem principal do case</label>
     {item ? (
       <>
@@ -49,7 +53,8 @@ const hasVideo = Boolean(item?.video_url);
           <strong data-main-image-name></strong>
           <span class="admin-muted" data-main-image-size></span>
         </div>
-        <p class="admin-muted">A substituição só será aplicada ao salvar alterações.</p>
+        <p class="admin-alert admin-alert--compact" data-main-image-message hidden></p>
+        <p class="admin-muted">Imagem até {maxImageLabel}. A substituição só será aplicada ao salvar alterações.</p>
       </>
     ) : (
       <>
@@ -57,10 +62,11 @@ const hasVideo = Boolean(item?.video_url);
           <input class="admin-file-input" id="main_image" name="main_image" type="file" accept="image/*" required data-main-image-input />
           <div>
             <strong>Solte a imagem principal aqui</strong>
-            <p class="admin-muted">Obrigatória. Será usada como thumbnail do case fora da galeria.</p>
+            <p class="admin-muted">Obrigatória, até {maxImageLabel}. Será usada como thumbnail do case fora da galeria.</p>
           </div>
           <button class="admin-button" type="button" data-main-image-button>Selecionar imagem</button>
         </div>
+        <p class="admin-alert admin-alert--compact" data-main-image-message hidden></p>
         <div class="admin-main-image-preview" data-main-image-preview hidden>
           <p class="admin-muted">Imagem principal selecionada</p>
           <img src="" alt="" data-main-image-preview-img />
@@ -70,7 +76,7 @@ const hasVideo = Boolean(item?.video_url);
       </>
     )}
   </div>
-  <div class="admin-field" data-video-upload>
+  <div class="admin-field" data-video-upload data-max-video-bytes={MAX_VIDEO_BYTES}>
     <label for="video">Vídeo do case</label>
     {item?.video_url && (
       <div class="admin-video-current" data-current-video-card>
@@ -114,7 +120,7 @@ const hasVideo = Boolean(item?.video_url);
       <input class="admin-file-input" id="video" name="video" type="file" accept="video/*" data-video-input />
       <div>
         <strong>{hasVideo ? 'Solte um novo vídeo aqui' : 'Solte o vídeo aqui'}</strong>
-        <p class="admin-muted">MP4, WebM ou MOV até 2GB. {isEdit ? (hasVideo ? 'Um novo arquivo substitui o vídeo atual ao salvar.' : 'A prévia aparece antes de salvar o case.') : 'A prévia aparece antes de criar o case.'}</p>
+        <p class="admin-muted">MP4, WebM ou MOV até {maxVideoLabel}. {isEdit ? (hasVideo ? 'Um novo arquivo substitui o vídeo atual ao salvar.' : 'A prévia aparece antes de salvar o case.') : 'A prévia aparece antes de criar o case.'}</p>
       </div>
       <button class="admin-button" type="button" data-video-button>Selecionar vídeo</button>
     </div>
@@ -139,16 +145,17 @@ const hasVideo = Boolean(item?.video_url);
   <div class="admin-field"><label for="entrega">Entrega</label><textarea class="admin-textarea" id="entrega" name="entrega">{item?.entrega || ''}</textarea></div>
   <div class="admin-field"><label for="resultado">Resultado</label><textarea class="admin-textarea" id="resultado" name="resultado">{item?.resultado || ''}</textarea></div>
 
-  <div class="admin-field" data-image-upload>
+  <div class="admin-field" data-image-upload data-max-image-bytes={MAX_IMAGE_BYTES}>
     <label for="images">{isEdit ? 'Adicionar imagens' : 'Imagens do case'}</label>
     <div class="admin-upload-zone" data-upload-zone>
       <input class="admin-file-input" id="images" name="images" type="file" accept="image/*" multiple data-upload-input />
       <div>
         <strong>{isEdit ? 'Solte novas imagens aqui' : 'Solte as imagens aqui'}</strong>
-        <p class="admin-muted">{isEdit ? 'As imagens selecionadas entram na grade abaixo. Arraste qualquer card para definir a ordem final.' : 'As imagens selecionadas aparecem na grade abaixo para remoção e ordenação antes do envio.'}</p>
+        <p class="admin-muted">{isEdit ? `Imagens até ${maxImageLabel} entram na grade abaixo. Arraste qualquer card para definir a ordem final.` : `Imagens até ${maxImageLabel} aparecem na grade abaixo para remoção e ordenação antes do envio.`}</p>
       </div>
       <button class="admin-button" type="button" data-upload-button>Selecionar imagens</button>
     </div>
+    <p class="admin-alert admin-alert--compact" data-upload-message hidden></p>
     <template data-upload-card-template><AdminCaseImageCard mode="upload-template" /></template>
     {isEdit && <label>Imagens do case</label>}
     {isEdit && images.length === 0 && <p class="admin-muted">Nenhuma imagem adicionada ainda.</p>}

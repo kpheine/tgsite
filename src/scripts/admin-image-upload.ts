@@ -1,3 +1,5 @@
+import { formatBytesLabel, getByteLimit } from './admin-upload-limits';
+
 type PendingUpload = {
   id: string;
   file: File;
@@ -67,6 +69,12 @@ function createUploadCard(template: HTMLTemplateElement, upload: PendingUpload) 
   return card;
 }
 
+function setMessage(message: HTMLElement | null, text: string | null) {
+  if (!message) return;
+  message.textContent = text || '';
+  message.hidden = !text;
+}
+
 function syncUploadState(root: HTMLElement, input: HTMLInputElement, list: HTMLElement) {
   const uploads = imageInputFiles.get(input) || [];
   const orderedIds = getImageCards(list)
@@ -82,11 +90,23 @@ function syncUploadState(root: HTMLElement, input: HTMLInputElement, list: HTMLE
   updateImageOrder(list);
 }
 
-function addUploads(root: HTMLElement, input: HTMLInputElement, list: HTMLElement, template: HTMLTemplateElement, files: FileList | File[]) {
+function addUploads(root: HTMLElement, input: HTMLInputElement, list: HTMLElement, template: HTMLTemplateElement, files: FileList | File[], message: HTMLElement | null, maxImageBytes: number) {
   const uploads = imageInputFiles.get(input) || [];
+  let hasInvalidType = false;
+  let hasOversizedImage = false;
+  const maxImageLabel = formatBytesLabel(maxImageBytes);
 
   for (const file of [...files]) {
-    if (!file.type.startsWith('image/')) continue;
+    if (!file.type.startsWith('image/')) {
+      hasInvalidType = true;
+      continue;
+    }
+
+    if (file.size > maxImageBytes) {
+      hasOversizedImage = true;
+      continue;
+    }
+
     const upload = {
       id: crypto.randomUUID(),
       file,
@@ -101,6 +121,18 @@ function addUploads(root: HTMLElement, input: HTMLInputElement, list: HTMLElemen
 
   imageInputFiles.set(input, uploads);
   syncUploadState(root, input, list);
+
+  if (hasOversizedImage) {
+    setMessage(message, `Uma ou mais imagens excedem o limite de ${maxImageLabel} e não foram adicionadas.`);
+    return;
+  }
+
+  if (hasInvalidType) {
+    setMessage(message, 'Uma ou mais imagens não têm um formato válido e não foram adicionadas.');
+    return;
+  }
+
+  setMessage(message, null);
 }
 
 function initImageUpload(root: HTMLElement) {
@@ -109,17 +141,19 @@ function initImageUpload(root: HTMLElement) {
   const zone = root.querySelector<HTMLElement>('[data-upload-zone]');
   const list = root.querySelector<HTMLElement>('[data-image-list]');
   const template = root.querySelector<HTMLTemplateElement>('[data-upload-card-template]');
+  const message = root.querySelector<HTMLElement>('[data-upload-message]');
 
   if (!input || !button || !zone || !list || !template) return;
   imageInputFiles.set(input, []);
   updateImageOrder(list);
+  const maxImageBytes = getByteLimit(root, 'maxImageBytes', 8 * 1024 * 1024);
 
   let draggedCard: HTMLElement | null = null;
 
   button.addEventListener('click', () => input.click());
 
   input.addEventListener('change', () => {
-    if (input.files) addUploads(root, input, list, template, input.files);
+    if (input.files) addUploads(root, input, list, template, input.files, message, maxImageBytes);
   });
 
   for (const eventName of ['dragenter', 'dragover']) {
@@ -137,7 +171,7 @@ function initImageUpload(root: HTMLElement) {
   }
 
   zone.addEventListener('drop', (event) => {
-    if (event.dataTransfer?.files) addUploads(root, input, list, template, event.dataTransfer.files);
+    if (event.dataTransfer?.files) addUploads(root, input, list, template, event.dataTransfer.files, message, maxImageBytes);
   });
 
   list.addEventListener('click', (event) => {
