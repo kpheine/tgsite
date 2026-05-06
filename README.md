@@ -63,7 +63,7 @@ Copy `.env.example` to `.env` and set:
 | `ADMIN_PATH` | One-segment private admin path, for example `/painel-tg-2026` |
 | `ADMIN_USERNAME` | Primary admin username synced into SQLite on startup |
 | `ADMIN_PASSWORD` | Primary admin password synced into SQLite on startup; must be set and changed from the default |
-| `SESSION_SECRET` | Secret used to hash session tokens |
+| `SESSION_SECRET` | Secret used to hash session tokens; must be set and changed from the default |
 | `HOST` | Server bind address (use `0.0.0.0` in Docker) |
 | `PORT` | Server port (default `4321`) |
 

@@ -5,6 +5,7 @@ import { getEnv } from './env';
 
 const SESSION_COOKIE = 'tg_admin_session';
 const SESSION_IDLE_MINUTES = 30;
+const PLACEHOLDER_SESSION_SECRET = 'replace-with-a-long-random-secret';
 
 interface UserRecord {
   id: number;
@@ -28,9 +29,24 @@ export function adminUrl(path = '') {
   return `/${getAdminPath()}${cleanPath ? `/${cleanPath}` : ''}`;
 }
 
+function getSessionSecret() {
+  const secret = getEnv('SESSION_SECRET');
+
+  if (!secret) {
+    throw new Error('SESSION_SECRET is required. Set a strong session secret in .env before starting the app.');
+  }
+
+  if (secret === PLACEHOLDER_SESSION_SECRET) {
+    throw new Error('SESSION_SECRET must be changed from the default value in .env before starting the app.');
+  }
+
+  return secret;
+}
+
+const sessionSecret = getSessionSecret();
+
 function hashToken(token: string) {
-  const secret = getEnv('SESSION_SECRET', 'dev-session-secret');
-  return createHash('sha256').update(`${secret}:${token}`).digest('hex');
+  return createHash('sha256').update(`${sessionSecret}:${token}`).digest('hex');
 }
 
 function sqliteDateTime(date: Date) {
