@@ -547,8 +547,23 @@ const getRelatedCases = (card: PublicCase) => cards
       return window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : caseModalSwitchMs;
     }
 
-    function pauseVideos(container: ParentNode = caseModal) {
-      container.querySelectorAll('video').forEach((video) => video.pause());
+    function stopVideos(container: ParentNode = caseModal) {
+      container.querySelectorAll<HTMLVideoElement>('video').forEach((video) => video.pause());
+      container.querySelectorAll<HTMLIFrameElement>('iframe.case-modal__video').forEach((iframe) => {
+        if (iframe.src) {
+          iframe.dataset.videoSrc = iframe.src;
+          iframe.removeAttribute('src');
+        }
+      });
+    }
+
+    function restoreVideos(container: ParentNode) {
+      container.querySelectorAll<HTMLIFrameElement>('iframe.case-modal__video').forEach((iframe) => {
+        const videoSrc = iframe.dataset.videoSrc;
+        if (videoSrc && !iframe.src) {
+          iframe.src = videoSrc;
+        }
+      });
     }
 
     function syncModalControls(nextCase: HTMLElement) {
@@ -571,7 +586,12 @@ const getRelatedCases = (card: PublicCase) => cards
     function showCase(caseId: string, animate: boolean) {
       const nextCase = caseModal.querySelector<HTMLElement>(`[${caseModalContentAttribute}][data-case-id="${CSS.escape(caseId)}"]`);
 
-      if (!nextCase || nextCase === activeCase || !stage) {
+      if (!nextCase || !stage) {
+        return;
+      }
+
+      if (nextCase === activeCase) {
+        restoreVideos(nextCase);
         return;
       }
 
@@ -580,11 +600,12 @@ const getRelatedCases = (card: PublicCase) => cards
         switchTimer = undefined;
       }
 
-      pauseVideos(activeCase ?? caseModal);
+      stopVideos(activeCase ?? caseModal);
 
       const applySwitch = () => {
         activeCase?.setAttribute('hidden', '');
         nextCase.removeAttribute('hidden');
+        restoreVideos(nextCase);
         activeCase = nextCase;
         if (body) {
           body.scrollTop = 0;
@@ -644,7 +665,7 @@ const getRelatedCases = (card: PublicCase) => cards
 
       if (target !== caseModal) return;
 
-      pauseVideos();
+      stopVideos();
       stage?.classList.remove('is-switching');
     }, true);
   }
