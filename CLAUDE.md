@@ -24,3 +24,6 @@ Claude's persistent memory for this project is stored at:
 Consult it at the start of each session for stack decisions, architectural choices, and project context.
 
 **Memory update rule:** After every major change (new file created, stack decision made, architecture updated, significant feature added or removed), update `./memory/MEMORY.md` to reflect the current state. Keep it concise and accurate — it is the team's shared source of truth.
+
+Additional memory files:
+- `./memory/client-handoff.md` — issues and setup steps to communicate to the client before delivery (e.g. Gmail App Password setup for the contact form)

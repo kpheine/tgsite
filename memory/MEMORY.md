@@ -23,7 +23,7 @@
 - Existing case videos in the admin edit form are click-to-load placeholders, so opening the edit page does not immediately request the current video. Uploaded media is served with byte-range streaming from `src/pages/uploads/[...path].ts` for efficient video playback after the user clicks.
 - Server env reads go through `src/lib/env.ts`, which checks Astro `import.meta.env` first and falls back to `process.env`; this keeps `.env` working in `npm run dev` and Docker/process env working in production.
 - Docker/Astro SSR host validation uses build-time `ALLOWED_HOSTS` (default `localhost,127.0.0.1`) passed through Compose build args into `astro.config.mjs`; set it to the production domain(s) before building a deployed image. `SESSION_COOKIE_SECURE` controls whether admin session cookies require HTTPS, defaulting to secure in production unless overridden for local Docker HTTP testing.
-- Popup framework: native HTML `<dialog>` wrapped by `src/components/Modal.astro`, controlled by `src/scripts/modal-manager.ts`; content is layout-agnostic and can come from Astro components, structured API data, Markdown-rendered HTML, or sanitized raw HTML. Open/close transitions are handled with `.is-open` / `.is-closing` classes plus a short close delay so native dialogs can animate out. Modal scroll lock measures the active scrollbar width and compensates with body padding only when needed to avoid layout shifts without forcing a permanent gutter. `Modal.astro` supports a `className` hook for per-modal styling. `src/components/ContactModal.astro` owns the public header contact popup UI: dark rounded two-column form, Bebas Neue "FALE COM A GENTE." title, TG brand mark, WhatsApp CTA, and responsive stacked mobile layout. Public case carousel cards open one shared white case modal with a large padded container, fixed topbar containing only previous/next arrows between published cases, in-place fade transitions between case content, a separate scrollable body whose scrollbar is offset right while preserving content width, optional video playback only when `video_url` exists, client label when present, large Bebas Neue case title, conditional cards for non-empty `desafio`, `entrega`, and `resultado` fields with distinct gradients per card (centered 3-card-width flex row on desktop, stacked full-width cards on tablet/mobile), and an ordered case image gallery where `destaque` images span full width while regular images use a two-column desktop grid and stack on mobile.
+- Popup framework: native HTML `<dialog>` wrapped by `src/components/Modal.astro`, controlled by `src/scripts/modal-manager.ts`; content is layout-agnostic and can come from Astro components, structured API data, Markdown-rendered HTML, or sanitized raw HTML. Open/close transitions are handled with `.is-open` / `.is-closing` classes plus a short close delay so native dialogs can animate out. Modal scroll lock measures the active scrollbar width and compensates with body padding only when needed to avoid layout shifts without forcing a permanent gutter. `Modal.astro` supports a `className` hook for per-modal styling. `src/components/ContactModal.astro` owns the public header contact popup UI: dark rounded two-column form, Bebas Neue "FALE COM A GENTE." title, TG brand mark, WhatsApp CTA, and responsive stacked mobile layout. The submit button has a `data-state` attribute (`idle` / `loading` / `error`) controlling its appearance; on success a full-panel green overlay fades in over the modal with a checkmark SVG and "Enviado!" in Bebas Neue, then the modal auto-closes after 1 second via `[data-modal-close]` click. Form submission POSTs JSON to `POST /api/contact`, which validates fields and sends via Nodemailer + Gmail SMTP; see `memory/client-handoff.md` for the client's one-time Gmail App Password setup. Public case carousel cards open one shared white case modal with a large padded container, fixed topbar containing only previous/next arrows between published cases, in-place fade transitions between case content, a separate scrollable body whose scrollbar is offset right while preserving content width, optional video playback only when `video_url` exists, client label when present, large Bebas Neue case title, conditional cards for non-empty `desafio`, `entrega`, and `resultado` fields with distinct gradients per card (centered 3-card-width flex row on desktop, stacked full-width cards on tablet/mobile), and an ordered case image gallery where `destaque` images span full width while regular images use a two-column desktop grid and stack on mobile.
 
 ## Project Context
 
@@ -36,7 +36,7 @@
 ## UI Conventions (confirmed in session)
 
 - **Horizontal padding:** 165px fixed on content sections (not percentage-based)
-- **Dark background:** `#0d0d0d` for most sections; white for Diferenciais section
+- **Dark background:** `#030303` fallback color for all pixel-gradient sections (formerly `#0d0d0d`); white for Diferenciais section
 - **Decorative blobs:** use `mix-blend-mode: screen` so they glow organically on dark backgrounds
 - **Dividers:** `<hr>` with `border-top: 1px solid #fff; margin: 30px 165px`
 - **Gradient borders:** use `::before` pseudo-element + CSS mask technique — avoids clipping artifacts with `border-radius: 50%` that the `padding-box/border-box` background trick produces
@@ -184,6 +184,7 @@ src/
   lib/upload-limits.ts   — env-driven admin media size limits and generated display labels
   lib/uploads.ts         — image/video upload validation and filesystem writes
   pages/[adminPath]/...  — configurable private dashboard routes
+  pages/api/contact.ts   — public POST endpoint: validates form fields, sends HTML email via Nodemailer + Gmail SMTP
   pages/api/panel/...    — protected login/logout/case endpoints
   pages/index.astro      — hello world page
   pages/uploads/[...path].ts — serves media from local uploads volume
@@ -196,7 +197,7 @@ scripts/dev-reset.mjs    — dev-only local SQLite/uploads reset command used by
   Dockerfile               — multi-stage, Node 20 Alpine + native build deps, runs dist/server/entry.mjs
   docker-compose.yml       — port 4321, data/uploads volumes, reads .env
   .dockerignore            — excludes host node_modules/dist/data/uploads so native dependencies are built for Linux inside Docker and bind-mounted content is not copied into the image
-.env.example             — ADMIN_PATH, ADMIN_USERNAME, ADMIN_PASSWORD, SESSION_SECRET, HOST, PORT, UPLOAD_MAX_IMAGE_BYTES, UPLOAD_MAX_VIDEO_BYTES
+.env.example             — ADMIN_PATH, ADMIN_USERNAME, ADMIN_PASSWORD, SESSION_SECRET, HOST, PORT, ALLOWED_HOSTS, SESSION_COOKIE_SECURE, UPLOAD_MAX_IMAGE_BYTES, UPLOAD_MAX_VIDEO_BYTES, SMTP_USER, SMTP_PASS, CONTACT_TO
 astro.config.mjs         — output: server, adapter: @astrojs/node (standalone)
 ```
 
