@@ -360,10 +360,20 @@ import Modal from './Modal.astro';
   submitBtn?.addEventListener('click', async () => {
     setState('loading');
 
+    const form = document.querySelector<HTMLFormElement>('.contact-modal__form');
+    const data = form ? Object.fromEntries(new FormData(form)) : {};
+
     try {
-      // TODO: replace with real form submission
-      await new Promise(resolve => setTimeout(resolve, 600));
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) throw new Error('send failed');
+
       showSuccess();
+      form?.reset();
     } catch {
       setState('error');
       setTimeout(() => setState('idle'), 3000);
