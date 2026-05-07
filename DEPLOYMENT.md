@@ -143,7 +143,6 @@ PORT=4321
 ALLOWED_HOSTS=seudominio.com.br,www.seudominio.com.br
 SESSION_COOKIE_SECURE=true
 UPLOAD_MAX_IMAGE_BYTES=8388608
-UPLOAD_MAX_VIDEO_BYTES=2147483648
 
 SMTP_USER=conta-que-vai-enviar@gmail.com
 SMTP_PASS=xxxx xxxx xxxx xxxx

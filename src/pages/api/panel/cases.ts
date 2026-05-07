@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { adminUrl, requireUser } from '../../../lib/auth';
 import { db } from '../../../lib/db';
 import { cleanupUploadedFiles, fieldValue, fieldValues, parseCaseUploadRequest, UploadValidationError, type ParsedCaseUpload } from '../../../lib/uploads';
+import { normalizeYouTubeUrl } from '../../../lib/youtube';
 
 function saveImages(upload: ParsedCaseUpload, caseId: number) {
   let sortOrder = 0;
@@ -20,6 +21,12 @@ function saveImages(upload: ParsedCaseUpload, caseId: number) {
 
 function textValue(upload: ParsedCaseUpload, name: string) {
   return fieldValue(upload, name).trim() || null;
+}
+
+function youtubeUrlValue(upload: ParsedCaseUpload) {
+  const value = fieldValue(upload, 'video_url').trim();
+  if (!value) return null;
+  return normalizeYouTubeUrl(value);
 }
 
 function nextCaseSortOrder() {
@@ -54,6 +61,12 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     return new Response('A imagem principal é obrigatória', { status: 400 });
   }
 
+  const videoUrl = youtubeUrlValue(upload);
+  if (fieldValue(upload, 'video_url').trim() && !videoUrl) {
+    cleanupUploadedFiles(upload.uploadedUrls);
+    return new Response('Informe uma URL válida do YouTube', { status: 400 });
+  }
+
   const createCase = db.transaction(() => {
     const result = db.prepare(`
       INSERT INTO cases (titulo, cliente, main_image_url, video_url, desafio, entrega, resultado, status, sort_order)
@@ -62,7 +75,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       titulo,
       textValue(upload, 'cliente'),
       upload.mainImageUrl,
-      upload.videoUrl,
+      videoUrl,
       textValue(upload, 'desafio'),
       textValue(upload, 'entrega'),
       textValue(upload, 'resultado'),

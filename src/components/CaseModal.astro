@@ -1,6 +1,7 @@
 ---
 import Modal from './Modal.astro';
 import type { PublicCase } from '../lib/public-cases';
+import { getYouTubeEmbedUrl } from '../lib/youtube';
 
 type Props = {
   cards: PublicCase[];
@@ -56,6 +57,7 @@ const getRelatedCases = (card: PublicCase) => cards
     <article class="case-modal__body">
       <div class="case-modal__content-stage" data-case-modal-stage>
         {cards.map((card, index) => {
+          const videoEmbedUrl = getYouTubeEmbedUrl(card.video);
           const detailCards = getDetailCards(card);
           const galleryImages = card.images ?? [];
           const nonFeaturedGalleryCount = galleryImages.filter((image) => !image.destaque).length;
@@ -75,8 +77,15 @@ const getRelatedCases = (card: PublicCase) => cards
               hidden={index !== 0}
             >
               <div class="case-modal__content">
-                {card.video && (
-                  <video class="case-modal__video" src={card.video} controls playsinline preload="metadata"></video>
+                {videoEmbedUrl && (
+                  <iframe
+                    class="case-modal__video"
+                    src={videoEmbedUrl}
+                    title={`Vídeo do case ${card.title}`}
+                    loading="lazy"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen
+                  ></iframe>
                 )}
 
                 <header class="case-modal__header">
@@ -272,9 +281,10 @@ const getRelatedCases = (card: PublicCase) => cards
     display: block;
     width: 100%;
     max-width: 1078px;
+    aspect-ratio: 16 / 9;
+    border: 0;
     max-height: min(63svh, 610px);
     background: #111;
-    object-fit: contain;
   }
 
   .case-modal__header {

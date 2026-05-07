@@ -40,7 +40,7 @@ docker compose up --build
 # -> http://localhost:4321
 ```
 
-SQLite data is persisted in `./data/site.db`, and uploaded images/videos are persisted in `./uploads/` on the host machine via Docker volume bind mounts.
+SQLite data is persisted in `./data/site.db`, and uploaded images are persisted in `./uploads/` on the host machine via Docker volume bind mounts. Case videos are stored as YouTube URLs.
 
 ## Verification
 
@@ -91,7 +91,7 @@ See [`memory/ROADMAP.md`](./memory/ROADMAP.md) for the full phased plan:
 
 1. UI blocks from Figma
 2. Local SQLite content storage
-3. Admin panel (CRUD, image/video upload)
+3. Admin panel (CRUD, image upload, YouTube video URL)
 4. Wire portfolio to SQLite-backed live data
 5. Production readiness + client handoff
 

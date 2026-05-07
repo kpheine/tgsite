@@ -1,16 +1,4 @@
-import { formatBytesLabel, getByteLimit } from './admin-upload-limits';
-
-function formatFileSize(bytes: number) {
-  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
-  if (bytes >= 1024 * 1024 * 1024) return `${(bytes / 1024 / 1024 / 1024).toFixed(2)} GB`;
-  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
-}
-
-function setInputFile(input: HTMLInputElement, file: File | null) {
-  const transfer = new DataTransfer();
-  if (file) transfer.items.add(file);
-  input.files = transfer.files;
-}
+import { getYouTubeEmbedUrl } from '../lib/youtube';
 
 function setMessage(message: HTMLElement | null, text: string | null) {
   if (!message) return;
@@ -18,134 +6,42 @@ function setMessage(message: HTMLElement | null, text: string | null) {
   message.hidden = !text;
 }
 
-function initVideoUpload(root: HTMLElement) {
-  const input = root.querySelector<HTMLInputElement>('[data-video-input]');
-  const buttons = root.querySelectorAll<HTMLButtonElement>('[data-video-button]');
-  const zone = root.querySelector<HTMLElement>('[data-video-zone]');
+function initYouTubePreview(root: HTMLElement) {
+  const input = root.querySelector<HTMLInputElement>('[data-youtube-url-input]');
   const preview = root.querySelector<HTMLElement>('[data-video-preview]');
-  const player = root.querySelector<HTMLVideoElement>('[data-video-preview-player]');
-  const name = root.querySelector<HTMLElement>('[data-video-name]');
-  const size = root.querySelector<HTMLElement>('[data-video-size]');
-  const type = root.querySelector<HTMLElement>('[data-video-type]');
-  const removeSelection = root.querySelector<HTMLButtonElement>('[data-video-remove-selection]');
+  const frame = root.querySelector<HTMLIFrameElement>('[data-youtube-preview-frame]');
   const message = root.querySelector<HTMLElement>('[data-video-message]');
-  const removeCurrentInput = root.querySelector<HTMLInputElement>('[data-remove-current-video-input]');
-  const removeCurrentButton = root.querySelector<HTMLButtonElement>('[data-remove-current-video]');
-  const currentCard = root.querySelector<HTMLElement>('[data-current-video-card]');
-  const currentBanner = root.querySelector<HTMLElement>('[data-current-video-banner]');
-  const currentLoadButton = root.querySelector<HTMLButtonElement>('[data-current-video-load]');
-  const currentPlayer = root.querySelector<HTMLVideoElement>('[data-current-video-player]');
 
-  if (!input || !zone || !preview || !player) return;
+  if (!input || !preview || !frame) return;
 
-  let previewUrl: string | null = null;
-  const removeSelectionText = removeSelection?.textContent || 'Remover seleção';
-  const maxVideoBytes = getByteLimit(root, 'maxVideoBytes', 2 * 1024 * 1024 * 1024);
-  const maxVideoLabel = formatBytesLabel(maxVideoBytes);
+  function updatePreview() {
+    const value = input?.value.trim() || '';
+    const embedUrl = getYouTubeEmbedUrl(value);
 
-  function clearSelection() {
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
-    previewUrl = null;
-    player.removeAttribute('src');
-    player.load();
-    preview.hidden = true;
-    setInputFile(input, null);
-    setMessage(message, null);
-    root.classList.remove('has-video-file');
-    root.classList.remove('is-replacing-video');
-    if (currentCard) currentCard.hidden = false;
-    if (removeSelection) removeSelection.textContent = removeSelectionText;
-    setCurrentRemoval(false);
-  }
-
-  function selectFile(file: File | null) {
-    setMessage(message, null);
-
-    if (!file) {
-      clearSelection();
+    if (!value) {
+      frame.removeAttribute('src');
+      preview.hidden = true;
+      setMessage(message, null);
       return;
     }
 
-    if (!file.type.startsWith('video/')) {
-      clearSelection();
-      setMessage(message, 'Selecione um arquivo de vídeo válido.');
+    if (!embedUrl) {
+      frame.removeAttribute('src');
+      preview.hidden = true;
+      setMessage(message, 'Informe uma URL válida do YouTube.');
       return;
     }
 
-    if (file.size > maxVideoBytes) {
-      clearSelection();
-      setMessage(message, `O vídeo excede o limite de ${maxVideoLabel}.`);
-      return;
-    }
-
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
-    previewUrl = URL.createObjectURL(file);
-    setInputFile(input, file);
-
-    if (name) name.textContent = file.name;
-    if (size) size.textContent = formatFileSize(file.size);
-    if (type) type.textContent = file.type || 'Tipo não informado';
-
-    player.src = previewUrl;
+    frame.src = embedUrl;
     preview.hidden = false;
-    root.classList.add('has-video-file');
-
-    if (currentCard) {
-      currentCard.hidden = true;
-      root.classList.add('is-replacing-video');
-      if (removeSelection) removeSelection.textContent = 'Cancelar';
-    }
+    setMessage(message, null);
   }
 
-  function setCurrentRemoval(willRemove: boolean) {
-    if (!removeCurrentInput || !removeCurrentButton || !currentCard) return;
-
-    removeCurrentInput.disabled = !willRemove;
-    currentCard.classList.toggle('is-removing', willRemove);
-    removeCurrentButton.classList.toggle('admin-image-action--remove', !willRemove);
-    removeCurrentButton.classList.toggle('admin-image-action--restore', willRemove);
-    removeCurrentButton.textContent = willRemove ? 'Restaurar vídeo atual' : 'Remover vídeo atual';
-    if (currentBanner) currentBanner.hidden = !willRemove;
-  }
-
-  buttons.forEach((button) => button.addEventListener('click', () => input.click()));
-  removeSelection?.addEventListener('click', clearSelection);
-  removeCurrentButton?.addEventListener('click', () => {
-    setCurrentRemoval(removeCurrentInput?.disabled ?? false);
-  });
-
-  currentLoadButton?.addEventListener('click', () => {
-    if (!currentPlayer || !currentLoadButton.dataset.videoSrc) return;
-
-    currentPlayer.src = currentLoadButton.dataset.videoSrc;
-    currentPlayer.hidden = false;
-    currentLoadButton.hidden = true;
-    currentPlayer.load();
-  });
-
-  input.addEventListener('change', () => {
-    selectFile(input.files?.[0] || null);
-  });
-
-  for (const eventName of ['dragenter', 'dragover']) {
-    zone.addEventListener(eventName, (event) => {
-      event.preventDefault();
-      zone.classList.add('is-drag-over');
-    });
-  }
-
-  for (const eventName of ['dragleave', 'drop']) {
-    zone.addEventListener(eventName, (event) => {
-      event.preventDefault();
-      zone.classList.remove('is-drag-over');
-    });
-  }
-
-  zone.addEventListener('drop', (event) => {
-    selectFile(event.dataTransfer?.files?.[0] || null);
-  });
+  input.addEventListener('input', updatePreview);
+  input.addEventListener('change', updatePreview);
+  updatePreview();
 }
 
-document.querySelectorAll<HTMLElement>('[data-video-upload]').forEach(initVideoUpload);
+document.querySelectorAll<HTMLElement>('[data-youtube-preview]').forEach(initYouTubePreview);
 
 export {};

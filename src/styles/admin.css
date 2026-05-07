@@ -306,20 +306,7 @@ body.admin-shell {
 .admin-upload-zone.is-drag-over { background: rgba(143, 168, 255, 0.1); border-color: var(--admin-accent); transform: translateY(-1px); }
 .admin-upload-zone strong { color: #fff; display: block; font-size: 18px; margin-bottom: 6px; }
 .admin-upload-zone p { margin: 0; }
-.admin-video-upload {
-  align-items: center;
-  border: 1px dashed rgba(143, 168, 255, 0.5);
-  border-radius: 20px;
-  display: flex;
-  gap: 18px;
-  justify-content: space-between;
-  padding: 22px;
-  transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
-}
-.admin-video-upload.is-drag-over { background: rgba(143, 168, 255, 0.1); border-color: var(--admin-accent); transform: translateY(-1px); }
-.admin-video-upload strong { color: #fff; display: block; font-size: 18px; margin-bottom: 6px; }
-.admin-video-upload p { margin: 0; }
-.admin-video-current, .admin-video-preview {
+.admin-video-preview {
   border: 1px solid var(--admin-line);
   border-radius: 18px;
   display: grid;
@@ -329,15 +316,14 @@ body.admin-shell {
   position: relative;
   transition: border-color 160ms ease, opacity 160ms ease;
 }
-.admin-video-current[hidden], .admin-video-current video[hidden], .admin-video-preview[hidden], .admin-video-preview video[hidden], .admin-alert[hidden], .admin-upload-modal[hidden], .admin-upload-modal [hidden] { display: none; }
-.admin-video-current.is-removing { border-color: rgba(255, 117, 117, 0.7); opacity: 0.72; }
+.admin-video-preview[hidden], .admin-alert[hidden], .admin-upload-modal[hidden], .admin-upload-modal [hidden] { display: none; }
 .admin-video-preview__header { align-items: flex-start; display: flex; gap: 14px; justify-content: space-between; }
 .admin-video-preview__header p { margin: 0 0 6px; }
 .admin-video-preview__header strong { color: #fff; display: block; font-size: 14px; line-height: 1.4; word-break: break-word; }
 .admin-video-preview__header span { display: inline-block; font-size: 12px; margin-right: 10px; margin-top: 5px; }
 .admin-video-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
-.admin-video-current p, .admin-video-preview p { margin: 0; }
-.admin-video-current video, .admin-video-preview video { aspect-ratio: 16 / 9; background: #050505; border-radius: 12px; display: block; width: 100%; }
+.admin-video-preview p { margin: 0; }
+.admin-video-preview iframe { aspect-ratio: 16 / 9; background: #050505; border: 0; border-radius: 12px; display: block; width: 100%; }
 .admin-video-lazy {
   align-items: center;
   aspect-ratio: 16 / 9;
@@ -431,7 +417,7 @@ body.admin-shell {
   .admin-header, .admin-form-row, .admin-case-order-panel__header { display: grid; }
   .admin-grid, .admin-support-status { grid-template-columns: 1fr; }
   .admin-case-list { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
-  .admin-upload-zone, .admin-video-upload, .admin-video-preview__header { align-items: stretch; display: grid; }
+  .admin-upload-zone, .admin-video-preview__header { align-items: stretch; display: grid; }
   .admin-video-actions { justify-content: flex-start; }
   .admin-table-wrap { overflow-x: auto; }
   .admin-upload-modal__card { padding: 28px 22px; }

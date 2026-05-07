@@ -2,9 +2,16 @@ import type { APIRoute } from 'astro';
 import { adminUrl, requireUser } from '../../../../lib/auth';
 import { db, type CaseImageRecord, type CaseRecord } from '../../../../lib/db';
 import { cleanupUploadedFiles, deleteUploadedFile, fieldValue, fieldValues, parseCaseUploadRequest, UploadValidationError, type ParsedCaseUpload } from '../../../../lib/uploads';
+import { normalizeYouTubeUrl } from '../../../../lib/youtube';
 
 function textValue(upload: ParsedCaseUpload, name: string) {
   return fieldValue(upload, name).trim() || null;
+}
+
+function youtubeUrlValue(upload: ParsedCaseUpload) {
+  const value = fieldValue(upload, 'video_url').trim();
+  if (!value) return null;
+  return normalizeYouTubeUrl(value);
 }
 
 function saveNewImages(upload: ParsedCaseUpload, caseId: number) {
@@ -25,7 +32,7 @@ function saveNewImages(upload: ParsedCaseUpload, caseId: number) {
 
 function getCaseMediaUrls(item: CaseRecord) {
   const images = db.prepare('SELECT url FROM imagens_case WHERE case_id = ?').all(item.id) as Pick<CaseImageRecord, 'url'>[];
-  return [item.main_image_url, item.video_url, ...images.map((image) => image.url)];
+  return [item.main_image_url, ...images.map((image) => image.url)];
 }
 
 function deleteCommittedMedia(urls: Array<string | null>) {
@@ -128,10 +135,14 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
     return new Response('O título é obrigatório', { status: 400 });
   }
 
-  const videoUrl = upload.videoUrl;
-  const removeVideo = fieldValue(upload, 'remove_video') === '1';
-  const nextVideoUrl = videoUrl || (removeVideo ? null : item.video_url);
+  const rawVideoUrl = fieldValue(upload, 'video_url').trim();
+  const nextVideoUrl = youtubeUrlValue(upload);
   const nextMainImageUrl = upload.mainImageUrl || item.main_image_url;
+
+  if (rawVideoUrl && !nextVideoUrl) {
+    cleanupUploadedFiles(upload.uploadedUrls);
+    return new Response('Informe uma URL válida do YouTube', { status: 400 });
+  }
 
   if (!nextMainImageUrl) {
     cleanupUploadedFiles(upload.uploadedUrls);
@@ -171,7 +182,6 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
 
   deleteCommittedMedia([
     ...(upload.mainImageUrl ? [item.main_image_url] : []),
-    ...(videoUrl || removeVideo ? [item.video_url] : []),
     ...removedImageUrls,
   ]);
 
