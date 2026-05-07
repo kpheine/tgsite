@@ -1,5 +1,6 @@
 ---
 import { adminUrl } from '../lib/auth';
+import { db, SUPPORT_ADMIN_USERNAME } from '../lib/db';
 import '../styles/admin.css';
 
 interface Props {
@@ -8,6 +9,14 @@ interface Props {
 }
 
 const { title, username } = Astro.props;
+
+const supportUser = username ? db.prepare(`
+  SELECT support_enabled, support_expires_at
+  FROM users
+  WHERE username = ? AND role = 'support'
+`).get(SUPPORT_ADMIN_USERNAME) as { support_enabled: 0 | 1; support_expires_at: string | null } | undefined : undefined;
+const supportExpiresAt = supportUser?.support_expires_at ? new Date(`${supportUser.support_expires_at.replace(' ', 'T')}Z`) : null;
+const supportIsActive = Boolean(supportUser?.support_enabled && supportExpiresAt && supportExpiresAt > new Date());
 ---
 <!doctype html>
 <html lang="pt-BR">
@@ -20,13 +29,19 @@ const { title, username } = Astro.props;
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
   </head>
   <body class="admin-shell">
-    <aside class="admin-sidebar">
+    <aside class:list={['admin-sidebar', { 'admin-sidebar--support-active': supportIsActive }]}>
       <a class="admin-brand" href={adminUrl()}>TG Admin</a>
       <nav class="admin-nav" aria-label="Navegação do painel administrativo">
         <a href={adminUrl()}>Painel</a>
         <a href={adminUrl('cases')}>Cases</a>
         <a href={adminUrl('recomendacoes')}>Recomendações</a>
       </nav>
+      {supportIsActive && (
+        <a class="admin-sidebar-support" href={adminUrl()} aria-label="Suporte ativo. Ir para o painel para gerenciar o acesso de suporte.">
+          <strong>Suporte ativo</strong>
+          <span>Gerenciar</span>
+        </a>
+      )}
       {username && <p class="admin-user">Conectado como<br /><strong>{username}</strong></p>}
       {username && (
         <form method="post" action="/api/panel/logout">

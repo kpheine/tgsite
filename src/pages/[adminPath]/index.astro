@@ -53,16 +53,62 @@ const supportIsEnabled = Boolean(supportUser?.support_enabled && !supportIsExpir
       <h1 class="admin-title">Painel</h1>
       <p class="admin-muted">Gerencie rascunhos, cases, recomendações e mídias.</p>
     </div>
-    <a class="admin-button admin-button--primary" href={adminUrl('cases/new')}>Novo case</a>
   </header>
 
-  <section class="admin-grid" aria-label="Estatísticas dos cases">
-    <article class="admin-card">Total de cases<strong>{caseStats.total}</strong></article>
-    <article class="admin-card">Cases publicados<strong>{caseStats.published ?? 0}</strong></article>
-    <article class="admin-card">Cases em rascunho<strong>{caseStats.drafts ?? 0}</strong></article>
-    <article class="admin-card">Total de recomendações<strong>{testimonialStats.total}</strong></article>
-    <article class="admin-card">Recomendações publicadas<strong>{testimonialStats.published ?? 0}</strong></article>
-    <article class="admin-card">Recomendações em rascunho<strong>{testimonialStats.drafts ?? 0}</strong></article>
+  <section class="admin-summary-grid" aria-label="Resumo do conteúdo">
+    <article class="admin-summary-card">
+      <div class="admin-summary-card__header">
+        <div>
+          <p class="admin-kicker">Cases</p>
+          <h2>Portfólio</h2>
+        </div>
+        <a class="admin-button" href={adminUrl('cases')}>Gerenciar</a>
+      </div>
+
+      <dl class="admin-summary-metrics">
+        <div>
+          <dt>Total</dt>
+          <dd>{caseStats.total}</dd>
+        </div>
+        <div>
+          <dt>Publicados</dt>
+          <dd>{caseStats.published ?? 0}</dd>
+        </div>
+        <div>
+          <dt>Rascunhos</dt>
+          <dd>{caseStats.drafts ?? 0}</dd>
+        </div>
+      </dl>
+
+      <a class="admin-summary-card__link" href={adminUrl('cases/new')}>Criar novo case</a>
+    </article>
+
+    <article class="admin-summary-card">
+      <div class="admin-summary-card__header">
+        <div>
+          <p class="admin-kicker">Recomendações</p>
+          <h2>Depoimentos</h2>
+        </div>
+        <a class="admin-button" href={adminUrl('recomendacoes')}>Gerenciar</a>
+      </div>
+
+      <dl class="admin-summary-metrics">
+        <div>
+          <dt>Total</dt>
+          <dd>{testimonialStats.total}</dd>
+        </div>
+        <div>
+          <dt>Publicadas</dt>
+          <dd>{testimonialStats.published ?? 0}</dd>
+        </div>
+        <div>
+          <dt>Rascunhos</dt>
+          <dd>{testimonialStats.drafts ?? 0}</dd>
+        </div>
+      </dl>
+
+      <a class="admin-summary-card__link" href={adminUrl('recomendacoes/new')}>Criar nova recomendação</a>
+    </article>
   </section>
 
   {user.role === 'admin' && supportUser && (
