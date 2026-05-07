@@ -1,9 +1,6 @@
-import { createWriteStream, existsSync, mkdirSync, unlinkSync } from 'node:fs';
+import { existsSync, mkdirSync, unlinkSync, writeFileSync } from 'node:fs';
 import { extname, resolve, sep } from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { Readable } from 'node:stream';
-import { pipeline } from 'node:stream/promises';
-import Busboy from 'busboy';
 import { formatBytesLabel } from './bytes';
 import { MAX_IMAGE_BYTES } from './upload-limits';
 
@@ -44,24 +41,17 @@ function uploadDestination(name: string) {
   };
 }
 
-async function saveUploadStream(stream: NodeJS.ReadableStream, name: string, mimeType: string) {
-  assertAllowedUpload(mimeType);
+async function saveUploadFile(file: File) {
+  assertAllowedUpload(file.type);
 
-  const { filePath, url } = uploadDestination(name);
-  const maxSize = MAX_IMAGE_BYTES;
-  let bytesWritten = 0;
+  if (file.size > MAX_IMAGE_BYTES) {
+    throw new UploadValidationError(`A imagem excede o limite de ${uploadLimitLabel()}.`);
+  }
 
-  stream.on('data', (chunk: Buffer) => {
-    bytesWritten += chunk.length;
-    if (bytesWritten > maxSize) {
-      if ('destroy' in stream && typeof stream.destroy === 'function') {
-        stream.destroy(new UploadValidationError(`A imagem excede o limite de ${uploadLimitLabel()}.`));
-      }
-    }
-  });
+  const { filePath, url } = uploadDestination(file.name);
 
   try {
-    await pipeline(stream, createWriteStream(filePath));
+    writeFileSync(filePath, Buffer.from(await file.arrayBuffer()));
   } catch (error) {
     if (existsSync(filePath)) unlinkSync(filePath);
     throw error;
@@ -71,58 +61,27 @@ async function saveUploadStream(stream: NodeJS.ReadableStream, name: string, mim
 }
 
 export async function parseCaseUploadRequest(request: Request): Promise<ParsedCaseUpload> {
-  if (!request.body) throw new Error('Envio inválido.');
+  const formData = await request.formData();
 
   const fields = new Map<string, string[]>();
   let mainImageUrl: string | null = null;
   const imageUrls: string[] = [];
   const uploadedUrls: string[] = [];
-  let parseError: Error | null = null;
-  const pendingFiles: Promise<void>[] = [];
 
-  const busboy = Busboy({
-    headers: Object.fromEntries(request.headers.entries()),
-    limits: {
-      fileSize: MAX_IMAGE_BYTES,
-    },
-  });
+  try {
+    for (const [name, value] of formData.entries()) {
+      if (typeof value === 'string') {
+        fields.set(name, [...(fields.get(name) || []), value]);
+        continue;
+      }
 
-  busboy.on('field', (name, value) => {
-    fields.set(name, [...(fields.get(name) || []), value]);
-  });
+      if (!value.name || (name !== 'images' && name !== 'main_image')) continue;
 
-  busboy.on('file', (name, stream, info) => {
-    if (!info.filename) {
-      stream.resume();
-      return;
-    }
-
-    if (name !== 'images' && name !== 'main_image') {
-      stream.resume();
-      return;
-    }
-
-    try {
-      assertAllowedUpload(info.mimeType);
-    } catch (error) {
-      parseError = error instanceof Error ? error : new Error('Envio inválido.');
-      stream.resume();
-      return;
-    }
-
-    const uploadPromise = saveUploadStream(stream, info.filename, info.mimeType).then((url) => {
+      const url = await saveUploadFile(value);
       uploadedUrls.push(url);
       if (name === 'main_image') mainImageUrl = url;
       else imageUrls.push(url);
-    });
-
-    pendingFiles.push(uploadPromise);
-  });
-
-  try {
-    await pipeline(Readable.fromWeb(request.body), busboy);
-    await Promise.all(pendingFiles);
-    if (parseError) throw parseError;
+    }
   } catch (error) {
     for (const url of uploadedUrls) deleteUploadedFile(url);
     throw error;
