@@ -55,7 +55,7 @@ const supportIsEnabled = Boolean(supportUser?.support_enabled && !supportIsExpir
   </section>
 
   {user.role === 'admin' && supportUser && (
-    <section class="admin-support-card" aria-labelledby="support-title">
+    <section class:list={['admin-support-card', { 'admin-support-card--active': supportIsEnabled }]} aria-labelledby="support-title">
       <div>
         <p class="admin-kicker">Acesso de suporte</p>
         <p class="admin-muted">
@@ -64,10 +64,37 @@ const supportIsEnabled = Boolean(supportUser?.support_enabled && !supportIsExpir
       </div>
 
       {supportPassword && (
-        <div class="admin-support-password" role="status" aria-live="polite">
-          <span>Senha temporária</span>
-          <strong>{supportPassword}</strong>
-          <p>Copie agora: por segurança, ela não será exibida novamente.</p>
+        <div class="admin-support-credentials" role="status" aria-live="polite">
+          <table>
+            <tbody>
+              <tr>
+                <th scope="row">Usuário</th>
+                <td>{supportUser.username}</td>
+              </tr>
+              <tr>
+                <th scope="row">Senha temporária</th>
+                <td>
+                  <div class="admin-support-password-row">
+                    <strong>{supportPassword}</strong>
+                    <button
+                      class="admin-support-copy-button"
+                      type="button"
+                      data-support-password-copy
+                      data-copy-value={supportPassword}
+                      aria-label="Copiar senha temporária"
+                    >
+                      <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none">
+                        <path d="M9 7.5V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                        <rect x="5" y="8" width="10" height="12" rx="2" stroke="currentColor" stroke-width="1.8" />
+                      </svg>
+                      <span data-copy-label>Copiar</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <p>Copie agora: por segurança, a senha não será exibida novamente.</p>
         </div>
       )}
 
@@ -76,7 +103,7 @@ const supportIsEnabled = Boolean(supportUser?.support_enabled && !supportIsExpir
       <dl class="admin-support-status">
         <div>
           <dt>Status</dt>
-          <dd>{supportIsEnabled ? 'Ativo' : 'Desativado'}</dd>
+          <dd class:list={{ 'admin-support-status-active': supportIsEnabled }}>{supportIsEnabled ? 'Ativo' : 'Desativado'}</dd>
         </div>
         <div>
           <dt>Expira em</dt>
