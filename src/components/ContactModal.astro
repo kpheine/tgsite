@@ -3,6 +3,14 @@ import Modal from './Modal.astro';
 ---
 
 <Modal id="contact-modal" ariaLabel="Contato" className="contact-modal">
+  <div class="contact-success-overlay" aria-hidden="true">
+    <svg class="contact-success-overlay__check" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="32" cy="32" r="31" stroke="white" stroke-width="2" stroke-opacity="0.3"/>
+      <polyline points="18,33 28,43 46,22" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <p class="contact-success-overlay__label">Enviado!</p>
+  </div>
+
   <div class="contact-modal__content">
     <section class="contact-modal__form-area" aria-labelledby="contact-modal-title">
       <h2 id="contact-modal-title" class="contact-modal__title">Fale com a gente.</h2>
@@ -36,7 +44,14 @@ import Modal from './Modal.astro';
         </label>
 
         <div class="contact-modal__actions">
-          <button class="site-button site-button--gradient contact-modal__submit" type="button">Enviar</button>
+          <button class="site-button site-button--gradient contact-modal__submit" type="button" data-state="idle">
+            <span class="btn-label">Enviar</span>
+            <span class="btn-loading" aria-hidden="true">
+              <span class="btn-spinner"></span>
+              Enviando...
+            </span>
+            <span class="btn-error" aria-live="polite">✕ Algo deu errado</span>
+          </button>
           <a href="https://wa.me/" class="contact-modal__whatsapp" target="_blank" rel="noopener noreferrer" aria-label="Falar pelo WhatsApp">
             <img src="/images/whatsapp.svg" alt="" aria-hidden="true" />
           </a>
@@ -57,6 +72,7 @@ import Modal from './Modal.astro';
   }
 
   :global(.contact-modal .modal__panel) {
+    position: relative;
     overflow: hidden;
     border: 1px solid rgba(80, 36, 100, 0.36);
     background:
@@ -64,6 +80,40 @@ import Modal from './Modal.astro';
       linear-gradient(110deg, #1b1624 0%, #08090c 51%, #101018 100%);
     box-shadow: 0 26px 80px rgba(0, 0, 0, 0.72);
     padding: 48px 49px 46px;
+  }
+
+  .contact-success-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    background: linear-gradient(135deg, #0a3d24 0%, #1a7a4a 100%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 300ms ease;
+  }
+
+  .contact-success-overlay.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .contact-success-overlay__check {
+    width: 80px;
+    height: 80px;
+  }
+
+  .contact-success-overlay__label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 5vw, 4.5rem);
+    font-weight: 400;
+    color: #fff;
+    margin: 0;
+    letter-spacing: 0.02em;
   }
 
   :global(.contact-modal .modal__close) {
@@ -167,6 +217,41 @@ import Modal from './Modal.astro';
     --site-button-letter-spacing: 0;
     border-radius: 999px;
     font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: opacity 160ms ease;
+  }
+
+  /* Hide all state content by default */
+  .btn-label, .btn-loading, .btn-success, .btn-error { display: none; }
+
+  /* idle */
+  .contact-modal__submit[data-state="idle"] .btn-label { display: inline; }
+
+  /* loading */
+  .contact-modal__submit[data-state="loading"] .btn-loading { display: inline-flex; align-items: center; gap: 8px; }
+  .contact-modal__submit[data-state="loading"] { pointer-events: none; opacity: 0.8; }
+
+  /* error */
+  .contact-modal__submit[data-state="error"] .btn-error { display: inline; }
+  .contact-modal__submit[data-state="error"] {
+    background: linear-gradient(135deg, #7a1a2a, #c0302b) !important;
+  }
+
+  .btn-spinner {
+    width: 15px;
+    height: 15px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #fff;
+    border-radius: 50%;
+    flex-shrink: 0;
+    animation: contact-spin 0.7s linear infinite;
+  }
+
+  @keyframes contact-spin {
+    to { transform: rotate(360deg); }
   }
 
   .contact-modal__whatsapp:hover {
@@ -248,3 +333,40 @@ import Modal from './Modal.astro';
     }
   }
 </style>
+
+<script>
+  const dialog    = document.getElementById('contact-modal') as HTMLDialogElement;
+  const submitBtn = document.querySelector<HTMLButtonElement>('.contact-modal__submit');
+  const overlay   = document.querySelector<HTMLElement>('.contact-success-overlay');
+
+  function setState(state: 'idle' | 'loading' | 'error') {
+    if (!submitBtn) return;
+    submitBtn.dataset.state = state;
+    submitBtn.disabled = state === 'loading';
+  }
+
+  function showSuccess() {
+    overlay?.classList.add('is-visible');
+    setTimeout(() => {
+      dialog?.querySelector<HTMLButtonElement>('[data-modal-close]')?.click();
+    }, 1000);
+  }
+
+  dialog?.addEventListener('close', () => {
+    overlay?.classList.remove('is-visible');
+    setState('idle');
+  });
+
+  submitBtn?.addEventListener('click', async () => {
+    setState('loading');
+
+    try {
+      // TODO: replace with real form submission
+      await new Promise(resolve => setTimeout(resolve, 600));
+      showSuccess();
+    } catch {
+      setState('error');
+      setTimeout(() => setState('idle'), 3000);
+    }
+  });
+</script>
