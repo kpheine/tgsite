@@ -6,7 +6,7 @@ import { dirname, resolve } from 'node:path';
 import { getEnv } from './env';
 
 export const SUPPORT_ADMIN_USERNAME = 'support-admin';
-const DB_SCHEMA_VERSION = 1;
+const DB_SCHEMA_VERSION = 2;
 const DEFAULT_ADMIN_PASSWORD = 'change-this-password';
 
 const dbPath = resolve(process.cwd(), 'data/site.db');
@@ -63,6 +63,18 @@ if (shouldCreateSchema) {
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (case_id) REFERENCES cases(id) ON DELETE CASCADE
     );
+
+    CREATE TABLE testimonials (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      quote TEXT NOT NULL,
+      person_name TEXT NOT NULL,
+      person_role TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'draft',
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
   `);
 
   db.pragma(`user_version = ${DB_SCHEMA_VERSION}`);
@@ -107,6 +119,18 @@ export interface CaseImageRecord {
   url: string;
   destaque: 0 | 1;
   created_at: string;
+}
+
+export interface TestimonialRecord {
+  id: number;
+  title: string;
+  quote: string;
+  person_name: string;
+  person_role: string;
+  status: 'draft' | 'published';
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
 }
 
 function syncPrimaryAdminFromEnv() {

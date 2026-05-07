@@ -157,6 +157,9 @@ body.admin-shell {
 }
 .admin-case-card__footer { color: var(--admin-muted); font-size: 12px; line-height: 1.35; }
 .admin-case-card__footer a { color: var(--admin-accent); font-weight: 800; text-transform: uppercase; }
+.admin-testimonial-card { background: linear-gradient(145deg, rgba(103, 137, 217, 0.16), rgba(255, 255, 255, 0.04)); }
+.admin-testimonial-card .admin-case-card__content { align-self: start; }
+.admin-testimonial-card .admin-case-card__content strong { color: #fff; }
 .admin-status { border-radius: 999px; display: inline-flex; font-size: 12px; font-weight: 700; padding: 6px 10px; text-transform: uppercase; }
 .admin-status--published { background: rgba(167, 255, 131, 0.12); color: var(--admin-good); }
 .admin-status--draft { background: rgba(255, 255, 255, 0.08); color: var(--admin-muted); }

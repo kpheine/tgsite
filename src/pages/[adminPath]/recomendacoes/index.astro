@@ -1,0 +1,50 @@
+---
+import AdminLayout from '../../../components/AdminLayout.astro';
+import { adminUrl, isAdminPath, requireUser } from '../../../lib/auth';
+import { db, type TestimonialRecord } from '../../../lib/db';
+
+if (!isAdminPath(Astro.params.adminPath)) {
+  return new Response('Não encontrado', { status: 404 });
+}
+
+const user = requireUser(Astro.cookies);
+if (!user) return Astro.redirect(adminUrl('login'));
+
+const testimonials = db.prepare('SELECT * FROM testimonials ORDER BY sort_order DESC, id DESC').all() as TestimonialRecord[];
+const statusLabels = { draft: 'Rascunho', published: 'Publicado' };
+---
+<AdminLayout title="Recomendações" username={user.username}>
+  <header class="admin-header">
+    <div>
+      <p class="admin-kicker">Depoimentos do site</p>
+      <h1 class="admin-title">Recomendações</h1>
+    </div>
+    <a class="admin-button admin-button--primary" href={adminUrl('recomendacoes/new')}>Nova recomendação</a>
+  </header>
+
+  <section class="admin-case-order-panel" data-order-panel data-order-endpoint="/api/panel/testimonials/order">
+    <div class="admin-case-order-panel__header">
+      <p class="admin-muted">Arraste os cards para definir a ordem de exibição. Novas recomendações entram no topo automaticamente.</p>
+      <p class="admin-muted" data-order-status aria-live="polite"></p>
+    </div>
+
+    {testimonials.length === 0 && <p class="admin-muted">Nenhuma recomendação criada ainda.</p>}
+    <div class="admin-case-list" data-order-list>
+      {testimonials.map((item) => (
+        <article class="admin-case-card admin-testimonial-card" data-order-card data-order-id={item.id} draggable="true">
+          <div class="admin-case-card__topline">
+            <span class={`admin-status admin-status--${item.status}`}>{statusLabels[item.status]}</span>
+          </div>
+          <div class="admin-case-card__content">
+            <h2>{item.title}</h2>
+            <p><strong>{item.person_name}</strong></p>
+          </div>
+          <div class="admin-case-card__footer">
+            <span>Atualizada em {new Date(item.updated_at).toLocaleDateString('pt-BR')}</span>
+            <a href={adminUrl(`recomendacoes/${item.id}`)}>Editar</a>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+</AdminLayout>

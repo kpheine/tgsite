@@ -207,6 +207,8 @@ astro.config.mjs         — output: server, adapter: @astrojs/node (standalone)
 
 - Public case API/components share the case response shape through `src/lib/public-cases.ts` (`PublicCase`, `PublicCaseImage`) to keep `/api/cases`, `CasesSection`, `CasesCarousel`, and `CaseModal` aligned.
 
+- Admin testimonials/recommendations are stored in SQLite table `testimonials` (schema v2) with `title`, `quote`, `person_name`, `person_role`, `status`, and `sort_order`. The admin sidebar exposes `Recomendações`; routes under `[adminPath]/recomendacoes` provide create/edit/delete, `Publicado`/`Rascunho`, and drag ordering via `/api/panel/testimonials/order`. Public testimonials are read through `src/lib/public-testimonials.ts` and `/api/testimonials`; `DepoimentosSection.astro` renders published DB content with the previous hardcoded cards as fallback.
+
 - Admin case create/edit pages share the main form markup through `src/components/AdminCaseForm.astro`; edit-only delete remains in `src/pages/[adminPath]/cases/[id].astro`.
 
 - Admin dashboard styling lives in `src/styles/admin.css`; `src/components/AdminLayout.astro` owns only the admin shell markup, upload modal markup, script imports, and stylesheet import.

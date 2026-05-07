@@ -1,9 +1,15 @@
-function getCaseCards(container: HTMLElement) {
-  return [...container.querySelectorAll<HTMLElement>('[data-case-card]')];
+type OrderConfig = {
+  cardSelector: string;
+  idAttribute: string;
+  endpoint: string;
+};
+
+function getOrderCards(container: HTMLElement, config: OrderConfig) {
+  return [...container.querySelectorAll<HTMLElement>(config.cardSelector)];
 }
 
-function getCardAfterPointer(container: HTMLElement, x: number, y: number) {
-  const cards = getCaseCards(container).filter((card) => !card.classList.contains('is-dragging'));
+function getCardAfterPointer(container: HTMLElement, config: OrderConfig, x: number, y: number) {
+  const cards = getOrderCards(container, config).filter((card) => !card.classList.contains('is-dragging'));
 
   return cards.find((card) => {
     const box = card.getBoundingClientRect();
@@ -14,15 +20,15 @@ function getCardAfterPointer(container: HTMLElement, x: number, y: number) {
   }) || null;
 }
 
-async function saveCaseOrder(panel: HTMLElement, list: HTMLElement) {
-  const status = panel.querySelector<HTMLElement>('[data-case-order-status]');
-  const ids = getCaseCards(list).map((card) => Number(card.dataset.caseId)).filter(Number.isInteger);
+async function saveOrder(panel: HTMLElement, list: HTMLElement, config: OrderConfig) {
+  const status = panel.querySelector<HTMLElement>('[data-order-status], [data-case-order-status]');
+  const ids = getOrderCards(list, config).map((card) => Number(card.dataset[config.idAttribute])).filter(Number.isInteger);
 
   if (ids.length === 0) return;
   if (status) status.textContent = 'Salvando ordem...';
 
   try {
-    const response = await fetch('/api/panel/cases/order', {
+    const response = await fetch(config.endpoint, {
       method: 'POST',
       credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
@@ -36,15 +42,22 @@ async function saveCaseOrder(panel: HTMLElement, list: HTMLElement) {
   }
 }
 
-function initCaseOrder(panel: HTMLElement) {
-  const list = panel.querySelector<HTMLElement>('[data-case-order-list]');
+function initOrder(panel: HTMLElement) {
+  const list = panel.querySelector<HTMLElement>('[data-order-list], [data-case-order-list]');
   if (!list) return;
+
+  const hasGenericCards = Boolean(list.querySelector('[data-order-card]'));
+  const config: OrderConfig = {
+    cardSelector: hasGenericCards ? '[data-order-card]' : '[data-case-card]',
+    idAttribute: hasGenericCards ? 'orderId' : 'caseId',
+    endpoint: panel.dataset.orderEndpoint || '/api/panel/cases/order',
+  };
 
   let draggedCard: HTMLElement | null = null;
   let orderChanged = false;
 
   list.addEventListener('dragstart', (event) => {
-    const card = (event.target as HTMLElement).closest<HTMLElement>('[data-case-card]');
+    const card = (event.target as HTMLElement).closest<HTMLElement>(config.cardSelector);
     if (!card) return;
 
     draggedCard = card;
@@ -54,7 +67,7 @@ function initCaseOrder(panel: HTMLElement) {
     const offsetX = event.clientX - rect.left;
     const offsetY = event.clientY - rect.top;
 
-    event.dataTransfer?.setData('text/plain', String(card.dataset.caseId || ''));
+    event.dataTransfer?.setData('text/plain', String(card.dataset[config.idAttribute] || ''));
     event.dataTransfer?.setDragImage(card, offsetX, offsetY);
     requestAnimationFrame(() => card.classList.add('is-dragging'));
   });
@@ -63,7 +76,7 @@ function initCaseOrder(panel: HTMLElement) {
     event.preventDefault();
     if (!draggedCard) return;
 
-    const nextCard = getCardAfterPointer(list, event.clientX, event.clientY);
+    const nextCard = getCardAfterPointer(list, config, event.clientX, event.clientY);
     if (nextCard && nextCard !== draggedCard) {
       list.insertBefore(draggedCard, nextCard);
       orderChanged = true;
@@ -77,7 +90,7 @@ function initCaseOrder(panel: HTMLElement) {
     draggedCard?.classList.remove('is-dragging');
     draggedCard = null;
 
-    if (orderChanged) void saveCaseOrder(panel, list);
+    if (orderChanged) void saveOrder(panel, list, config);
   });
 
   list.addEventListener('drop', (event) => {
@@ -85,6 +98,6 @@ function initCaseOrder(panel: HTMLElement) {
   });
 }
 
-document.querySelectorAll<HTMLElement>('[data-case-order-panel]').forEach(initCaseOrder);
+document.querySelectorAll<HTMLElement>('[data-order-panel], [data-case-order-panel]').forEach(initOrder);
 
 export {};

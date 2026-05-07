@@ -1,0 +1,22 @@
+---
+import AdminLayout from '../../../components/AdminLayout.astro';
+import AdminTestimonialForm from '../../../components/AdminTestimonialForm.astro';
+import { adminUrl, isAdminPath, requireUser } from '../../../lib/auth';
+
+if (!isAdminPath(Astro.params.adminPath)) {
+  return new Response('Não encontrado', { status: 404 });
+}
+
+const user = requireUser(Astro.cookies);
+if (!user) return Astro.redirect(adminUrl('login'));
+---
+<AdminLayout title="Nova recomendação" username={user.username}>
+  <header class="admin-header">
+    <div>
+      <p class="admin-kicker">Criar depoimento</p>
+      <h1 class="admin-title">Nova recomendação</h1>
+    </div>
+  </header>
+
+  <AdminTestimonialForm />
+</AdminLayout>

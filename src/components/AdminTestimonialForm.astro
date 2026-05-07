@@ -1,0 +1,34 @@
+---
+import { adminUrl } from '../lib/auth';
+import type { TestimonialRecord } from '../lib/db';
+
+interface Props {
+  item?: TestimonialRecord;
+}
+
+const { item } = Astro.props;
+const isEdit = Boolean(item);
+const action = item ? `/api/panel/testimonials/${item.id}` : '/api/panel/testimonials';
+const status = item?.status ?? 'draft';
+---
+
+<form class="admin-form" method="post" action={action}>
+  <div class="admin-field"><label for="title">Título</label><input class="admin-input" id="title" name="title" value={item?.title ?? ''} required /></div>
+  <div class="admin-field"><label for="quote">Depoimento</label><textarea class="admin-textarea" id="quote" name="quote" required>{item?.quote ?? ''}</textarea></div>
+  <div class="admin-form-row">
+    <div class="admin-field"><label for="person_name">Nome</label><input class="admin-input" id="person_name" name="person_name" value={item?.person_name ?? ''} required /></div>
+    <div class="admin-field"><label for="person_role">Cargo / Empresa</label><input class="admin-input" id="person_role" name="person_role" value={item?.person_role ?? ''} required /></div>
+  </div>
+  <div class="admin-field" data-status-toggle-field>
+    <label for="status">Status</label>
+    <input id="status" name="status" type="hidden" value={status} data-status-toggle-input />
+    <button class="admin-status-toggle" type="button" data-status-toggle aria-pressed={status === 'published' ? 'true' : 'false'}>
+      <span data-status-toggle-label>{status === 'published' ? 'Publicado' : 'Rascunho'}</span>
+      <small>Clique aqui para mudar o status</small>
+    </button>
+  </div>
+  <div class="admin-actions">
+    <button class="admin-button admin-button--primary" type="submit">{isEdit ? 'Salvar alterações' : 'Criar recomendação'}</button>
+    <a class="admin-button" href={adminUrl('recomendacoes')}>{isEdit ? 'Voltar' : 'Cancelar'}</a>
+  </div>
+</form>

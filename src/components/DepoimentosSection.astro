@@ -1,41 +1,45 @@
 ---
-const cards = [
+import { getPublicTestimonials } from '../lib/public-testimonials';
+
+const fallbackCards = [
   {
-    variant: 'sunset',
     title: "Título aqui",
     quote: '"This summit opened my eyes to the future of AI and how it will shape industries."',
-    name: "Nome Sobrenome",
-    role: "Marketing, BASF",
+    personName: "Nome Sobrenome",
+    personRole: "Marketing, BASF",
   },
   {
-    variant: 'blue',
     title: "Título aqui",
     quote: '"Incredible speakers, top-tier networking, and cutting-edge discussions all in one place."',
-    name: "Nome Sobrenome",
-    role: "Marketing, EDP",
+    personName: "Nome Sobrenome",
+    personRole: "Marketing, EDP",
   },
   {
-    variant: 'pink',
     title: "Título aqui",
     quote: '"From hands-on workshops to visionary talks, this summit is a must-attend for AI professionals."',
-    name: "Nome Sobrenome",
-    role: "Marketing, Volkswagen",
+    personName: "Nome Sobrenome",
+    personRole: "Marketing, Volkswagen",
   },
   {
-    variant: 'sunset',
     title: "Título aqui",
     quote: '"An unforgettable experience that challenged everything we thought we knew about strategy."',
-    name: "Nome Sobrenome",
-    role: "Marketing, Claro",
+    personName: "Nome Sobrenome",
+    personRole: "Marketing, Claro",
   },
   {
-    variant: 'blue',
     title: "Título aqui",
     quote: '"The connections made here translated directly into business results within months."',
-    name: "Nome Sobrenome",
-    role: "Marketing, Natura",
+    personName: "Nome Sobrenome",
+    personRole: "Marketing, Natura",
   },
 ];
+
+const variants = ['sunset', 'blue', 'pink'];
+const publicTestimonials = getPublicTestimonials();
+const cards = (publicTestimonials.length > 0 ? publicTestimonials : fallbackCards).map((card, index) => ({
+  ...card,
+  variant: variants[index % variants.length],
+}));
 ---
 
 <div class="dep-section" id="depoimentos">
@@ -58,15 +62,15 @@ const cards = [
     </div>
 
     <!-- Carousel viewport -->
-    <div class="carousel-viewport">
-      <div class="carousel-track" id="dep-track">
+      <div class="carousel-viewport">
+        <div class:list={['carousel-track', { 'carousel-track--centered': cards.length < 3 }]} id="dep-track">
         {cards.map((card) => (
           <div class:list={['dep-card', `dep-card--${card.variant}`]}>
             <h3 class="card-title">{card.title}</h3>
             <p class="card-quote">{card.quote}</p>
             <div class="card-attr">
-              <p class="card-name">{card.name}</p>
-              <p class="card-role">{card.role}</p>
+              <p class="card-name">{card.personName}</p>
+              <p class="card-role">{card.personRole}</p>
             </div>
           </div>
         ))}
@@ -137,6 +141,10 @@ const cards = [
     padding-bottom: 0.25rem;
   }
 
+  .dep-nav.is-hidden {
+    display: none;
+  }
+
   .nav-btn {
     position: relative;
     width: 68px;
@@ -150,6 +158,10 @@ const cards = [
     transition: opacity 0.15s ease;
     /* Active: gradient fill */
     background: linear-gradient(-87.39deg, rgb(33,110,242) 5%, rgb(163,67,203) 49%, rgb(234,14,129) 93%);
+  }
+
+  .nav-btn[hidden] {
+    display: none !important;
   }
 
   .nav-btn img {
@@ -202,6 +214,12 @@ const cards = [
     gap: 1.25rem;
     transition: transform 0.4s ease;
     will-change: transform;
+  }
+
+  @media (min-width: 769px) {
+    .carousel-track--centered {
+      justify-content: center;
+    }
   }
 
   /* Cards — 3 visible at once on desktop, 1 on mobile */
@@ -297,6 +315,9 @@ const cards = [
     track.style.transform = `translateX(-${current * step}px)`;
     prevBtn.disabled = current === 0;
     nextBtn.disabled = current >= maxIndex;
+    prevBtn.hidden = maxIndex === 0;
+    nextBtn.hidden = maxIndex === 0;
+    prevBtn.parentElement?.classList.toggle('is-hidden', maxIndex === 0);
   }
 
   prevBtn.addEventListener('click', () => {
