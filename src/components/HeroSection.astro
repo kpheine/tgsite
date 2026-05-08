@@ -9,12 +9,17 @@
     aria-hidden="true"
   />
 
-  <!-- "AQUI TEM SOLUÇÃO" gradient headline -->
-  <img
-    src="/images/hero-headline.png"
-    alt="Aqui tem solução"
+  <h1
     class="hero-headline"
-  />
+    aria-label="Aqui tem estratégia, criatividade, inteligência, análise, planejamento e solução"
+  >
+    <span class="hero-headline__prefix">AQUI TEM</span>
+    <span class="hero-headline__typed" data-hero-typed-word>Estratégia</span><span
+      class="hero-headline__cursor is-idle"
+      data-hero-typing-cursor
+      aria-hidden="true"
+    >_</span>
+  </h1>
 
   <!-- Bottom bar: social icons + address -->
   <div class="hero-footer">
@@ -34,6 +39,62 @@
     <img src="/images/hero-vector.svg" alt="" width="23" height="29" />
   </button>
 </section>
+
+<script>
+  const typedWord = document.querySelector<HTMLElement>('[data-hero-typed-word]');
+  const cursor = document.querySelector<HTMLElement>('[data-hero-typing-cursor]');
+  const words = ['Estratégia', 'Criatividade', 'Inteligência', 'Análise', 'Planejamento', 'Solução'];
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (typedWord && cursor && !prefersReducedMotion) {
+    let wordIndex = 0;
+    let characterIndex = words[wordIndex].length;
+    let isDeleting = true;
+
+    const setIdle = (isIdle: boolean) => {
+      cursor.classList.toggle('is-idle', isIdle);
+    };
+
+    const scheduleNextStep = (delay: number) => {
+      window.setTimeout(typeNextCharacter, delay);
+    };
+
+    const typeNextCharacter = () => {
+      const currentWord = words[wordIndex];
+      setIdle(false);
+
+      if (isDeleting) {
+        characterIndex -= 1;
+        typedWord.textContent = currentWord.slice(0, characterIndex);
+
+        if (characterIndex === 0) {
+          isDeleting = false;
+          wordIndex = (wordIndex + 1) % words.length;
+          scheduleNextStep(260);
+          return;
+        }
+
+        scheduleNextStep(58);
+        return;
+      }
+
+      const nextWord = words[wordIndex];
+      characterIndex += 1;
+      typedWord.textContent = nextWord.slice(0, characterIndex);
+
+      if (characterIndex === nextWord.length) {
+        setIdle(true);
+        isDeleting = true;
+        scheduleNextStep(3200);
+        return;
+      }
+
+      scheduleNextStep(95);
+    };
+
+    window.setTimeout(typeNextCharacter, 1600);
+  }
+</script>
 
 <style>
   .hero-section {
@@ -55,14 +116,64 @@
     pointer-events: none;
   }
 
-  /* Gradient headline — positioned at ~45% from top, 7.9% from left */
   .hero-headline {
     position: absolute;
     top: 44.9%;
-    left: 7.9%;
+    left: 50%;
+    transform: translateX(-50%);
     width: 83.9%;
-    height: auto;
+    color: #fff;
+    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-size: clamp(4rem, 8.6vw, 8.8rem);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 0.86;
     pointer-events: none;
+    text-align: center;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .hero-headline__prefix {
+    background: linear-gradient(100deg, #3157d6 0%, #23d6ec 28%, #ec148f 55%, #3157d6 82%, #23d6ec 100%);
+    background-size: 240% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: hero-gradient-cycle 30s ease-in-out infinite;
+  }
+
+  .hero-headline__typed,
+  .hero-headline__cursor {
+    color: #fff;
+  }
+
+  .hero-headline__cursor {
+    opacity: 1;
+  }
+
+  .hero-headline__cursor.is-idle {
+    animation: hero-cursor-blink 1.2s steps(1, end) infinite;
+  }
+
+  @keyframes hero-cursor-blink {
+    0%, 45% {
+      opacity: 1;
+    }
+
+    46%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes hero-gradient-cycle {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+
+    50% {
+      background-position: 100% 50%;
+    }
   }
 
   /* Bottom bar */
@@ -114,14 +225,33 @@
   }
 
   @media (max-width: 768px) {
+    .hero-headline {
+      font-size: clamp(3.1rem, 8.7vw, 5rem);
+    }
+
     .hero-address {
       font-size: 0.85rem;
     }
   }
 
   @media (max-width: 480px) {
+    .hero-headline {
+      top: 42%;
+      left: 50%;
+      width: 88%;
+      font-size: clamp(2.25rem, 15vw, 4.4rem);
+      white-space: normal;
+    }
+
     .hero-address {
       display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-headline__prefix,
+    .hero-headline__cursor.is-idle {
+      animation: none;
     }
   }
 </style>
