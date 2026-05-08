@@ -71,7 +71,7 @@ All in `src/components/`:
 5. `DiferenciaisSection.astro` — white bg, event collage left, title + 2×2 gradient cards right
 6. `ClientesSection.astro` — dark, gradient title, 24 logos in 8×3 grid
 7. `DepoimentosSection.astro` — dark, gradient title, 3-card carousel with JS sliding
-8. `PremiosSection.astro` — dark, 2-col: text+award logos left, collage right _(layout needs revisit)_
+8. `PremiosSection.astro` — dark, 2-col: text+award logos left, collage right, configurable CTA/variant used by home and `/sobre` _(layout needs revisit)_
 9. `WpiSection.astro` — dark, earth card + WPI/TG logos, tagline, 4 feature blobs
 10. `ContatoFooter.astro` — dark, title + CTA, gradient blob (screen blend), hr divider, Google Maps embed, footer
 
@@ -91,8 +91,8 @@ All in `src/components/` and `src/pages/sobre.astro`:
 1. `sobre.astro` — page shell: Header + sections + ContatoFooter
 2. Hero — full-bleed event photo (`sobre_hero.jpg`), Bebas Neue heading overlay
 3. `SobreStatsSection.astro` — dark, Bebas Neue heading, "Já foram mais de", 4-col stats with gradient blobs + dividers, tagline
-4. `SobreClientesSection.astro` — dark, gradient "AQUI TEM" title, Figtree subtitle, 8×3 logo grid (25 logos in `public/images/sobre_clientes/`)
-5. `SobrePremiosSection.astro` — same as `PremiosSection.astro` but without the CTA button
+4. `SobreClientesSection.astro` — dark, gradient "AQUI TEM" title, Figtree subtitle, 8×3 logo grid rendered from shared `clientLogos` data
+5. `PremiosSection.astro` with `showCta={false}` and `variant="sobre"` — shared awards intro without the CTA button
 6. `SobreAwardsCards.astro` — 3 gradient award cards (FIP full-width, Colunistas+Lusófonos row, Caio full-width)
 
 ## Git Workflow Preference
@@ -179,6 +179,7 @@ src/
   components/AdminLayout.astro — standalone dashboard shell for private content management
   components/AdminCaseForm.astro — shared admin case create/edit form markup
   components/Modal.astro    — reusable layout-agnostic modal shell using native <dialog>
+  data/site-content.ts      — shared static logo/award metadata rendered by repeated public sections
   layouts/Layout.astro   — base HTML shell, imports global.css, Google Fonts (Inter)
   lib/auth.ts            — admin path helpers, username login/session cookie utilities
   lib/bytes.ts           — shared pure byte label formatter used by server and browser upload code

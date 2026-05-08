@@ -3,7 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import SobreStatsSection from '../components/SobreStatsSection.astro';
 import SobreClientesSection from '../components/SobreClientesSection.astro';
-import SobrePremiosSection from '../components/SobrePremiosSection.astro';
+import PremiosSection from '../components/PremiosSection.astro';
 import SobreAwardsCards from '../components/SobreAwardsCards.astro';
 import ContatoFooter from '../components/ContatoFooter.astro';
 ---
@@ -19,7 +19,7 @@ import ContatoFooter from '../components/ContatoFooter.astro';
     </section>
     <SobreStatsSection />
     <SobreClientesSection />
-    <SobrePremiosSection />
+    <PremiosSection showCta={false} variant="sobre" />
     <SobreAwardsCards />
   </main>
   <ContatoFooter />

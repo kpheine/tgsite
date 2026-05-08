@@ -1,4 +1,5 @@
 ---
+import { clientLogos } from '../data/site-content';
 ---
 <section class="sobre-clientes" id="clientes">
   <h2 class="sobre-clientes__title">
@@ -11,30 +12,9 @@
   </p>
 
   <div class="sobre-clientes__grid">
-    <div class="logo-cell"><img src="/images/logos/einstein.png"   alt="Einstein" /></div>
-    <div class="logo-cell"><img src="/images/logos/basf.png"       alt="BASF" /></div>
-    <div class="logo-cell"><img src="/images/logos/big.png"        alt="BIG" /></div>
-    <div class="logo-cell"><img src="/images/logos/boehringer.png" alt="Boehringer Ingelheim" /></div>
-    <div class="logo-cell"><img src="/images/logos/vector-1.png"   alt="Cliente" /></div>
-    <div class="logo-cell"><img src="/images/logos/claro.png"      alt="Claro" /></div>
-    <div class="logo-cell"><img src="/images/logos/coty.png"       alt="Coty" /></div>
-    <div class="logo-cell"><img src="/images/logos/edp.png"        alt="EDP" /></div>
-    <div class="logo-cell"><img src="/images/logos/eurofarma.png"  alt="Eurofarma" /></div>
-    <div class="logo-cell"><img src="/images/logos/group-14.png"   alt="Cliente" /></div>
-    <div class="logo-cell"><img src="/images/logos/genie.png"      alt="Genie" /></div>
-    <div class="logo-cell"><img src="/images/logos/getinge.png"    alt="Getinge" /></div>
-    <div class="logo-cell"><img src="/images/logos/petropolis.png" alt="Grupo Petrópolis" /></div>
-    <div class="logo-cell"><img src="/images/logos/marfrig.png"    alt="Marfrig" /></div>
-    <div class="logo-cell"><img src="/images/logos/natura.png"     alt="Natura" /></div>
-    <div class="logo-cell"><img src="/images/logos/netflix.png"    alt="Netflix" /></div>
-    <div class="logo-cell"><img src="/images/logos/nissin.png"     alt="Nissin" /></div>
-    <div class="logo-cell"><img src="/images/logos/rd-saude.png"   alt="RD Saúde" /></div>
-    <div class="logo-cell"><img src="/images/logos/group.png"      alt="Cliente" /></div>
-    <div class="logo-cell"><img src="/images/logos/santander.png"  alt="Santander" /></div>
-    <div class="logo-cell"><img src="/images/logos/vivo.png"       alt="Vivo" /></div>
-    <div class="logo-cell"><img src="/images/logos/group-16.png"   alt="Cliente" /></div>
-    <div class="logo-cell"><img src="/images/logos/vamos.png"      alt="Vamos" /></div>
-    <div class="logo-cell"><img src="/images/logos/vortx.png"      alt="Vortx" /></div>
+    {clientLogos.map((logo) => (
+      <div class="logo-cell"><img src={logo.src} alt={logo.alt} /></div>
+    ))}
   </div>
 </section>
 

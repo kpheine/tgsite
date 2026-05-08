@@ -1,9 +1,16 @@
 ---
+import { awardLogoRows } from '../data/site-content';
+
+type Props = {
+  showCta?: boolean;
+  variant?: 'home' | 'sobre';
+};
+
+const { showCta = true, variant = 'home' } = Astro.props;
 ---
-<section class="premios-section" id="premios">
+<section class:list={['premios-section', `premios-section--${variant}`]} id="premios">
   <div class="premios-inner">
 
-    <!-- Left: title + award logos + CTA -->
     <div class="premios-text">
       <h2 class="premios-title">
         <span class="title-gradient">Aqui tem</span>
@@ -11,21 +18,18 @@
       </h2>
 
       <div class="award-logos">
-        <div class="award-row">
-          <img src="/images/premios/live.png"      alt="Prêmio Live Marketing" />
-          <img src="/images/premios/fip.png"        alt="FIP" />
-          <img src="/images/premios/caio.png"       alt="Prêmio Caio" />
-        </div>
-        <div class="award-row">
-          <img src="/images/premios/colunistas.png" alt="Prêmio Colunistas" />
-          <img src="/images/premios/lusofonos.png"  alt="Prêmio Lusófonos da Criatividade" />
-        </div>
+        {awardLogoRows.map((row) => (
+          <div class="award-row">
+            {row.map((logo) => <img src={logo.src} alt={logo.alt} />)}
+          </div>
+        ))}
       </div>
 
-      <a href="/sobre#premios" class="site-button site-button--gradient btn-premios">Veja nossas conquistas</a>
+      {showCta && (
+        <a href="/sobre#premios" class="site-button site-button--gradient btn-premios">Veja nossas conquistas</a>
+      )}
     </div>
 
-    <!-- Right: awards collage -->
     <div class="premios-image-col">
       <img
         src="/images/premios/collage.png"
@@ -128,11 +132,20 @@
     overflow: hidden;
   }
 
+  .premios-section--sobre .premios-image-col {
+    justify-content: flex-end;
+  }
+
   .premios-collage {
     width: 90%;
     height: auto;
     object-fit: contain;
     display: block;
+  }
+
+  .premios-section--sobre .premios-collage {
+    width: 100%;
+    object-position: left center;
   }
 
   @media (max-width: 768px) {
