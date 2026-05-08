@@ -1,3 +1,4 @@
+import type { APIContext } from 'astro';
 import { compareSync } from 'bcryptjs';
 import { createHash, randomBytes } from 'node:crypto';
 import { db } from './db';
@@ -14,6 +15,8 @@ interface UserRecord {
   support_enabled: 0 | 1;
   support_expires_at: string | null;
 }
+
+type AstroCookies = APIContext['cookies'];
 
 export function getAdminPath() {
   return env.adminPath;
@@ -63,7 +66,7 @@ export function login(username: string, password: string) {
   return { token, expiresAt };
 }
 
-export function setSessionCookie(cookies: any, token: string, expiresAt: string) {
+export function setSessionCookie(cookies: AstroCookies, token: string, expiresAt: string) {
   cookies.set(SESSION_COOKIE, token, {
     path: '/',
     httpOnly: true,
@@ -73,7 +76,7 @@ export function setSessionCookie(cookies: any, token: string, expiresAt: string)
   });
 }
 
-export function clearSession(cookies: any) {
+export function clearSession(cookies: AstroCookies) {
   const token = cookies.get(SESSION_COOKIE)?.value;
   if (token) {
     db.prepare('DELETE FROM sessions WHERE token_hash = ?').run(hashToken(token));
@@ -81,7 +84,7 @@ export function clearSession(cookies: any) {
   cookies.delete(SESSION_COOKIE, { path: '/' });
 }
 
-export function getCurrentUser(cookies: any) {
+export function getCurrentUser(cookies: AstroCookies) {
   const token = cookies.get(SESSION_COOKIE)?.value;
   if (!token) return null;
 
@@ -106,6 +109,6 @@ export function getCurrentUser(cookies: any) {
   return user || null;
 }
 
-export function requireUser(cookies: any) {
+export function requireUser(cookies: AstroCookies) {
   return getCurrentUser(cookies);
 }
