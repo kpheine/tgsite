@@ -21,6 +21,7 @@
 - Main admin dashboard groups content stats into two summary cards (`Cases` and `Recomendações`) instead of separate cards for each count, reducing visual clutter while preserving total/published/draft metrics and management shortcuts.
 - Admin sidebar shows a compact green `Suporte ativo` link only while support access is enabled and unexpired; it links back to the main dashboard support card for enabling/disabling or generating a new support password.
 - Case create/edit forms submit through an admin-only `XMLHttpRequest` handler (`src/scripts/admin-case-form-submit.ts`) to show a blocking centered upload modal with a rotating percentage ring. The percentage tracks browser-to-server upload progress; after 100%, the modal shows processing copy until the server redirect completes. Server-side multipart parsing uses standard `request.formData()` with buffered image writes; streamed upload parsing was intentionally removed to keep the code simple.
+- Admin case create/update/delete domain behavior lives in `src/lib/admin-cases.ts`; API routes only handle auth, request parsing, error-to-response mapping, and redirects. The module owns case validation, YouTube/status normalization, image ordering, SQLite transactions, uploaded-file rollback, and committed media deletion after successful deletes/replacements.
 - Admin case create/edit forms warn before tab close, internal navigation, or non-case form submits when unsaved changes exist (`src/scripts/admin-unsaved-case-warning.ts`). Case delete forms require a browser confirmation before submitting (`src/scripts/admin-case-delete-confirm.ts`).
 - Case videos are YouTube URLs or raw 11-character YouTube IDs stored normalized in `cases.video_url`; the admin form validates supported YouTube URL/ID formats client/server side and shows an iframe preview so users can verify the link before saving.
 - Public case modal YouTube iframes are stopped by unloading their `src` whenever the user switches to another case or closes the modal, then restored when that case becomes active again.
@@ -181,6 +182,7 @@ src/
   components/Modal.astro    — reusable layout-agnostic modal shell using native <dialog>
   data/site-content.ts      — shared static logo/award metadata rendered by repeated public sections
   layouts/Layout.astro   — base HTML shell, imports global.css, Google Fonts (Inter)
+  lib/admin-cases.ts     — admin case create/update/delete domain operations with validation, transactions, and media cleanup
   lib/admin-order.ts     — shared admin drag-order parsing and descending `sort_order` persistence for cases/testimonials
   lib/auth.ts            — admin path helpers, username login/session cookie utilities
   lib/bytes.ts           — shared pure byte label formatter used by server and browser upload code

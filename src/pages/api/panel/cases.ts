@@ -1,38 +1,7 @@
 import type { APIRoute } from 'astro';
 import { adminUrl, requireUser } from '../../../lib/auth';
-import { db } from '../../../lib/db';
-import { cleanupUploadedFiles, fieldValue, fieldValues, parseCaseUploadRequest, UploadValidationError, type ParsedCaseUpload } from '../../../lib/uploads';
-import { normalizeYouTubeUrl } from '../../../lib/youtube';
-
-function saveImages(upload: ParsedCaseUpload, caseId: number) {
-  let sortOrder = 0;
-  const insertImage = db.prepare('INSERT INTO imagens_case (case_id, sort_order, url, destaque) VALUES (?, ?, ?, ?)');
-  const orders = fieldValues(upload, 'new_image_order');
-  const destaques = fieldValues(upload, 'new_image_destaque');
-
-  for (const [index, url] of upload.imageUrls.entries()) {
-    const requestedOrder = Number(orders[index]);
-    const imageOrder = Number.isFinite(requestedOrder) ? requestedOrder : sortOrder;
-
-    insertImage.run(caseId, imageOrder, url, destaques[index] === '1' ? 1 : 0);
-    sortOrder += 1;
-  }
-}
-
-function textValue(upload: ParsedCaseUpload, name: string) {
-  return fieldValue(upload, name).trim() || null;
-}
-
-function youtubeUrlValue(upload: ParsedCaseUpload) {
-  const value = fieldValue(upload, 'video_url').trim();
-  if (!value) return null;
-  return normalizeYouTubeUrl(value);
-}
-
-function nextCaseSortOrder() {
-  const result = db.prepare('SELECT COALESCE(MAX(sort_order), -1) + 1 as value FROM cases').get() as { value: number };
-  return result.value;
-}
+import { AdminCaseError, createAdminCase } from '../../../lib/admin-cases';
+import { parseCaseUploadRequest, UploadValidationError, type ParsedCaseUpload } from '../../../lib/uploads';
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   if (!requireUser(cookies)) {
@@ -50,46 +19,10 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     throw error;
   }
 
-  const titulo = fieldValue(upload, 'titulo').trim();
-  if (!titulo) {
-    cleanupUploadedFiles(upload.uploadedUrls);
-    return new Response('O título é obrigatório', { status: 400 });
-  }
-
-  if (!upload.mainImageUrl) {
-    cleanupUploadedFiles(upload.uploadedUrls);
-    return new Response('A imagem principal é obrigatória', { status: 400 });
-  }
-
-  const videoUrl = youtubeUrlValue(upload);
-  if (fieldValue(upload, 'video_url').trim() && !videoUrl) {
-    cleanupUploadedFiles(upload.uploadedUrls);
-    return new Response('Informe uma URL válida do YouTube', { status: 400 });
-  }
-
-  const createCase = db.transaction(() => {
-    const result = db.prepare(`
-      INSERT INTO cases (titulo, cliente, main_image_url, video_url, desafio, entrega, resultado, status, sort_order)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      titulo,
-      textValue(upload, 'cliente'),
-      upload.mainImageUrl,
-      videoUrl,
-      textValue(upload, 'desafio'),
-      textValue(upload, 'entrega'),
-      textValue(upload, 'resultado'),
-      fieldValue(upload, 'status') === 'published' ? 'published' : 'draft',
-      nextCaseSortOrder(),
-    );
-
-    saveImages(upload, Number(result.lastInsertRowid));
-  });
-
   try {
-    createCase();
+    createAdminCase(upload);
   } catch (error) {
-    cleanupUploadedFiles(upload.uploadedUrls);
+    if (error instanceof AdminCaseError) return new Response(error.message, { status: error.status });
     throw error;
   }
 
