@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, unlinkSync, writeFileSync } from 'node:fs';
 import { extname, resolve, sep } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { formatBytesLabel } from './bytes';
-import { MAX_IMAGE_BYTES } from './upload-limits';
+import { env } from './env';
 
 const allowedImages = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 
@@ -16,9 +16,10 @@ export type ParsedCaseUpload = {
 };
 
 const uploadRoot = resolve(process.cwd(), 'uploads');
+const maxImageBytes = env.uploadMaxImageBytes;
 
 function uploadLimitLabel() {
-  return formatBytesLabel(MAX_IMAGE_BYTES);
+  return formatBytesLabel(maxImageBytes);
 }
 
 function assertAllowedUpload(mimeType: string) {
@@ -44,7 +45,7 @@ function uploadDestination(name: string) {
 async function saveUploadFile(file: File) {
   assertAllowedUpload(file.type);
 
-  if (file.size > MAX_IMAGE_BYTES) {
+  if (file.size > maxImageBytes) {
     throw new UploadValidationError(`A imagem excede o limite de ${uploadLimitLabel()}.`);
   }
 

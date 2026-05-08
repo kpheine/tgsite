@@ -3,7 +3,7 @@ import AdminCaseImageCard from './AdminCaseImageCard.astro';
 import { adminUrl } from '../lib/auth';
 import type { CaseImageRecord, CaseRecord } from '../lib/db';
 import { formatBytesLabel } from '../lib/bytes';
-import { MAX_IMAGE_BYTES } from '../lib/upload-limits';
+import { env } from '../lib/env';
 import { getYouTubeEmbedUrl } from '../lib/youtube';
 
 interface Props {
@@ -15,7 +15,8 @@ const { item, images = [] } = Astro.props;
 const isEdit = Boolean(item);
 const action = item ? `/api/panel/cases/${item.id}` : '/api/panel/cases';
 const status = item?.status ?? 'draft';
-const maxImageLabel = formatBytesLabel(MAX_IMAGE_BYTES);
+const maxImageBytes = env.uploadMaxImageBytes;
+const maxImageLabel = formatBytesLabel(maxImageBytes);
 const videoEmbedUrl = getYouTubeEmbedUrl(item?.video_url);
 ---
 
@@ -32,7 +33,7 @@ const videoEmbedUrl = getYouTubeEmbedUrl(item?.video_url);
       <small>Clique aqui para mudar o status</small>
     </button>
   </div>
-  <div class="admin-field" data-main-image-upload data-max-image-bytes={MAX_IMAGE_BYTES}>
+  <div class="admin-field" data-main-image-upload data-max-image-bytes={maxImageBytes}>
     <label for="main_image">Imagem principal do case</label>
     {item ? (
       <>
@@ -105,7 +106,7 @@ const videoEmbedUrl = getYouTubeEmbedUrl(item?.video_url);
   <div class="admin-field"><label for="entrega">Entrega</label><textarea class="admin-textarea" id="entrega" name="entrega">{item?.entrega || ''}</textarea></div>
   <div class="admin-field"><label for="resultado">Resultado</label><textarea class="admin-textarea" id="resultado" name="resultado">{item?.resultado || ''}</textarea></div>
 
-  <div class="admin-field" data-image-upload data-max-image-bytes={MAX_IMAGE_BYTES}>
+  <div class="admin-field" data-image-upload data-max-image-bytes={maxImageBytes}>
     <label for="images">{isEdit ? 'Adicionar imagens' : 'Imagens do case'}</label>
     <div class="admin-upload-zone" data-upload-zone>
       <input class="admin-file-input" id="images" name="images" type="file" accept="image/*" multiple data-upload-input />
