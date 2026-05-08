@@ -49,6 +49,19 @@ main {
   min-height: 100dvh;
 }
 
+/* ─── Public Hero Divider ────────────────────────────────────────────────── */
+:where(.hero-section, .wpi-hero, .sobre-hero)::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  height: 2px;
+  background: linear-gradient(100deg, #3157d6 0%, #23d6ec 49%, #ec148f 100%);
+  pointer-events: none;
+}
+
 /* ─── Shared Public Buttons ──────────────────────────────────────────────── */
 .site-button {
   position: relative;
@@ -210,4 +223,3 @@ main {
     transition: none;
   }
 }
-
