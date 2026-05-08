@@ -181,6 +181,7 @@ src/
   components/Modal.astro    — reusable layout-agnostic modal shell using native <dialog>
   data/site-content.ts      — shared static logo/award metadata rendered by repeated public sections
   layouts/Layout.astro   — base HTML shell, imports global.css, Google Fonts (Inter)
+  lib/admin-order.ts     — shared admin drag-order parsing and descending `sort_order` persistence for cases/testimonials
   lib/auth.ts            — admin path helpers, username login/session cookie utilities
   lib/bytes.ts           — shared pure byte label formatter used by server and browser upload code
   lib/db.ts              — SQLite connection, fresh-schema creation, schema version guard, env-synced primary admin credentials, support user seeding (`cases`, `imagens_case`)
@@ -211,6 +212,8 @@ astro.config.mjs         — output: server, adapter: @astrojs/node (standalone)
 - Public case API/components share the case response shape through `src/lib/public-cases.ts` (`PublicCase`, `PublicCaseImage`) to keep `/api/cases`, `CasesSection`, `CasesCarousel`, and `CaseModal` aligned.
 
 - Admin testimonials/recommendations are stored in SQLite table `testimonials` (schema v2) with `title`, `quote`, `person_name`, `person_role`, `status`, and `sort_order`. The admin sidebar exposes `Recomendações`; routes under `[adminPath]/recomendacoes` provide create/edit/delete, `Publicado`/`Rascunho`, and drag ordering via `/api/panel/testimonials/order`. Public testimonials are read through `src/lib/public-testimonials.ts` and `/api/testimonials`; `DepoimentosSection.astro` renders published DB content with the previous hardcoded cards as fallback.
+
+- Admin drag ordering for cases and testimonials uses `src/lib/admin-order.ts` so both order endpoints share ID parsing and the descending `sort_order` update rule.
 
 - Admin case create/edit pages share the main form markup through `src/components/AdminCaseForm.astro`; edit-only delete remains in `src/pages/[adminPath]/cases/[id].astro`.
 
