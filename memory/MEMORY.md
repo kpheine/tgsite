@@ -196,6 +196,7 @@ src/
   pages/api/panel/...    — protected login/logout/case endpoints
   pages/index.astro      — hello world page
   pages/uploads/[...path].ts — serves full media files from local uploads volume without HTTP range support
+  scripts/admin-upload-shared.ts — shared browser upload primitives for file input syncing, drop zones, image validation, upload messages, and size labels
   scripts/admin-upload-limits.ts — browser-safe upload limit data attribute parsing and byte label formatting
   scripts/admin-video-upload.ts — admin case YouTube URL preview behavior
   scripts/modal-manager.ts — delegated open/close behavior for all modals
@@ -209,7 +210,7 @@ scripts/dev-reset.mjs    — dev-only local SQLite/uploads reset command used by
 astro.config.mjs         — output: server, adapter: @astrojs/node (standalone)
 ```
 
-- Case image uploads use UUID v4 filenames. Main thumbnail images and gallery images are hard-linked to cases for simplicity: deleting a case deletes its media DB rows and local files from `./uploads/`. Admin case create/edit/delete DB mutations run inside SQLite transactions; old/replaced media files are deleted only after the DB transaction succeeds, while newly uploaded files are cleaned up if the DB write fails. Admin case upload endpoints parse multipart requests with `busboy` for image files. Image size limits are read from `UPLOAD_MAX_IMAGE_BYTES` via `src/lib/upload-limits.ts`, defaulting to 8MB; display labels are generated from bytes. The admin UI receives the resolved limit through `data-*`, validates oversized images before submission, and upload validation failures return pt-BR form/modal errors instead of Astro error pages. Case videos are not uploaded; admins paste a YouTube URL or ID into `video_url`, which is normalized server-side and rendered as a `youtube-nocookie.com` iframe.
+- Case image uploads use UUID v4 filenames. Main thumbnail images and gallery images are hard-linked to cases for simplicity: deleting a case deletes its media DB rows and local files from `./uploads/`. Admin case create/edit/delete DB mutations run inside SQLite transactions; old/replaced media files are deleted only after the DB transaction succeeds, while newly uploaded files are cleaned up if the DB write fails. Admin case upload endpoints parse multipart requests with `busboy` for image files. Image size limits are read from `UPLOAD_MAX_IMAGE_BYTES` via `src/lib/upload-limits.ts`, defaulting to 8MB; display labels are generated from bytes. The admin UI receives the resolved limit through `data-*`, validates oversized images before submission, and shared browser upload primitives live in `src/scripts/admin-upload-shared.ts` while main-image and gallery scripts keep their distinct workflows. Upload validation failures return pt-BR form/modal errors instead of Astro error pages. Case videos are not uploaded; admins paste a YouTube URL or ID into `video_url`, which is normalized server-side and rendered as a `youtube-nocookie.com` iframe.
 
 - Public case API/components share the case response shape through `src/lib/public-cases.ts` (`PublicCase`, `PublicCaseImage`) to keep `/api/cases`, `CasesSection`, `CasesCarousel`, and `CaseModal` aligned.
 

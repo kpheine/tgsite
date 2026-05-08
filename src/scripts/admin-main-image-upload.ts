@@ -1,21 +1,5 @@
 import { formatBytesLabel, getByteLimit } from './admin-upload-limits';
-
-function formatFileSize(bytes: number) {
-  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
-  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
-}
-
-function setInputFile(input: HTMLInputElement, file: File | null) {
-  const transfer = new DataTransfer();
-  if (file) transfer.items.add(file);
-  input.files = transfer.files;
-}
-
-function setMessage(message: HTMLElement | null, text: string | null) {
-  if (!message) return;
-  message.textContent = text || '';
-  message.hidden = !text;
-}
+import { bindUploadDropZone, formatFileSize, setInputFiles, setUploadMessage, validateImageFile } from './admin-upload-shared';
 
 function initMainImageUpload(root: HTMLElement) {
   const input = root.querySelector<HTMLInputElement>('[data-main-image-input]');
@@ -37,24 +21,25 @@ function initMainImageUpload(root: HTMLElement) {
   if (!input || !button || !zone || !preview || !name || !size) return;
 
   function setFile(file: File) {
-    setMessage(message, null);
+    setUploadMessage(message, null);
+    const validationError = validateImageFile(file, maxImageBytes);
 
-    if (!file.type.startsWith('image/')) {
-      setInputFile(input, selectedFile);
-      setMessage(message, 'Selecione um arquivo de imagem válido.');
+    if (validationError === 'invalid-type') {
+      setInputFiles(input, selectedFile ? [selectedFile] : []);
+      setUploadMessage(message, 'Selecione um arquivo de imagem válido.');
       return;
     }
 
-    if (file.size > maxImageBytes) {
-      setInputFile(input, selectedFile);
-      setMessage(message, `A imagem excede o limite de ${maxImageLabel}. Escolha uma imagem mais leve.`);
+    if (validationError === 'oversized') {
+      setInputFiles(input, selectedFile ? [selectedFile] : []);
+      setUploadMessage(message, `A imagem excede o limite de ${maxImageLabel}. Escolha uma imagem mais leve.`);
       return;
     }
 
     if (previewUrl) URL.revokeObjectURL(previewUrl);
 
     selectedFile = file;
-    setInputFile(input, file);
+    setInputFiles(input, [file]);
     previewUrl = URL.createObjectURL(file);
     if (currentImage) currentImage.src = previewUrl;
     if (previewImage) previewImage.src = previewUrl;
@@ -78,7 +63,7 @@ function initMainImageUpload(root: HTMLElement) {
     preview.hidden = true;
     if (revertButton) revertButton.hidden = true;
     root.classList.remove('has-file');
-    setMessage(message, null);
+    setUploadMessage(message, null);
   }
 
   button.addEventListener('click', () => input.click());
@@ -89,22 +74,8 @@ function initMainImageUpload(root: HTMLElement) {
     if (file) setFile(file);
   });
 
-  for (const eventName of ['dragenter', 'dragover']) {
-    zone.addEventListener(eventName, (event) => {
-      event.preventDefault();
-      zone.classList.add('is-drag-over');
-    });
-  }
-
-  for (const eventName of ['dragleave', 'drop']) {
-    zone.addEventListener(eventName, (event) => {
-      event.preventDefault();
-      zone.classList.remove('is-drag-over');
-    });
-  }
-
-  zone.addEventListener('drop', (event) => {
-    const file = event.dataTransfer?.files?.[0];
+  bindUploadDropZone(zone, (files) => {
+    const file = files[0];
     if (file) setFile(file);
   });
 }

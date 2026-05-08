@@ -1,4 +1,5 @@
 import { formatBytesLabel, getByteLimit } from './admin-upload-limits';
+import { bindUploadDropZone, setInputFiles, setUploadMessage, validateImageFile } from './admin-upload-shared';
 
 type PendingUpload = {
   id: string;
@@ -8,12 +9,6 @@ type PendingUpload = {
 };
 
 const imageInputFiles = new WeakMap<HTMLInputElement, PendingUpload[]>();
-
-function syncFileInput(input: HTMLInputElement, uploads: PendingUpload[]) {
-  const transfer = new DataTransfer();
-  for (const upload of uploads) transfer.items.add(upload.file);
-  input.files = transfer.files;
-}
 
 function getImageCards(container: HTMLElement) {
   return [...container.querySelectorAll<HTMLElement>('[data-image-card], [data-upload-card]')];
@@ -69,12 +64,6 @@ function createUploadCard(template: HTMLTemplateElement, upload: PendingUpload) 
   return card;
 }
 
-function setMessage(message: HTMLElement | null, text: string | null) {
-  if (!message) return;
-  message.textContent = text || '';
-  message.hidden = !text;
-}
-
 function syncUploadState(root: HTMLElement, input: HTMLInputElement, list: HTMLElement) {
   const uploads = imageInputFiles.get(input) || [];
   const orderedIds = getImageCards(list)
@@ -86,7 +75,7 @@ function syncUploadState(root: HTMLElement, input: HTMLInputElement, list: HTMLE
 
   imageInputFiles.set(input, orderedUploads);
   root.classList.toggle('has-files', uploads.length > 0);
-  syncFileInput(input, orderedUploads);
+  setInputFiles(input, orderedUploads.map((upload) => upload.file));
   updateImageOrder(list);
 }
 
@@ -97,12 +86,14 @@ function addUploads(root: HTMLElement, input: HTMLInputElement, list: HTMLElemen
   const maxImageLabel = formatBytesLabel(maxImageBytes);
 
   for (const file of [...files]) {
-    if (!file.type.startsWith('image/')) {
+    const validationError = validateImageFile(file, maxImageBytes);
+
+    if (validationError === 'invalid-type') {
       hasInvalidType = true;
       continue;
     }
 
-    if (file.size > maxImageBytes) {
+    if (validationError === 'oversized') {
       hasOversizedImage = true;
       continue;
     }
@@ -123,16 +114,16 @@ function addUploads(root: HTMLElement, input: HTMLInputElement, list: HTMLElemen
   syncUploadState(root, input, list);
 
   if (hasOversizedImage) {
-    setMessage(message, `Uma ou mais imagens excedem o limite de ${maxImageLabel} e não foram adicionadas.`);
+    setUploadMessage(message, `Uma ou mais imagens excedem o limite de ${maxImageLabel} e não foram adicionadas.`);
     return;
   }
 
   if (hasInvalidType) {
-    setMessage(message, 'Uma ou mais imagens não têm um formato válido e não foram adicionadas.');
+    setUploadMessage(message, 'Uma ou mais imagens não têm um formato válido e não foram adicionadas.');
     return;
   }
 
-  setMessage(message, null);
+  setUploadMessage(message, null);
 }
 
 function initImageUpload(root: HTMLElement) {
@@ -156,23 +147,7 @@ function initImageUpload(root: HTMLElement) {
     if (input.files) addUploads(root, input, list, template, input.files, message, maxImageBytes);
   });
 
-  for (const eventName of ['dragenter', 'dragover']) {
-    zone.addEventListener(eventName, (event) => {
-      event.preventDefault();
-      zone.classList.add('is-drag-over');
-    });
-  }
-
-  for (const eventName of ['dragleave', 'drop']) {
-    zone.addEventListener(eventName, (event) => {
-      event.preventDefault();
-      zone.classList.remove('is-drag-over');
-    });
-  }
-
-  zone.addEventListener('drop', (event) => {
-    if (event.dataTransfer?.files) addUploads(root, input, list, template, event.dataTransfer.files, message, maxImageBytes);
-  });
+  bindUploadDropZone(zone, (files) => addUploads(root, input, list, template, files, message, maxImageBytes));
 
   list.addEventListener('click', (event) => {
     const destaqueButton = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-destaque-toggle]');
