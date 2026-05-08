@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import nodemailer from 'nodemailer';
-import { getEnv } from '../../lib/env';
+import { env } from '../../lib/env';
 
 export const POST: APIRoute = async ({ request }) => {
   let body: Record<string, string>;
@@ -21,9 +21,7 @@ export const POST: APIRoute = async ({ request }) => {
     return Response.json({ error: 'Nome, email e mensagem são obrigatórios.' }, { status: 400 });
   }
 
-  const smtpUser = getEnv('SMTP_USER');
-  const smtpPass = getEnv('SMTP_PASS');
-  const contactTo = getEnv('CONTACT_TO');
+  const { smtpUser, smtpPass, contactTo } = env;
 
   if (!smtpUser || !smtpPass || !contactTo) {
     console.error('[contact] SMTP env variables are not configured.');

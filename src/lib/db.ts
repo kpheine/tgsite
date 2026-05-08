@@ -3,11 +3,10 @@ import { compareSync, hashSync } from 'bcryptjs';
 import { existsSync, mkdirSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { dirname, resolve } from 'node:path';
-import { getEnv } from './env';
+import { env } from './env';
 
 export const SUPPORT_ADMIN_USERNAME = 'support-admin';
 const DB_SCHEMA_VERSION = 2;
-const DEFAULT_ADMIN_PASSWORD = 'change-this-password';
 
 const dbPath = resolve(process.cwd(), 'data/site.db');
 mkdirSync(dirname(dbPath), { recursive: true });
@@ -134,16 +133,8 @@ export interface TestimonialRecord {
 }
 
 function syncPrimaryAdminFromEnv() {
-  const username = getEnv('ADMIN_USERNAME', 'admin').trim().toLowerCase() || 'admin';
-  const password = getEnv('ADMIN_PASSWORD');
-
-  if (!password) {
-    throw new Error('ADMIN_PASSWORD is required. Set a strong admin password in .env before starting the app.');
-  }
-
-  if (password === DEFAULT_ADMIN_PASSWORD) {
-    throw new Error('ADMIN_PASSWORD must be changed from the default value in .env before starting the app.');
-  }
+  const username = env.adminUsername;
+  const password = env.adminPassword;
 
   const admin = db.prepare("SELECT id, username, password_hash FROM users WHERE role = 'admin' ORDER BY id ASC LIMIT 1").get() as
     | { id: number; username: string | null; password_hash: string }

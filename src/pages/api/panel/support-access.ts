@@ -3,6 +3,7 @@ import { hashSync } from 'bcryptjs';
 import { randomBytes } from 'node:crypto';
 import { adminUrl, requireUser } from '../../../lib/auth';
 import { db, SUPPORT_ADMIN_USERNAME } from '../../../lib/db';
+import { env } from '../../../lib/env';
 
 const SUPPORT_PASSWORD_COOKIE = 'tg_support_password_once';
 const SUPPORT_ACCESS_HOURS = 24;
@@ -57,7 +58,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     path: '/',
     httpOnly: true,
     sameSite: 'lax',
-    secure: import.meta.env.PROD,
+    secure: env.sessionCookieSecure,
     maxAge: 60,
   });
 

@@ -1,11 +1,10 @@
 import { compareSync } from 'bcryptjs';
 import { createHash, randomBytes } from 'node:crypto';
 import { db } from './db';
-import { getEnv } from './env';
+import { env } from './env';
 
 const SESSION_COOKIE = 'tg_admin_session';
 const SESSION_IDLE_MINUTES = 30;
-const PLACEHOLDER_SESSION_SECRET = 'replace-with-a-long-random-secret';
 
 interface UserRecord {
   id: number;
@@ -17,7 +16,7 @@ interface UserRecord {
 }
 
 export function getAdminPath() {
-  return getEnv('ADMIN_PATH', '/painel-tg-2026').replace(/^\/+|\/+$/g, '') || 'painel-tg-2026';
+  return env.adminPath;
 }
 
 export function isAdminPath(param: string | undefined) {
@@ -29,29 +28,14 @@ export function adminUrl(path = '') {
   return `/${getAdminPath()}${cleanPath ? `/${cleanPath}` : ''}`;
 }
 
-function getSessionSecret() {
-  const secret = getEnv('SESSION_SECRET');
-
-  if (!secret) {
-    throw new Error('SESSION_SECRET is required. Set a strong session secret in .env before starting the app.');
-  }
-
-  if (secret === PLACEHOLDER_SESSION_SECRET) {
-    throw new Error('SESSION_SECRET must be changed from the default value in .env before starting the app.');
-  }
-
-  return secret;
-}
-
-const sessionSecret = getSessionSecret();
+const sessionSecret = env.sessionSecret;
 
 function hashToken(token: string) {
   return createHash('sha256').update(`${sessionSecret}:${token}`).digest('hex');
 }
 
 function isSessionCookieSecure() {
-  const configured = getEnv('SESSION_COOKIE_SECURE', import.meta.env.PROD ? 'true' : 'false').trim().toLowerCase();
-  return configured === 'true' || configured === '1';
+  return env.sessionCookieSecure;
 }
 
 function sqliteDateTime(date: Date) {
