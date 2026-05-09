@@ -1,6 +1,6 @@
 # TGsite
 
-Website for an advertising agency. Built with Astro (SSR), Docker, SQLite, and local file uploads.
+Website for an advertising agency. Built with Astro (SSR), Docker, Caddy, SQLite, and local file uploads.
 
 ## Stack
 
@@ -9,6 +9,7 @@ Website for an advertising agency. Built with Astro (SSR), Docker, SQLite, and l
 | Frontend | Astro 5 (SSR, `@astrojs/node` adapter) |
 | Database | SQLite via `better-sqlite3` (`./data/site.db`) |
 | Media storage | Local Docker volume (`./uploads/`) |
+| Reverse proxy / HTTPS | Caddy 2 |
 | Containerization | Docker Compose |
 | Hosting | Google Cloud Compute Engine (or any VPS) |
 
@@ -37,10 +38,14 @@ npm run dev
 # Build and start
 docker compose up --build
 
-# -> http://localhost:4321
+# -> Caddy listens on ports 80/443 for the domains in SITE_DOMAINS
 ```
 
-SQLite data is persisted in `./data/site.db`, and uploaded images are persisted in `./uploads/` on the host machine via Docker volume bind mounts. Case videos are stored as YouTube URLs.
+Production traffic should enter through Caddy on ports `80` and `443`. The Astro app is only exposed inside the Docker network at `app:4321`.
+
+For local Docker smoke testing without a real domain, set `SITE_DOMAINS=localhost` in `.env` and open `http://localhost`.
+
+SQLite data is persisted in `./data/site.db`, uploaded images are persisted in `./uploads/`, and Caddy certificates are persisted in Docker volumes. Case videos are stored as YouTube URLs.
 
 ## Verification
 
@@ -52,7 +57,7 @@ npm run build
 docker compose up --build
 ```
 
-`npm run check` runs Astro's TypeScript/template validation. `npm run build` verifies the production build. `docker compose up --build` verifies the production-like container starts with the same local SQLite/upload storage model used for deployment.
+`npm run check` runs Astro's TypeScript/template validation. `npm run build` verifies the production build. `docker compose up --build` verifies the production-like Caddy + app stack starts with the same local SQLite/upload storage model used for deployment.
 
 ## Environment variables
 
@@ -60,12 +65,13 @@ Copy `.env.example` to `.env` and set:
 
 | Variable | Description |
 |---|---|
+| `SITE_DOMAINS` | Comma-separated production domains served by Caddy, for example `example.com, www.example.com`; do not include `https://` |
 | `ADMIN_PATH` | One-segment private admin path, for example `/painel-tg-2026` |
 | `ADMIN_USERNAME` | Primary admin username synced into SQLite on startup |
 | `ADMIN_PASSWORD` | Primary admin password synced into SQLite on startup; must be set and changed from the default |
 | `SESSION_SECRET` | Secret used to hash session tokens; must be set and changed from the default |
-| `HOST` | Server bind address (use `0.0.0.0` in Docker) |
-| `PORT` | Server port (default `4321`) |
+| `SESSION_COOKIE_SECURE` | Whether admin cookies require HTTPS; keep `true` for production with Caddy |
+| `UPLOAD_MAX_IMAGE_BYTES` | Maximum image upload size in bytes |
 
 ## Project structure
 
@@ -77,8 +83,9 @@ src/
   pages/                 — public pages, admin routes, API routes, upload serving
   scripts/               — public modal and admin form/upload behaviors
   styles/global.css      — public CSS reset + modal styles
-Dockerfile               — multi-stage Node 20 Alpine build
-docker-compose.yml       — single-service compose config
+Caddyfile                — Caddy reverse proxy and automatic HTTPS config
+Dockerfile               — multi-stage Node 20 Alpine app build
+docker-compose.yml       — Caddy + app production compose config
 .env.example             — env variable template
 memory/
   MEMORY.md              — team memory: stack decisions, architecture

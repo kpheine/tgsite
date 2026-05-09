@@ -1,5 +1,27 @@
 # Client Handoff Notes
 
+## Production Hosting — Docker Compose + Caddy
+
+### One-time setup the client must perform
+
+1. Install Docker and Docker Compose on the VM.
+2. Point the domain DNS `A` records to the VM public IP.
+3. Open ports `80` and `443` in the VM/cloud firewall.
+4. Copy `.env.example` to `.env` and set `SITE_DOMAINS` to the production domain list, for example `example.com, www.example.com`.
+5. Start the stack with `docker compose up -d --build`.
+
+### Domain configuration
+
+- `SITE_DOMAINS` is the only domain setting the client needs to edit.
+- Do not include `http://` or `https://` in `SITE_DOMAINS`.
+- If the domain changes, update `.env` and run `docker compose up -d --build` again.
+
+### HTTPS and routing
+
+- Caddy is included in Docker Compose and automatically issues/renews HTTPS certificates.
+- Public traffic should enter only through Caddy on ports `80` and `443`.
+- The Astro app runs internally on `app:4321`; the host machine should not expose port `4321` in production.
+
 ## Contact Form — Email Sending (Nodemailer + Gmail)
 
 ### One-time setup the client must perform
