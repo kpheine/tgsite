@@ -9,7 +9,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
   const session = login(username, password);
   if (!session) {
-    return new Response(null, { status: 303, headers: { Location: `/${adminPath}/login?error=1` } });
+    const params = new URLSearchParams({ error: '1', username });
+    return new Response(null, { status: 303, headers: { Location: `/${adminPath}/login?${params}` } });
   }
 
   setSessionCookie(cookies, session.token, session.expiresAt);

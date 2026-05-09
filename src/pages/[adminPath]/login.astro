@@ -10,6 +10,7 @@ if (getCurrentUser(Astro.cookies)) {
 }
 
 const error = Astro.url.searchParams.get('error');
+const username = Astro.url.searchParams.get('username') || '';
 ---
 <!doctype html>
 <html lang="pt-BR">
@@ -30,7 +31,7 @@ const error = Astro.url.searchParams.get('error');
         {error && <p class="login-error">Usuário ou senha inválidos.</p>}
         <label>
           Usuário
-          <input name="username" type="text" autocomplete="username" autocapitalize="none" required />
+          <input name="username" type="text" autocomplete="username" autocapitalize="none" value={username} required />
         </label>
         <label>
           Senha
