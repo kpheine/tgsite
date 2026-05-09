@@ -39,7 +39,7 @@ function clientIp(request: Request, directAddress: string | undefined) {
   return directAddress || 'unknown';
 }
 
-function rateLimitResponse(pathname: string, retryAfterSeconds: number) {
+async function rateLimitResponse(request: Request, pathname: string, retryAfterSeconds: number) {
   const headers = { 'Retry-After': String(retryAfterSeconds) };
 
   if (pathname === '/api/contact') {
@@ -47,6 +47,18 @@ function rateLimitResponse(pathname: string, retryAfterSeconds: number) {
       { error: 'Muitas tentativas. Tente novamente em alguns minutos.' },
       { status: 429, headers },
     );
+  }
+
+  if (pathname === '/api/panel/login') {
+    const formData = await request.formData();
+    const adminPath = String(formData.get('adminPath') || env.adminPath).replace(/^\/+|\/+$/g, '') || env.adminPath;
+    const username = String(formData.get('username') || '');
+    const params = new URLSearchParams({ error: 'rate-limit', username });
+
+    return new Response(null, {
+      status: 303,
+      headers: { ...headers, Location: `/${adminPath}/login?${params}` },
+    });
   }
 
   return new Response('Muitas tentativas. Tente novamente em alguns minutos.', {
@@ -66,7 +78,7 @@ function routeLimits(pathname: string, method: string) {
   return null;
 }
 
-export const onRequest = defineMiddleware((context, next) => {
+export const onRequest = defineMiddleware(async (context, next) => {
   const pathname = context.url.pathname;
   const limits = routeLimits(pathname, context.request.method);
   if (!limits) return next();
@@ -74,7 +86,7 @@ export const onRequest = defineMiddleware((context, next) => {
   const ip = clientIp(context.request, context.clientAddress);
   const result = checkRateLimit(`${limits.scope}:${ip}`, limits.rules);
 
-  if (!result.allowed) return rateLimitResponse(pathname, result.retryAfterSeconds);
+  if (!result.allowed) return rateLimitResponse(context.request, pathname, result.retryAfterSeconds);
 
   return next();
 });

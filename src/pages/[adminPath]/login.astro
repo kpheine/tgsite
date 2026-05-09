@@ -11,6 +11,11 @@ if (getCurrentUser(Astro.cookies)) {
 
 const error = Astro.url.searchParams.get('error');
 const username = Astro.url.searchParams.get('username') || '';
+const errorMessage = error === 'rate-limit'
+  ? 'Muitas tentativas. Tente novamente em alguns minutos.'
+  : error
+    ? 'Usuário ou senha inválidos.'
+    : '';
 ---
 <!doctype html>
 <html lang="pt-BR">
@@ -28,7 +33,7 @@ const username = Astro.url.searchParams.get('username') || '';
         <input type="hidden" name="adminPath" value={Astro.params.adminPath} />
         <p class="login-kicker">Área restrita</p>
         <h1>TG Admin</h1>
-        {error && <p class="login-error">Usuário ou senha inválidos.</p>}
+        {errorMessage && <p class="login-error">{errorMessage}</p>}
         <label>
           Usuário
           <input name="username" type="text" autocomplete="username" autocapitalize="none" value={username} required />
