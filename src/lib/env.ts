@@ -64,6 +64,7 @@ export const env = {
   adminPassword: readAdminPassword(),
   sessionSecret: readSessionSecret(),
   sessionCookieSecure: readBooleanEnv('SESSION_COOKIE_SECURE', import.meta.env.PROD),
+  trustProxyHeaders: readBooleanEnv('TRUST_PROXY_HEADERS', true),
   uploadMaxImageBytes: readPositiveIntegerEnv('UPLOAD_MAX_IMAGE_BYTES', ENV_DEFAULTS.uploadMaxImageBytes),
   smtpUser: readEnv('SMTP_USER'),
   smtpPass: readEnv('SMTP_PASS'),

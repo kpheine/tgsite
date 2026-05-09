@@ -142,6 +142,7 @@ HOST=0.0.0.0
 PORT=4321
 ALLOWED_HOSTS=seudominio.com.br,www.seudominio.com.br
 SESSION_COOKIE_SECURE=true
+TRUST_PROXY_HEADERS=true
 UPLOAD_MAX_IMAGE_BYTES=8388608
 
 SMTP_USER=conta-que-vai-enviar@gmail.com
@@ -277,10 +278,14 @@ server {
         proxy_set_header Connection 'upgrade';
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
         proxy_cache_bypass $http_upgrade;
     }
 }
 ```
+
+O site usa `TRUST_PROXY_HEADERS=true` por padrão para limitar tentativas por IP real quando roda atrás do Nginx/Caddy. Se a porta 4321 ficar exposta diretamente para a internet sem proxy, mude para `TRUST_PROXY_HEADERS=false` no `.env`.
 
 Salve: `Ctrl+O`, Enter, `Ctrl+X`.
 
