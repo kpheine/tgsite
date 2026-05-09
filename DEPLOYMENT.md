@@ -43,11 +43,12 @@ Clique em **Criar instância** e configure:
 
 Clique em **Criar** e aguarde a VM ficar com o status "Em execução" (bolinha verde).
 
-### 2.3 Abrir a porta do site no firewall
+### 2.3 Abrir as portas do site no firewall
 
-O site roda na porta 4321 internamente, mas o Nginx (instalado mais adiante)
-vai expor as portas 80 e 443 para o mundo. As portas 80 e 443 já foram liberadas
-ao marcar HTTP/HTTPS na criação da VM. Nenhuma ação adicional é necessária.
+O site roda em Docker Compose com Caddy na frente. O Caddy expõe as portas
+`80` e `443` para o mundo e encaminha o tráfego internamente para a aplicação.
+As portas `80` e `443` já foram liberadas ao marcar HTTP/HTTPS na criação da VM.
+Nenhuma ação adicional é necessária.
 
 ---
 
@@ -138,9 +139,7 @@ ADMIN_PATH=/painel-tg-2026
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=CRIE-UMA-SENHA-FORTE-AQUI
 SESSION_SECRET=UMA-SEQUENCIA-LONGA-E-ALEATORIA-DE-LETRAS-E-NUMEROS
-HOST=0.0.0.0
-PORT=4321
-ALLOWED_HOSTS=seudominio.com.br,www.seudominio.com.br
+SITE_DOMAINS=seudominio.com.br, www.seudominio.com.br
 SESSION_COOKIE_SECURE=true
 TRUST_PROXY_HEADERS=true
 UPLOAD_MAX_IMAGE_BYTES=8388608
@@ -154,7 +153,7 @@ CONTACT_TO=onde-chegar-os-emails@seudominio.com.br
 
 - `ADMIN_PASSWORD` — senha de acesso ao painel de administração. Use algo longo e difícil.
 - `SESSION_SECRET` — sequência aleatória longa (ex: abra [passwordsgenerator.net](https://passwordsgenerator.net) e gere 64 caracteres sem símbolos).
-- `ALLOWED_HOSTS` — coloque seu domínio real (sem `https://`). Se ainda não tiver domínio, coloque o IP externo da VM (visível na lista de instâncias do Google Cloud).
+- `SITE_DOMAINS` — coloque o domínio real atendido pelo Caddy, sem `https://`. Exemplo: `seudominio.com.br, www.seudominio.com.br`.
 - `SMTP_USER`, `SMTP_PASS`, `CONTACT_TO` — veja a **Parte 7** (configuração do formulário de contato).
 
 Para salvar no `nano`: `Ctrl+O`, Enter, depois `Ctrl+X`.
@@ -175,7 +174,7 @@ O build leva 3–5 minutos na primeira vez. Para verificar se está rodando:
 docker compose ps
 ```
 
-Deve aparecer o container com status `Up`.
+Devem aparecer dois containers com status `Up`: `app` e `caddy`.
 
 Para ver os logs em tempo real:
 
@@ -183,16 +182,17 @@ Para ver os logs em tempo real:
 docker compose logs -f
 ```
 
-O site já está rodando na porta 4321. Para acessar temporariamente antes de configurar o domínio:
+O Caddy escuta nas portas `80` e `443`. Depois que o domínio apontar para a VM,
+acesse:
 
 ```
-http://IP-EXTERNO-DA-VM:4321
+https://seudominio.com.br
 ```
 
-> O IP externo da VM está visível na lista de instâncias do Google Cloud.
-> Para acessar essa URL temporária, você precisará abrir a porta 4321 no firewall
-> do Google Cloud (VPC Network > Firewall > Criar regra: tcp:4321, todas as origens).
-> Remova essa regra após configurar o Nginx.
+Para um teste local sem domínio real, use `SITE_DOMAINS=localhost` no `.env`, rode
+`docker compose up --build -d` e acesse `http://localhost` na própria máquina.
+Na VM de produção, não abra a porta `4321` no firewall: a aplicação deve ficar
+acessível apenas pela rede interna do Docker.
 
 ---
 
@@ -237,7 +237,7 @@ docker compose up --build -d
 
 ---
 
-## Parte 8 — Domínio e HTTPS (Nginx + Certbot)
+## Parte 8 — Domínio e HTTPS (Caddy)
 
 ### 8.1 Apontar o domínio para a VM
 
@@ -248,71 +248,42 @@ No painel do seu provedor de domínio (Registro.br, GoDaddy, etc.):
 
 Aguarde a propagação (pode levar de alguns minutos até 24 horas).
 
-### 8.2 Instalar Nginx
+### 8.2 Conferir o `.env`
 
-Na VM:
-
-```bash
-sudo apt install -y nginx
-```
-
-### 8.3 Criar a configuração do Nginx
+No arquivo `.env`, confirme que `SITE_DOMAINS` contém todos os domínios que
+apontam para a VM:
 
 ```bash
-sudo nano /etc/nginx/sites-available/tg-site
+SITE_DOMAINS=seudominio.com.br, www.seudominio.com.br
 ```
 
-Cole o conteúdo abaixo, substituindo `seudominio.com.br`:
+Não inclua `https://` e não use caminhos. Use apenas nomes de domínio.
 
-```nginx
-server {
-    listen 80;
-    server_name seudominio.com.br www.seudominio.com.br;
-
-    client_max_body_size 2100m;
-
-    location / {
-        proxy_pass http://localhost:4321;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_cache_bypass $http_upgrade;
-    }
-}
-```
-
-O site usa `TRUST_PROXY_HEADERS=true` por padrão para limitar tentativas por IP real quando roda atrás do Nginx/Caddy. Se a porta 4321 ficar exposta diretamente para a internet sem proxy, mude para `TRUST_PROXY_HEADERS=false` no `.env`.
-
-Salve: `Ctrl+O`, Enter, `Ctrl+X`.
-
-Ative a configuração:
+### 8.3 Subir ou reiniciar o Docker Compose
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/tg-site /etc/nginx/sites-enabled/
-sudo nginx -t
-sudo systemctl reload nginx
+docker compose up --build -d
 ```
 
-`nginx -t` deve retornar `syntax is ok` e `test is successful`.
+O Caddy lê o `Caddyfile`, atende os domínios em `SITE_DOMAINS`, emite o
+certificado HTTPS automaticamente via Let's Encrypt e redireciona HTTP para HTTPS.
+Os certificados ficam salvos no volume Docker `caddy_data`, então não são perdidos
+ao reiniciar ou atualizar o site.
 
-### 8.4 Instalar o certificado SSL (HTTPS)
+### 8.4 Verificar se o HTTPS funcionou
 
-```bash
-sudo apt install -y certbot python3-certbot-nginx
-sudo certbot --nginx -d seudominio.com.br -d www.seudominio.com.br
+Abra no navegador:
+
+```
+https://seudominio.com.br
 ```
 
-Siga as instruções:
-- Informe um email para receber alertas de renovação.
-- Aceite os termos.
-- Escolha redirecionar HTTP para HTTPS (opção 2).
+Se o certificado ainda não foi emitido, verifique:
 
-O Certbot configura o HTTPS e renova o certificado automaticamente. O site
-agora está acessível em `https://seudominio.com.br`.
+- O DNS do domínio já aponta para o IP externo da VM.
+- As portas `80` e `443` estão liberadas no firewall da VM.
+- O valor de `SITE_DOMAINS` está correto no `.env`.
+- Os logs do Caddy mostram detalhes do erro: `docker compose logs -f caddy`.
 
 ---
 
@@ -400,6 +371,6 @@ Se o site parar de funcionar, verifique nesta ordem:
 
 1. `docker compose ps` — o container está `Up`?
 2. `docker compose logs -f` — há algum erro visível?
-3. `sudo systemctl status nginx` — o Nginx está ativo?
+3. `docker compose logs -f caddy` — há erro de domínio, DNS ou certificado?
 4. O IP da VM mudou? VMs no Google Cloud podem ter IP externo dinâmico —
    considere reservar um IP estático (VPC Network > Endereços IP externos > Reservar).
