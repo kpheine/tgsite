@@ -2,6 +2,19 @@ import type { APIRoute } from 'astro';
 import nodemailer from 'nodemailer';
 import { env } from '../../lib/env';
 
+function escapeHtml(value: string) {
+  return value.replace(/[&<>"']/g, (char) => {
+    switch (char) {
+      case '&': return '&amp;';
+      case '<': return '&lt;';
+      case '>': return '&gt;';
+      case '"': return '&quot;';
+      case "'": return '&#39;';
+      default: return char;
+    }
+  });
+}
+
 export const POST: APIRoute = async ({ request }) => {
   let body: Record<string, string>;
 
@@ -36,6 +49,10 @@ export const POST: APIRoute = async ({ request }) => {
   });
 
   const fullName = [nome, sobrenome].filter(Boolean).join(' ');
+  const safeFullName = escapeHtml(fullName);
+  const safeEmail = escapeHtml(email);
+  const safeTelefone = escapeHtml(telefone);
+  const safeMensagem = escapeHtml(mensagem);
 
   try {
     await transporter.sendMail({
@@ -46,11 +63,11 @@ export const POST: APIRoute = async ({ request }) => {
       html: `
         <table style="font-family:sans-serif;font-size:15px;color:#222;line-height:1.6;max-width:560px">
           <tr><td><h2 style="margin:0 0 16px">Novo contato pelo site</h2></td></tr>
-          <tr><td><strong>Nome:</strong> ${fullName}</td></tr>
-          <tr><td><strong>Email:</strong> <a href="mailto:${email}">${email}</a></td></tr>
-          ${telefone ? `<tr><td><strong>Telefone:</strong> ${telefone}</td></tr>` : ''}
+          <tr><td><strong>Nome:</strong> ${safeFullName}</td></tr>
+          <tr><td><strong>Email:</strong> <a href="mailto:${safeEmail}">${safeEmail}</a></td></tr>
+          ${telefone ? `<tr><td><strong>Telefone:</strong> ${safeTelefone}</td></tr>` : ''}
           <tr><td style="padding-top:12px"><strong>Mensagem:</strong></td></tr>
-          <tr><td style="white-space:pre-wrap;padding:12px;background:#f5f5f5;border-radius:6px">${mensagem}</td></tr>
+          <tr><td style="white-space:pre-wrap;padding:12px;background:#f5f5f5;border-radius:6px">${safeMensagem}</td></tr>
         </table>
       `,
     });
