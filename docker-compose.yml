@@ -1,4 +1,12 @@
 services:
+  app-permissions:
+    image: alpine:3.20
+    volumes:
+      - ./data:/app/data
+      - ./uploads:/app/uploads
+    command: sh -c "mkdir -p /app/data /app/uploads/images /app/uploads/videos && chown -R 1000:1000 /app/data /app/uploads"
+    restart: "no"
+
   caddy:
     image: caddy:2-alpine
     ports:
@@ -16,6 +24,9 @@ services:
 
   app:
     build: .
+    depends_on:
+      app-permissions:
+        condition: service_completed_successfully
     expose:
       - "4321"
     volumes:

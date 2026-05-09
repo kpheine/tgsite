@@ -6,7 +6,7 @@
 **Database:** SQLite via `better-sqlite3` (`./data/site.db` Docker volume)
 **Image Storage:** Local Docker volume (mounted at `./uploads/`)
 **Hosting:** Google Cloud Compute Engine VM (or any VPS)
-**Containerization:** Docker Compose with Caddy reverse proxy
+**Containerization:** Docker Compose with Caddy reverse proxy; the app runtime image prunes dev dependencies after build and runs the Node server as the unprivileged `node` user. Compose includes an `app-permissions` init service that creates/fixes the bind-mounted `./data` and `./uploads` directories as UID/GID `1000:1000` before the app starts.
 **Delivery:** via .zip or git
 
 ## Key Decisions & Rationale
