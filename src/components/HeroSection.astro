@@ -24,8 +24,14 @@
   <!-- Bottom bar: social icons + address -->
   <div class="hero-footer">
     <div class="social-icons" aria-label="Redes sociais">
-      <img src="/images/linkedin.svg" alt="LinkedIn" />
-      <img src="/images/youtube.svg" alt="YouTube" />
+      <a href="https://www.linkedin.com/company/thegroupcomunicacao/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="social-item">
+        <img src="/images/footer/social-blob.png" alt="" class="social-item__blob" aria-hidden="true" />
+        <img src="/images/footer/linkedin-icon.svg" alt="LinkedIn" class="social-item__icon" />
+      </a>
+      <a href="https://www.youtube.com/@WPIThegroup" target="_blank" rel="noopener noreferrer" aria-label="YouTube" class="social-item">
+        <img src="/images/footer/social-blob.png" alt="" class="social-item__blob" aria-hidden="true" />
+        <img src="/images/footer/play-icon.svg" alt="YouTube" class="social-item__icon" />
+      </a>
     </div>
 
     <address class="hero-address">
@@ -193,9 +199,29 @@
     gap: 8px;
   }
 
-  .social-icons img {
-    width: 34px;
-    height: 34px;
+  .social-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+  }
+
+  .social-item__blob {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .social-item__icon {
+    position: relative;
+    width: 55%;
+    height: 55%;
+    object-fit: contain;
   }
 
   .hero-address {
