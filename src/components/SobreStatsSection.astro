@@ -2,44 +2,44 @@
 ---
 <section class="sobre-stats">
   <div class="sobre-stats__heading">
-    <h2>Unindo sensibilidade humana<br />à precisão da tecnologia.</h2>
+    <h2 data-reveal="up">Unindo sensibilidade humana<br />à precisão da tecnologia.</h2>
   </div>
 
-  <p class="sobre-stats__pre">Já foram mais de</p>
+  <p class="sobre-stats__pre" data-reveal="up">Já foram mais de</p>
 
-  <div class="sobre-stats__grid">
-    <div class="sobre-stats__col">
-      <img src="/images/sobre_blob1.png" alt="" class="blob" aria-hidden="true" />
+  <div class="sobre-stats__grid" data-reveal-stagger>
+    <div class="sobre-stats__col" data-reveal="up">
+      <img src="/images/sobre_blob1.png" alt="" class="blob blob-float" aria-hidden="true" />
       <span class="number">2.000</span>
       <span class="label">Eventos</span>
     </div>
 
-    <div class="sobre-stats__divider"></div>
+    <div class="sobre-stats__divider" data-reveal="fade"></div>
 
-    <div class="sobre-stats__col">
-      <img src="/images/sobre_blob2.png" alt="" class="blob blob--rot120" aria-hidden="true" />
+    <div class="sobre-stats__col" data-reveal="up">
+      <img src="/images/sobre_blob2.png" alt="" class="blob blob-float" aria-hidden="true" />
       <span class="number">2.000</span>
       <span class="label">Estandes</span>
     </div>
 
-    <div class="sobre-stats__divider"></div>
+    <div class="sobre-stats__divider" data-reveal="fade"></div>
 
-    <div class="sobre-stats__col">
-      <img src="/images/sobre_blob3.png" alt="" class="blob blob--rot30" aria-hidden="true" />
+    <div class="sobre-stats__col" data-reveal="up">
+      <img src="/images/sobre_blob3.png" alt="" class="blob blob-float" aria-hidden="true" />
       <span class="number">450</span>
       <span class="label">Promoções</span>
     </div>
 
-    <div class="sobre-stats__divider"></div>
+    <div class="sobre-stats__divider" data-reveal="fade"></div>
 
-    <div class="sobre-stats__col">
-      <img src="/images/sobre_blob1.png" alt="" class="blob" aria-hidden="true" />
+    <div class="sobre-stats__col" data-reveal="up">
+      <img src="/images/sobre_blob1.png" alt="" class="blob blob-float" aria-hidden="true" />
       <span class="number">200</span>
       <span class="label">Clientes</span>
     </div>
   </div>
 
-  <p class="sobre-stats__tagline">Números que não contam só volume. Contam consistência.</p>
+  <p class="sobre-stats__tagline" data-reveal="up">Números que não contam só volume. Contam consistência.</p>
 </section>
 
 <style>
@@ -97,21 +97,19 @@
     width: 140px;
     height: 140px;
     object-fit: contain;
-    left: 50%;
-    top: 50%;
-    transform: translate(-80%, -50%);
+    /* Positioned via offsets (not transform) so .blob-float can own transform. */
+    left: calc(50% - 112px);
+    top: calc(50% - 70px);
     mix-blend-mode: screen;
     pointer-events: none;
     user-select: none;
   }
 
-  .blob--rot120 {
-    transform: translate(-80%, -50%) rotate(-120deg);
-  }
-
-  .blob--rot30 {
-    transform: translate(-80%, -50%) rotate(-30deg);
-  }
+  /* Desync each column's blob so they don't drift in lockstep. */
+  .sobre-stats__col:nth-child(1) .blob { animation-delay: 0s;    animation-duration: 6s; }
+  .sobre-stats__col:nth-child(3) .blob { animation-delay: -1.5s; animation-duration: 7s; }
+  .sobre-stats__col:nth-child(5) .blob { animation-delay: -3s;   animation-duration: 5.5s; }
+  .sobre-stats__col:nth-child(7) .blob { animation-delay: -4.5s; animation-duration: 6.5s; }
 
   .number {
     position: relative;
@@ -128,6 +126,28 @@
     font-weight: 400;
     margin-top: 8px;
     display: block;
+  }
+
+  .number,
+  .label {
+    transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1);
+    transform-origin: center;
+  }
+
+  .sobre-stats__col:hover .number,
+  .sobre-stats__col:hover .label {
+    transform: scale(1.06);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .number,
+    .label {
+      transition: none;
+    }
+    .sobre-stats__col:hover .number,
+    .sobre-stats__col:hover .label {
+      transform: none;
+    }
   }
 
   /* Gradient divider */

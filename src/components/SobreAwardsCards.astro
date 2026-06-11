@@ -1,9 +1,9 @@
 ---
 ---
-<section class="awards-cards">
+<section class="awards-cards" data-reveal-stagger>
 
   <!-- Row 1: FIP Awards — full width, 3 columns -->
-  <div class="card card--fip">
+  <div class="card card--fip" data-reveal="up">
     <div class="card-col">
       <h3 class="award-title">Prêmio FIP Awards</h3>
       <p>Circuito Grandes Feiras - BASF | 2024<br />Categoria: Ações Vinculadas ao Agro</p>
@@ -21,7 +21,7 @@
   </div>
 
   <!-- Row 2: two cards side by side -->
-  <div class="row2">
+  <div class="row2" data-reveal="up">
 
     <!-- Card 2a: Colunistas — narrow -->
     <div class="card card--colunistas">
@@ -46,7 +46,7 @@
   </div>
 
   <!-- Row 3: Caio — full width, 3 columns -->
-  <div class="card card--caio">
+  <div class="card card--caio" data-reveal="up">
     <div class="card-col">
       <h3 class="award-title">Prêmio Caio</h3>
       <p>Lançamento Toyota Corolla Cross | 2021<br />Categoria: Eventos Realizados<br />ou Estandes Montados no Exterior</p>
@@ -88,6 +88,26 @@
     padding: 22px 40px;
     gap: 24px;
     color: #fff;
+    transition:
+      opacity 600ms ease,
+      transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1),
+      box-shadow 0.3s ease,
+      border-color 0.3s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.3);
+    border-color: #fff;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card {
+      transition: none;
+    }
+    .card:hover {
+      transform: none;
+    }
   }
 
   /* Full-width cards: 3 equal columns */

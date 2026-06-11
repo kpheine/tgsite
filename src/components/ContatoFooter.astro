@@ -5,14 +5,14 @@
   <!-- Contact top area -->
   <div class="contato-top">
     <div class="contato-left">
-      <h2 class="contato-title">
+      <h2 class="contato-title" data-reveal="up">
         <span class="title-gradient">Aqui tem</span>
         <span class="title-white"> o seu próximo<br />grande projeto.</span>
         <br />
         <span class="title-white">E ele começa agora.</span>
       </h2>
 
-      <div class="contato-actions">
+      <div class="contato-actions" data-reveal="up">
         <button type="button" class="site-button site-button--gradient btn-fale" data-modal-open="contact-modal">Fale com a gente</button>
         <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
           <img src="/images/footer/zap.svg" alt="" class="zap-icon" aria-hidden="true" />
@@ -28,7 +28,7 @@
   <div class="contato-map">
     <!-- Decorative gradient blob — upper half in contact area, lower half behind map -->
     <div class="contato-blob" aria-hidden="true">
-      <img src="/images/footer/blob.png" alt="" />
+      <img src="/images/footer/blob.png" alt="" class="blob-float" />
     </div>
 
     <iframe
@@ -143,6 +143,21 @@
     width: 44px;
     height: 44px;
     object-fit: contain;
+    transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1), filter 0.25s ease;
+  }
+
+  .contato-actions a:hover .zap-icon {
+    transform: translateY(-3px) scale(1.12);
+    filter: brightness(1.15);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .zap-icon {
+      transition: none;
+    }
+    .contato-actions a:hover .zap-icon {
+      transform: none;
+    }
   }
 
   /* Gradient blob — anchored to top of map, upper half floats into contact area */
@@ -247,6 +262,21 @@
     width: 52px;
     height: 52px;
     flex-shrink: 0;
+    transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1), filter 0.25s ease;
+  }
+
+  .social-item:hover {
+    transform: translateY(-3px) scale(1.1);
+    filter: brightness(1.12);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .social-item {
+      transition: none;
+    }
+    .social-item:hover {
+      transform: none;
+    }
   }
 
   .social-item__blob {

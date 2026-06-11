@@ -13,7 +13,7 @@ const features = [
 
     <!-- Left: earth globe card with logos -->
     <div class="wpi-card-col">
-      <div class="wpi-card">
+      <div class="wpi-card" data-reveal="left">
         <img src="/images/wpi/worldmap.png" alt="" class="wpi-worldmap" aria-hidden="true" />
         <img src="/images/wpi/earth.png" alt="Vista do planeta Terra" class="wpi-earth" />
         <div class="wpi-logos">
@@ -25,32 +25,32 @@ const features = [
     </div>
 
     <!-- Right: title + body + CTA -->
-    <div class="wpi-text">
-      <h2 class="wpi-title">
+    <div class="wpi-text" data-reveal-stagger>
+      <h2 class="wpi-title" data-reveal="up">
         <span class="wpi-gradient">Aqui tem</span>
         <span class="wpi-white"> conexão<br />global.</span>
       </h2>
-      <p class="wpi-body">
+      <p class="wpi-body" data-reveal="up">
         Somos parte da Worldwide Partners Inc.,<br />
         a maior rede de agências independentes<br />
         do mundo.
       </p>
-      <a href="/wpi" class="site-button site-button--gradient btn-rede">Conheça a rede</a>
+      <a href="/wpi" class="site-button site-button--gradient btn-rede" data-reveal="up">Conheça a rede</a>
     </div>
   </div>
 
   <!-- Tagline -->
-  <p class="wpi-tagline">
+  <p class="wpi-tagline" data-reveal="up">
     <strong>100% independentes,</strong>
     conectados a mais de 90 agências, em mais de 50 países.
   </p>
 
   <!-- Feature icons row -->
-  <div class="wpi-features">
+  <div class="wpi-features" data-reveal-stagger>
     {features.map((f) => (
-      <div class="feature">
+      <div class="feature" data-reveal="up">
         <div class="feature-icon-wrap">
-          <img src="/images/wpi/blob.png" alt="" class="feature-blob" aria-hidden="true" />
+          <img src="/images/wpi/blob.png" alt="" class="feature-blob blob-float" aria-hidden="true" />
           <img src={f.icon} alt="" class="feature-icon" aria-hidden="true" />
         </div>
         <p class="feature-label">{f.label}</p>
@@ -230,22 +230,13 @@ const features = [
     height: 100px;
   }
 
-  @keyframes blob-float {
-    0%   { transform: scale(1)    rotate(0deg)   translate(0px, 0px); }
-    25%  { transform: scale(1.04) rotate(4deg)   translate(2px, -3px); }
-    50%  { transform: scale(0.97) rotate(-2deg)  translate(-2px, 2px); }
-    75%  { transform: scale(1.03) rotate(3deg)   translate(1px, -2px); }
-    100% { transform: scale(1)    rotate(0deg)   translate(0px, 0px); }
-  }
-
+  /* Float animation comes from the global `.blob-float` utility in global.css. */
   .feature-blob {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: contain;
-    animation: blob-float 6s ease-in-out infinite;
-    transform-origin: center;
   }
 
   .feature:nth-child(2) .feature-blob { animation-delay: -1.5s; animation-duration: 7s; }

@@ -66,6 +66,7 @@ import ContactModal from './ContactModal.astro';
   }
 
   .nav a {
+    position: relative;
     font-family: 'Bebas Neue', sans-serif;
     font-size: 1.5rem;
     color: #fff;
@@ -75,8 +76,27 @@ import ContactModal from './ContactModal.astro';
     transition: opacity 0.15s ease;
   }
 
-  .nav a:hover {
-    opacity: 0.7;
+  .nav a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 100%;
+    height: 2px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .nav a:hover::after {
+    transform: scaleX(1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav a::after {
+      transition: none;
+    }
   }
 
   /* Actions (Contato + WhatsApp) */
@@ -101,6 +121,21 @@ import ContactModal from './ContactModal.astro';
   .whatsapp-link img {
     height: 44px;
     width: auto;
+    transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1), filter 0.25s ease;
+  }
+
+  .whatsapp-link:hover img {
+    transform: translateY(-3px) scale(1.12);
+    filter: brightness(1.15);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .whatsapp-link img {
+      transition: none;
+    }
+    .whatsapp-link:hover img {
+      transform: none;
+    }
   }
 
   /* Hamburger — hidden on desktop */

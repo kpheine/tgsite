@@ -8,12 +8,12 @@ const features = [
 ---
 
 <section class="wpi-pratica">
-  <h2 class="wpi-pratica__title">O que isso significa na prática?</h2>
-  <div class="wpi-pratica__features">
+  <h2 class="wpi-pratica__title" data-reveal="up">O que isso significa na prática?</h2>
+  <div class="wpi-pratica__features" data-reveal-stagger>
     {features.map((f) => (
-      <div class="wpi-pratica__feature">
+      <div class="wpi-pratica__feature" data-reveal="up">
         <div class="wpi-pratica__icon-wrap">
-          <img src={f.blob} alt="" class="wpi-pratica__blob" aria-hidden="true" />
+          <img src={f.blob} alt="" class="wpi-pratica__blob blob-float" aria-hidden="true" />
           <img src={f.icon} alt="" class="wpi-pratica__icon" aria-hidden="true" />
         </div>
         <p class="wpi-pratica__label">{f.label}</p>
@@ -21,11 +21,11 @@ const features = [
     ))}
   </div>
 
-  <p class="wpi-pratica__body">
+  <p class="wpi-pratica__body" data-reveal="up">
     Acesso a dados, referências e especialistas do mundo inteiro para ampliar estratégia, escala e resultado.
   </p>
 
-  <h3 class="wpi-pratica__quote">
+  <h3 class="wpi-pratica__quote" data-reveal="up">
     Porque quando a visão se expande,<br>o impacto cresce.
   </h3>
 </section>
@@ -79,22 +79,13 @@ const features = [
     height: 180px;
   }
 
-  @keyframes blob-float {
-    0%   { transform: scale(1)    rotate(0deg)   translate(0px, 0px); }
-    25%  { transform: scale(1.04) rotate(4deg)   translate(2px, -3px); }
-    50%  { transform: scale(0.97) rotate(-2deg)  translate(-2px, 2px); }
-    75%  { transform: scale(1.03) rotate(3deg)   translate(1px, -2px); }
-    100% { transform: scale(1)    rotate(0deg)   translate(0px, 0px); }
-  }
-
+  /* Float animation comes from the global `.blob-float` utility in global.css. */
   .wpi-pratica__blob {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: contain;
-    animation: blob-float 6s ease-in-out infinite;
-    transform-origin: center;
   }
 
   .wpi-pratica__feature:nth-child(2) .wpi-pratica__blob { animation-delay: -1.5s; animation-duration: 7s; }

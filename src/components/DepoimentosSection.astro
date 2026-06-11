@@ -46,7 +46,7 @@ const cards = (publicTestimonials.length > 0 ? publicTestimonials : fallbackCard
   <div class="dep-inner">
     <!-- Title + nav row -->
     <div class="dep-header">
-      <h2 class="dep-title">
+      <h2 class="dep-title" data-reveal="up">
         <span class="dep-gradient">Aqui tem</span>
         <span class="dep-white"> quem recomenda.</span>
       </h2>
@@ -231,6 +231,23 @@ const cards = (publicTestimonials.length > 0 ? publicTestimonials : fallbackCard
     flex-direction: column;
     gap: 1rem;
     min-height: 307px;
+    transition:
+      transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1),
+      box-shadow 0.3s ease;
+  }
+
+  .dep-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.35);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dep-card {
+      transition: none;
+    }
+    .dep-card:hover {
+      transform: none;
+    }
   }
 
   .dep-card--sunset {

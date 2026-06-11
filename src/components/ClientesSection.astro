@@ -4,14 +4,14 @@ import { clientLogos } from '../data/site-content';
 
 <section class="clientes-section" id="clientes">
   <div class="clientes-inner">
-    <h2 class="clientes-title">
+    <h2 class="clientes-title" data-reveal="up">
       <span class="title-gradient">Aqui tem</span>
       <span class="title-white"> marcas que confiam na entrega.</span>
     </h2>
 
-    <div class="logos-grid">
+    <div class="logos-grid" data-reveal-stagger>
       {clientLogos.map((logo) => (
-        <div class="logo-item">
+        <div class="logo-item" data-reveal="up">
           <img src={logo.src} alt={logo.alt} class="logo-img" />
         </div>
       ))}
@@ -88,7 +88,24 @@ import { clientLogos } from '../data/site-content';
     max-width: 100%;
     object-fit: contain;
     filter: brightness(0) invert(1);
-    opacity: 0.85;
+    opacity: 0.7;
+    transition:
+      transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1),
+      opacity 0.2s ease;
+  }
+
+  .logo-item:hover .logo-img {
+    opacity: 1;
+    transform: scale(1.09);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .logo-img {
+      transition: none;
+    }
+    .logo-item:hover .logo-img {
+      transform: none;
+    }
   }
 
   @media (max-width: 768px) {

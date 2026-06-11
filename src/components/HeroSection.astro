@@ -22,7 +22,7 @@
   </h1>
 
   <!-- Bottom bar: social icons + address -->
-  <div class="hero-footer">
+  <div class="hero-footer" data-reveal="up">
     <div class="social-icons" aria-label="Redes sociais">
       <a href="https://www.linkedin.com/company/thegroupcomunicacao/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="social-item">
         <img src="/images/footer/social-blob.png" alt="" class="social-item__blob" aria-hidden="true" />
@@ -207,6 +207,21 @@
     width: 52px;
     height: 52px;
     flex-shrink: 0;
+    transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1), filter 0.25s ease;
+  }
+
+  .social-item:hover {
+    transform: translateY(-3px) scale(1.1);
+    filter: brightness(1.12);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .social-item {
+      transition: none;
+    }
+    .social-item:hover {
+      transform: none;
+    }
   }
 
   .social-item__blob {

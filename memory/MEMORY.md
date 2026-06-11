@@ -52,6 +52,19 @@
 - **Maps:** embed via `maps.google.com/maps?q=...&output=embed` — no API key needed
 - **Header:** `position: sticky; top: 0` (not fixed) with `margin-bottom: -120px` so the hero sits behind the transparent gradient header instead of creating a top band
 
+## Motion & Animation System (added 2026-06-11)
+
+Site-wide "balanced & lively" motion pass across home, `/sobre`, and `/wpi`. Zero new dependencies — vanilla CSS + `IntersectionObserver`, fully `prefers-reduced-motion` compliant.
+
+- **Scroll reveals:** `src/scripts/scroll-reveal.ts` (imported in `Layout.astro`) observes every `[data-reveal]` element and adds `.is-revealed` once in view (one-shot, then unobserves). Base + variant CSS lives in `global.css`: `data-reveal="up|fade|left|right|zoom"`. Containers marked `[data-reveal-stagger]` get auto-incremented `--reveal-i` on their **direct** `[data-reveal]` children → cascade via `transition-delay`. Under reduced motion the script reveals everything immediately and skips the observer; CSS also forces `opacity:1`.
+  - **Gotcha:** the observer uses `rootMargin: '0px 0px -10% 0px'`, so a reveal target sitting in the bottom 10% of the viewport on load (e.g. the home hero footer) stays hidden until a slight scroll. Intentional.
+  - **Gotcha:** put `data-reveal-stagger` on the *direct* parent of the items to cascade — nested items won't be auto-indexed.
+- **Button hover:** `.site-button` has a `translateY(-2px)` hover lift in `global.css`. (Magnetic/cursor-follow CTAs were built then **removed at user request** — felt childish; `src/scripts/magnetic.ts` and all `data-magnetic` attributes are gone.)
+- **h2 hover scale:** all public `<h2>` get a very slight `scale(1.02)` on hover (`global.css`). Specificity is bumped via `h2[data-reveal].is-revealed:hover` so it still works on h2s that are scroll-reveal targets (otherwise `.is-revealed { transform: none }` would win). Reduced-motion guarded.
+- **Floating blobs:** the `blob-float` keyframe was **promoted to `global.css`** as a reusable `.blob-float` utility (with `nth-of-type` desync + reduced-motion guard). The duplicated local copies in `WpiSection.astro` and `WpiPraticaSection.astro` were removed (they now use the utility; per-feature `nth-child` delay overrides remain). Applied to the previously-static decorative blobs in `SobreStatsSection.astro` (positioning moved off `transform` onto `left/top` offsets so the animation can own `transform`; the `blob--rot120/30` static rotations were dropped) and the `ContatoFooter` decorative blob (on the inner `<img>`, wrapper keeps its positioning transform).
+- **Hover effects:** header nav links get a scaleX underline (`Header.astro`); cards lift + glow on hover in `DiferenciaisSection`, `DepoimentosSection`, `SobreAwardsCards`; logo grids dim at rest and brighten + scale on hover (hover applied to the inner `<img>` so it never clobbers the parent's reveal transition). Cases carousel hover was left as-is (already rich).
+- **Pattern note:** when an element is BOTH a `[data-reveal]` target and a hover target, don't set `transition` on it broadly (the shorthand clobbers the reveal's opacity transition). Either include `opacity` in the combined transition, or put the hover on a child element.
+
 ## Font Stack
 
 - **Bebas Neue** — section titles/headings (uppercase)
@@ -73,7 +86,7 @@ All in `src/components/`:
 1. `Header.astro` — sticky, gradient nav, Contato pill, WhatsApp
 2. `HeroSection.astro` — full-bleed dark photo, animated terminal-style text headline cycling strategy/creative words with idle-only blinking underscore cursor, social + address
 3. `CasesSection.astro` + `CasesCarousel.astro` + `CaseModal.astro` — pixel gradient bg, "CASES" title (centered), vertically centered section content, height-driven desktop card sizing, fixed-height carousel viewport, aligned vertical cards carousel with three case-stable gradient variants for borders/title bars, distance-based depth sizing around a larger focused center card using transform scaling on stable flex slots plus visual side-card push for active-card breathing room without oversized gaps between non-active cards, animated card grow/shrink during slide, repeated card sets with at least 11 rendered cards for infinite looping without visible image swaps even when there are few published cases, preloaded images, auto-rotation, manual arrow controls, responsive sizing, and one shared case modal in `CaseModal.astro` that swaps case content in place instead of closing/opening between cases; cards come from published SQLite cases via `/api/cases` using each case `main_image_url`, with a local placeholder card fallback when no published case is available.
-4. `HistoriaSection.astro` — 2-col: text+CTA left, blob photo right (uses `banner_1.png`)
+4. `HistoriaSection.astro` — 2-col: text+CTA left, blob-shaped autoplay/muted/loop video right (`/images/video_vw.mp4`, `object-fit: contain`)
 5. `DiferenciaisSection.astro` — white bg, event collage left, title + 2×2 gradient cards right
 6. `ClientesSection.astro` — dark, gradient title, 24 logos in 8×3 grid
 7. `DepoimentosSection.astro` — dark, gradient title, 3-card carousel with JS sliding
@@ -85,10 +98,10 @@ All in `src/components/`:
 
 All in `src/components/` and `src/pages/wpi.astro`:
 
-1. Hero — full-bleed earth photo (`wpi_hero_bg.jpg`), WPI+TG logos, Bebas Neue heading
+1. Hero — full-bleed autoplay/muted/loop video background (`/images/wpi/hero_wpi.mp4`), WPI+TG logos, Bebas Neue heading
 2. `WpiPraticaSection.astro` — dark, "O que isso significa na prática?", 4 feature blobs with composite SVG icons, body text, Bebas Neue quote
 3. `WpiConexaoSection.astro` — dark, Bebas Neue gradient headline, 2-col: stats (stacked) + body left / animated world map SVG right
-4. `WpiVideoSection.astro` — dark, centered gradient heading "Aqui tem alcance.", subtitle, 16:9 gray video placeholder with "Vídeo WPI" label
+4. `WpiVideoSection.astro` — dark, centered gradient heading "Aqui tem alcance.", subtitle, 16:9 YouTube embed (`youtube-nocookie.com`, lazy-loaded, video id `hmEh2VyrgGk`)
 
 ## /sobre Page (in progress)
 
@@ -238,7 +251,7 @@ astro.config.mjs         — output: server, adapter: @astrojs/node (standalone)
 ## Known Issues / Revisit Later
 
 - **PremiosSection collage image** (`src/components/PremiosSection.astro`) — size/layout not quite right, needs further adjustment. Currently uses `5fr 7fr` grid with right bleed.
-- **Blob unification** — decorative blob images exist across multiple sections (home + `/sobre` stats). Needs audit and consolidation into a shared set. **Do not act on this until user explicitly asks.**
+- **Blob unification** — partially done (2026-06-11): the `blob-float` animation is now a single `.blob-float` utility in `global.css` reused everywhere (see Motion & Animation System). The blob **image assets** themselves are still per-section and not consolidated into a shared set. **Do not consolidate the assets until user explicitly asks.**
 
 ## Chrome DevTools MCP (active)
 
