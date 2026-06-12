@@ -56,6 +56,20 @@ import ContatoFooter from '../components/ContatoFooter.astro';
     z-index: 1;
     text-align: center;
     padding: 0 165px;
+    /* Gentle ambient float. The h1 keeps its own data-reveal slide-in, so the
+       drift lives on this wrapper to avoid clobbering that transform. */
+    animation: sobre-hero-float 7s ease-in-out infinite;
+  }
+
+  @keyframes sobre-hero-float {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-12px); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sobre-hero__content {
+      animation: none;
+    }
   }
 
   .sobre-hero__content h1 {
