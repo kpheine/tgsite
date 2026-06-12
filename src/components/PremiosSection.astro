@@ -144,6 +144,23 @@ const { showCta = true, variant = 'home' } = Astro.props;
     display: block;
   }
 
+  /* Gentle continuous drift. The slide-in transform stays on the <img> via
+     data-reveal, so the float lives on this wrapper to avoid clobbering it. */
+  .premios-image-col {
+    animation: premios-float 7s ease-in-out infinite;
+  }
+
+  @keyframes premios-float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50%      { transform: translateY(-10px) rotate(-0.6deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .premios-image-col {
+      animation: none;
+    }
+  }
+
   .premios-section--sobre .premios-collage {
     width: 100%;
     object-position: left center;

@@ -286,6 +286,22 @@ h2[data-reveal].is-revealed:hover {
   }
 }
 
+/* ─── Cursor-reactive gradient text ───────────────────────────────────────── */
+/* Applied by src/scripts/gradient-follow.ts to gradient-clipped text. Oversizes
+   the gradient so there's slack to pan, then tracks the pointer via the
+   --gradient-mx/--gradient-my custom properties set on :root. */
+.gradient-follow {
+  background-size: 160% 160% !important;
+  background-position: var(--gradient-mx, 50%) var(--gradient-my, 50%) !important;
+  transition: background-position 200ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gradient-follow {
+    transition: none;
+  }
+}
+
 /* ─── Floating blob utility ───────────────────────────────────────────────── */
 /* Gentle organic drift for decorative blob art. Reused from the WPI feature
    blobs. Apply `.blob-float` to a blob element; siblings desync via nth-of-type. */
