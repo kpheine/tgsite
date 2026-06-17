@@ -248,6 +248,15 @@ astro.config.mjs         — output: server, adapter: @astrojs/node (standalone)
 - `docker compose up --build` → production-like Caddy + app stack; Caddy listens on ports 80/443 and proxies to internal app:4321
 - Release verification gate: run `npm run check`, `npm run build`, then `docker compose up --build` before handoff/packaging when Docker is available.
 
+## Staging / Client Preview (added 2026-06-17)
+
+- **Decision:** for now, staging is **not** a cloud VM — it's the **local dev server exposed via a Cloudflare quick tunnel** (cost/effort reasons). The GCP VM path in `DEPLOYMENT.md` remains the eventual production route and a future always-on staging option.
+- **How to run it (one command):** `npm run staging` → runs `scripts/staging.mjs`, which starts `astro dev`, auto-detects the chosen port (handles the 4321-in-use → 4322 fallback), opens the Cloudflare tunnel against it, prints the `https://<random>.trycloudflare.com` URL, and tears both down on Ctrl+C. The script also finds `cloudflared` on PATH or at the default winget install path, and errors with the install command if missing.
+- **Manual fallback (two terminals):** `npm run dev`, then `cloudflared tunnel --url http://localhost:<port>` matching the dev port.
+- **`cloudflared`** installed via `winget install --id Cloudflare.cloudflared` → `C:\Program Files (x86)\cloudflared\cloudflared.exe`. Quick tunnels need **no Cloudflare account**.
+- **`astro.config.mjs` change required:** added `vite.server.allowedHosts: ['.trycloudflare.com']` so the dev server doesn't reject the tunnel hostname with "Blocked request. This host is not allowed." NOTE: `allowedHosts: true` (boolean) did **not** work — it gets lost in Astro's Vite merge; use the explicit suffix array. Dev-server only; the production Node standalone server doesn't use Vite, so prod is unaffected.
+- **Caveats of quick tunnels:** ephemeral — the URL dies when the tunnel/PC stops, and a new random subdomain is issued on each `cloudflared` restart (the `.trycloudflare.com` suffix in `allowedHosts` means restarts just need re-sharing the new URL, no config change). No uptime guarantee. Fine for "show progress" previews, not for always-on staging.
+
 ## Known Issues / Revisit Later
 
 - **PremiosSection collage image** (`src/components/PremiosSection.astro`) — size/layout not quite right, needs further adjustment. Currently uses `5fr 7fr` grid with right bleed.

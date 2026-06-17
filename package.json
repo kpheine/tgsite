@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "astro dev",
     "dev:reset": "node scripts/dev-reset.mjs",
+    "staging": "node scripts/staging.mjs",
     "check": "astro check",
     "build": "astro build",
     "preview": "astro preview"
