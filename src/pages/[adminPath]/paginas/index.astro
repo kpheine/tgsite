@@ -1,0 +1,130 @@
+---
+import AdminLayout from '../../../components/AdminLayout.astro';
+import { adminUrl, isAdminPath, requireUser } from '../../../lib/auth';
+import { formatBytesLabel } from '../../../lib/bytes';
+import { env } from '../../../lib/env';
+import { listSharedPages } from '../../../lib/shared-pages';
+
+if (!isAdminPath(Astro.params.adminPath)) {
+  return new Response('Não encontrado', { status: 404 });
+}
+
+const user = requireUser(Astro.cookies);
+if (!user) return Astro.redirect(adminUrl('login'));
+
+const pages = listSharedPages();
+const errorMessage = Astro.url.searchParams.get('erro');
+const maxLabel = formatBytesLabel(env.uploadMaxHtmlBytes);
+const origin = Astro.url.origin;
+---
+<AdminLayout title="Páginas privadas" username={user.username}>
+  <header class="admin-header">
+    <div>
+      <p class="admin-kicker">Links secretos</p>
+      <h1 class="admin-title">Páginas privadas</h1>
+    </div>
+  </header>
+
+  <section class="admin-card">
+    <p class="admin-muted">
+      Envie um arquivo HTML para gerar um link secreto. O conteúdo só é acessível por quem tem o link
+      &mdash; ele não aparece no site nem em buscadores. Use arquivos autossuficientes (CSS e imagens
+      embutidos ou com URLs absolutas). Limite: {maxLabel}.
+    </p>
+
+    {errorMessage && <p class="admin-alert admin-alert--compact">{errorMessage}</p>}
+
+    <form
+      class="admin-form"
+      method="post"
+      action="/api/panel/shared-pages/create"
+      enctype="multipart/form-data"
+      data-shared-page-form
+      data-max-html-bytes={env.uploadMaxHtmlBytes}
+    >
+      <div class="admin-form-row">
+        <div class="admin-field">
+          <label for="title">Título (opcional)</label>
+          <input class="admin-input" id="title" name="title" placeholder="Usado só no painel" />
+        </div>
+        <div class="admin-field">
+          <label for="file">Arquivo HTML</label>
+          <input class="admin-input" id="file" name="file" type="file" accept=".html,.htm,text/html" required />
+        </div>
+      </div>
+      <p class="admin-alert admin-alert--compact" data-shared-page-error hidden></p>
+      <div class="admin-actions">
+        <button class="admin-button admin-button--primary" type="submit">Criar link</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="admin-case-order-panel">
+    <div class="admin-case-order-panel__header">
+      <p class="admin-muted">Páginas criadas</p>
+    </div>
+
+    {pages.length === 0 && <p class="admin-muted">Nenhuma página criada ainda.</p>}
+
+    <div class="admin-case-list">
+      {pages.map((page) => (
+        <article class="admin-case-card admin-testimonial-card admin-shared-page-card">
+          <div class="admin-case-card__content">
+            <h2>{page.title}</h2>
+            <div class="admin-shared-page-link">
+              <code>{`${origin}/p/${page.token}`}</code>
+              <button
+                class="admin-support-copy-button"
+                type="button"
+                data-copy-link
+                data-copy-value={`${origin}/p/${page.token}`}
+                aria-label="Copiar link"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M9 7.5V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                  <rect x="5" y="8" width="10" height="12" rx="2" stroke="currentColor" stroke-width="1.8" />
+                </svg>
+                <span data-copy-label>Copiar</span>
+              </button>
+            </div>
+          </div>
+          <div class="admin-case-card__footer">
+            <span>Criada em {new Date(page.created_at).toLocaleDateString('pt-BR')}</span>
+            <form method="post" action="/api/panel/shared-pages/delete" data-shared-page-delete-form>
+              <input type="hidden" name="id" value={page.id} />
+              <button class="admin-button admin-button--danger" type="submit">Excluir</button>
+            </form>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+</AdminLayout>
+
+<style>
+  /* The shared __content grid uses an implicit auto column that grows to the URL's
+     max-content width; cap it so the link can scroll/shrink inside the card. */
+  .admin-shared-page-card .admin-case-card__content {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .admin-shared-page-link {
+    align-items: center;
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    min-width: 0;
+  }
+  .admin-shared-page-link code {
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
+    flex: 1;
+    min-width: 0;
+    font-size: 13px;
+    overflow-x: auto;
+    padding: 8px 10px;
+    white-space: nowrap;
+  }
+  .admin-shared-page-link .admin-support-copy-button {
+    flex-shrink: 0;
+  }
+</style>

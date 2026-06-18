@@ -204,7 +204,10 @@ src/
   lib/admin-order.ts     — shared admin drag-order parsing and descending `sort_order` persistence for cases/testimonials
   lib/auth.ts            — admin path helpers, username login/session cookie utilities
   lib/bytes.ts           — shared pure byte label formatter used by server and browser upload code
-  lib/db.ts              — SQLite connection, fresh-schema creation, schema version guard, env-synced primary admin credentials, support user seeding (`cases`, `imagens_case`)
+  lib/db.ts              — SQLite connection, fresh-schema creation, forward-only migration runner (schema v3), env-synced primary admin credentials, support user seeding (`cases`, `imagens_case`, `testimonials`, `shared_pages`)
+  lib/shared-pages.ts    — private shared HTML pages domain logic (token gen, list/get/create/delete)
+  pages/p/[token].ts     — public serving route for shared HTML pages (sandboxed, noindex, no-store)
+  pages/api/panel/shared-pages/{create,delete}.ts — admin create/delete endpoints for shared pages
   lib/env.ts             — server env helper for Astro import.meta.env + process.env fallback
   lib/upload-limits.ts   — env-driven admin image size limits
   lib/uploads.ts         — buffered image upload validation and filesystem writes
@@ -256,6 +259,43 @@ astro.config.mjs         — output: server, adapter: @astrojs/node (standalone)
 - **`cloudflared`** installed via `winget install --id Cloudflare.cloudflared` → `C:\Program Files (x86)\cloudflared\cloudflared.exe`. Quick tunnels need **no Cloudflare account**.
 - **`astro.config.mjs` change required:** added `vite.server.allowedHosts: ['.trycloudflare.com']` so the dev server doesn't reject the tunnel hostname with "Blocked request. This host is not allowed." NOTE: `allowedHosts: true` (boolean) did **not** work — it gets lost in Astro's Vite merge; use the explicit suffix array. Dev-server only; the production Node standalone server doesn't use Vite, so prod is unaffected.
 - **Caveats of quick tunnels:** ephemeral — the URL dies when the tunnel/PC stops, and a new random subdomain is issued on each `cloudflared` restart (the `.trycloudflare.com` suffix in `allowedHosts` means restarts just need re-sharing the new URL, no config change). No uptime guarantee. Fine for "show progress" previews, not for always-on staging.
+
+## Private Shared HTML Pages — "secret links" (added 2026-06-18, schema v3)
+
+Admin-managed standalone HTML pages, each reachable only via a random unguessable URL
+(`/p/<token>`), not linked anywhere on the site and not indexable. Built for the client to send
+one-off HTML to a few contacts. Reuses the existing admin CRUD/auth/rate-limit patterns.
+
+- **Storage:** inline in SQLite `shared_pages` (`id, token, title, html, created_at`) — no files on
+  disk. `SharedPageRecord` in `src/lib/db.ts`; domain logic in `src/lib/shared-pages.ts`
+  (`SharedPageError`, `listSharedPages`, `getSharedPageHtml`, `createSharedPage`, `deleteSharedPage`).
+- **Token:** `randomBytes(16).toString('base64url')` (~22 chars, 128-bit) with a UNIQUE-collision retry loop.
+- **Serving route:** `src/pages/p/[token].ts` (APIRoute GET) returns the stored HTML with
+  `Content-Security-Policy: sandbox allow-scripts`, `X-Robots-Tag: noindex, nofollow, noarchive`,
+  `Cache-Control: no-store`, `Referrer-Policy: no-referrer`. 404 when the token is unknown.
+- **Security model:** the `CSP: sandbox` header puts each page in an **opaque origin** — uploaded JS
+  runs (animations) but **cannot read `tg_admin_session`/`localStorage` or send credentialed requests**
+  to admin endpoints. Verified in-browser: `document.cookie` and `localStorage` both throw `SecurityError`.
+  No `allow-same-origin`/`allow-forms`/`allow-popups`. Same-domain serving (no subdomain/DNS/Caddy work).
+- **Admin:** `[adminPath]/paginas/index.astro` — upload form (single `.html`, `accept=".html,.htm"`) +
+  list with per-row **copy-link** and **delete**. API: `src/pages/api/panel/shared-pages/create.ts` &
+  `delete.ts` (auto rate-limited via `/api/panel/*`). Lifecycle is **delete only** (no edit — re-upload
+  makes a new URL). Nav link "Páginas privadas" in `AdminLayout.astro`.
+- **Reused scripts:** copy handler `admin-support-password-copy.ts` broadened to `[data-copy-link]`;
+  delete confirm branch added to `admin-case-delete-confirm.ts`; new client size-check
+  `admin-shared-page-upload.ts` (reads `data-max-html-bytes` via `getByteLimit`). Server-side cap is
+  source of truth: `UPLOAD_MAX_HTML_BYTES` (default 16 MB) in `src/lib/env.ts` (`env.uploadMaxHtmlBytes`).
+- **Constraint:** uploaded HTML must be self-contained (inline or absolute-URL assets); relative paths
+  don't resolve in the opaque origin.
+
+## DB migrations (changed 2026-06-18)
+
+`src/lib/db.ts` no longer hard-throws on a `user_version` mismatch. It now runs a **forward-only
+migration runner** (`runMigrations()`): for each version between the stored `user_version` and
+`DB_SCHEMA_VERSION` (currently **3**) it applies an idempotent step in a transaction and bumps
+`user_version`. Existing client DBs upgrade in place with no data loss; `npm run dev:reset` still
+exists for a clean dev wipe. Fresh DBs are still created at the latest version directly. New tables
+should be added both to the fresh-create `db.exec` block and to the `migrations` map.
 
 ## Known Issues / Revisit Later
 

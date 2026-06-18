@@ -6,7 +6,17 @@ import { dirname, resolve } from 'node:path';
 import { env } from './env';
 
 export const SUPPORT_ADMIN_USERNAME = 'support-admin';
-const DB_SCHEMA_VERSION = 2;
+const DB_SCHEMA_VERSION = 3;
+
+const SHARED_PAGES_TABLE = `
+  CREATE TABLE IF NOT EXISTS shared_pages (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    token TEXT NOT NULL UNIQUE,
+    title TEXT NOT NULL,
+    html TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
+`;
 
 const dbPath = resolve(process.cwd(), 'data/site.db');
 mkdirSync(dirname(dbPath), { recursive: true });
@@ -74,16 +84,34 @@ if (shouldCreateSchema) {
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
+
+    ${SHARED_PAGES_TABLE}
   `);
 
   db.pragma(`user_version = ${DB_SCHEMA_VERSION}`);
 } else {
-  const schemaVersion = db.pragma('user_version', { simple: true });
+  runMigrations();
+}
 
-  if (schemaVersion !== DB_SCHEMA_VERSION) {
+// Forward-only migrations applied in order to existing databases so client data
+// upgrades in place (no destructive reset). Each step must be idempotent.
+function runMigrations() {
+  const migrations: Record<number, () => void> = {
+    3: () => db.exec(SHARED_PAGES_TABLE),
+  };
+
+  const current = db.pragma('user_version', { simple: true }) as number;
+
+  if (current > DB_SCHEMA_VERSION) {
     throw new Error(
-      `Local database schema is outdated. Run "npm run dev:reset" to recreate ./data/site.db for development.`,
+      `Local database schema (v${current}) is newer than this build (v${DB_SCHEMA_VERSION}). Update the application.`,
     );
+  }
+
+  for (let version = current + 1; version <= DB_SCHEMA_VERSION; version += 1) {
+    const step = migrations[version];
+    if (step) db.transaction(step)();
+    db.pragma(`user_version = ${version}`);
   }
 }
 
@@ -130,6 +158,14 @@ export interface TestimonialRecord {
   sort_order: number;
   created_at: string;
   updated_at: string;
+}
+
+export interface SharedPageRecord {
+  id: number;
+  token: string;
+  title: string;
+  html: string;
+  created_at: string;
 }
 
 function syncPrimaryAdminFromEnv() {

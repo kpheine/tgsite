@@ -4,6 +4,7 @@ const ENV_DEFAULTS = {
   adminPasswordPlaceholder: 'change-this-password',
   sessionSecretPlaceholder: 'replace-with-a-long-random-secret',
   uploadMaxImageBytes: 8 * 1024 * 1024,
+  uploadMaxHtmlBytes: 16 * 1024 * 1024,
 };
 
 function readEnv(name: string, fallback = '') {
@@ -66,6 +67,7 @@ export const env = {
   sessionCookieSecure: readBooleanEnv('SESSION_COOKIE_SECURE', import.meta.env.PROD),
   trustProxyHeaders: readBooleanEnv('TRUST_PROXY_HEADERS', true),
   uploadMaxImageBytes: readPositiveIntegerEnv('UPLOAD_MAX_IMAGE_BYTES', ENV_DEFAULTS.uploadMaxImageBytes),
+  uploadMaxHtmlBytes: readPositiveIntegerEnv('UPLOAD_MAX_HTML_BYTES', ENV_DEFAULTS.uploadMaxHtmlBytes),
   smtpUser: readEnv('SMTP_USER'),
   smtpPass: readEnv('SMTP_PASS'),
   contactTo: readEnv('CONTACT_TO'),

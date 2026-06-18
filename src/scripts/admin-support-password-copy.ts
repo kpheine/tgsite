@@ -6,7 +6,7 @@ async function copyText(value: string) {
 }
 
 document.addEventListener('click', async (event) => {
-  const button = (event.target as Element | null)?.closest<HTMLButtonElement>('[data-support-password-copy]');
+  const button = (event.target as Element | null)?.closest<HTMLButtonElement>('[data-support-password-copy], [data-copy-link]');
   if (!button) return;
 
   const value = button.dataset.copyValue;

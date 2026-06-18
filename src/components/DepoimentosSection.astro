@@ -207,6 +207,9 @@ const cards = (publicTestimonials.length > 0 ? publicTestimonials : fallbackCard
   /* Carousel */
   .carousel-viewport {
     overflow: hidden;
+    /* Breathing room so the hover lift + drop shadow aren't clipped */
+    padding: 16px 0 56px;
+    margin: -16px 0 -56px;
   }
 
   .carousel-track {

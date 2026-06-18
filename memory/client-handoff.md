@@ -22,6 +22,29 @@
 - Public traffic should enter only through Caddy on ports `80` and `443`.
 - The Astro app runs internally on `app:4321`; the host machine should not expose port `4321` in production.
 
+## Private Shared HTML Pages ("Páginas privadas")
+
+Admins can upload standalone HTML files in the panel; each gets a secret random URL
+(`/p/<token>`) to send to contacts. Pages are not linked anywhere and are marked `noindex`.
+
+### Deployment notes — nothing special required
+
+- **No DNS or Caddy change.** Pages are served from the same domain as the site; the security
+  isolation is done in-app via a `Content-Security-Policy: sandbox` header.
+- **Schema migration is automatic.** On first start after this update, the app upgrades the
+  SQLite database from schema v2 to v3 (adds the `shared_pages` table) **in place** — existing
+  cases/recomendações are preserved. No `dev:reset`, no manual step, no data loss.
+- **Optional config:** `UPLOAD_MAX_HTML_BYTES` (default `16777216` = 16 MB) caps uploaded HTML
+  size. Pages with many inline/base64 images can be large, hence the generous default. Only set
+  this in `.env` if a different limit is desired.
+
+### What the client should know
+
+- Uploaded HTML must be **self-contained**: inline CSS/JS and images as data URIs or absolute
+  URLs. Relative asset paths will not resolve (pages run in an isolated/opaque origin).
+- To change a page, delete it and upload again — this produces a **new** URL.
+- Anyone with the link can view the page; treat the link as the secret.
+
 ## Contact Form — Email Sending (Nodemailer + Gmail)
 
 ### One-time setup the client must perform

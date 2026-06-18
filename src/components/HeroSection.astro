@@ -32,6 +32,9 @@
         <img src="/images/footer/social-blob.png" alt="" class="social-item__blob" aria-hidden="true" />
         <img src="/images/footer/play-icon.svg" alt="YouTube" class="social-item__icon" />
       </a>
+      <a href="https://www.instagram.com/thegroupcomunicacao/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="social-item">
+        <img src="/images/insta-logo.png" alt="Instagram" class="social-item__combined" />
+      </a>
     </div>
 
     <address class="hero-address">
@@ -236,6 +239,14 @@
     position: relative;
     width: 55%;
     height: 55%;
+    object-fit: contain;
+  }
+
+  /* Instagram icon ships with the blob already baked in, so it fills the
+     whole item to match the footprint of the other icons' blobs */
+  .social-item__combined {
+    width: 100%;
+    height: 100%;
     object-fit: contain;
   }
 
