@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guia de Deploy — Google Cloud — Site TG</title>
+<style>
+  :root {
+    --ink: #1a1d21;
+    --muted: #5b6470;
+    --line: #e3e6ea;
+    --accent: #2b6cb0;
+    --accent-soft: #ebf2fa;
+    --code-bg: #f5f6f8;
+    --note-bg: #fff8e6;
+    --note-border: #e0b94d;
+    --max: 860px;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    color: var(--ink);
+    background: #fafbfc;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+  }
+  .page {
+    max-width: var(--max);
+    margin: 0 auto;
+    background: #fff;
+    padding: 56px 64px 80px;
+    border-left: 1px solid var(--line);
+    border-right: 1px solid var(--line);
+    min-height: 100vh;
+  }
+  header.doc {
+    border-bottom: 3px solid var(--accent);
+    padding-bottom: 20px;
+    margin-bottom: 8px;
+  }
+  header.doc .kicker {
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 0 0 6px;
+  }
+  h1 { font-size: 30px; line-height: 1.25; margin: 0 0 6px; }
+  .lead { color: var(--muted); font-size: 15px; margin: 0; }
+  h2 {
+    font-size: 22px;
+    margin: 44px 0 14px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+  }
+  h3 { font-size: 17px; margin: 26px 0 10px; color: #2d333b; }
+  p { margin: 12px 0; }
+  a { color: var(--accent); }
+  ul, ol { margin: 12px 0; padding-left: 26px; }
+  li { margin: 5px 0; }
+  strong { color: #14171a; }
+  code {
+    font-family: "SF Mono", "Cascadia Code", Consolas, "Liberation Mono", Menlo, monospace;
+    background: var(--code-bg);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-size: 13.5px;
+    color: #b03a5b;
+    white-space: nowrap;
+  }
+  pre {
+    background: #1f2430;
+    color: #e6e9ef;
+    border-radius: 8px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    font-size: 13.5px;
+    line-height: 1.55;
+    margin: 14px 0;
+  }
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+    white-space: pre;
+    font-size: 13.5px;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 16px 0;
+    font-size: 14.5px;
+  }
+  th, td {
+    border: 1px solid var(--line);
+    padding: 9px 12px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th { background: var(--accent-soft); font-weight: 600; }
+  tbody tr:nth-child(even) td { background: #fafbfc; }
+  blockquote {
+    margin: 16px 0;
+    padding: 12px 18px;
+    background: var(--note-bg);
+    border-left: 4px solid var(--note-border);
+    border-radius: 0 6px 6px 0;
+  }
+  blockquote p:first-child { margin-top: 0; }
+  blockquote p:last-child { margin-bottom: 0; }
+  hr { border: none; border-top: 1px solid var(--line); margin: 0; }
+  nav.toc {
+    background: #f7f9fb;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 18px 24px;
+    margin: 28px 0 8px;
+  }
+  nav.toc h2 {
+    border: none;
+    padding: 0;
+    margin: 0 0 10px;
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--muted);
+  }
+  nav.toc ol { margin: 0; padding-left: 22px; }
+  nav.toc a { text-decoration: none; }
+  nav.toc a:hover { text-decoration: underline; }
+  footer.doc {
+    margin-top: 48px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 13px;
+  }
+  @media (max-width: 720px) {
+    .page { padding: 32px 22px 56px; border: none; }
+    h1 { font-size: 25px; }
+  }
+  @media print {
+    body { background: #fff; font-size: 12pt; }
+    .page { max-width: none; border: none; padding: 0; }
+    h2 { page-break-after: avoid; }
+    h3 { page-break-after: avoid; }
+    pre, table, blockquote { page-break-inside: avoid; }
+    pre { background: #f2f2f2; color: #111; border: 1px solid #ccc; }
+    pre code { color: #111; }
+    a { color: inherit; text-decoration: none; }
+    nav.toc { background: none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="doc">
+  <p class="kicker">Site TG · Documentação de Infraestrutura</p>
+  <h1>Guia de Deploy — Google Cloud</h1>
+  <p class="lead">Siga cada passo na ordem. Tempo estimado de trabalho: 30 minutos.</p>
+</header>
+
+<nav class="toc">
+  <h2>Índice</h2>
+  <ol>
+    <li><a href="#parte-1">Conta e projeto no Google Cloud</a></li>
+    <li><a href="#parte-2">Criar a máquina virtual (VM)</a></li>
+    <li><a href="#parte-3">Conectar à VM e instalar dependências</a></li>
+    <li><a href="#parte-4">Colocar o código na VM</a></li>
+    <li><a href="#parte-5">Configurar as variáveis de ambiente</a></li>
+    <li><a href="#parte-6">Subir o site com Docker</a></li>
+    <li><a href="#parte-7">Configurar o formulário de contato (Gmail)</a></li>
+    <li><a href="#parte-8">Domínio e HTTPS (Caddy)</a></li>
+    <li><a href="#parte-9">Painel de administração</a></li>
+    <li><a href="#parte-10">Operação e manutenção</a></li>
+    <li><a href="#resumo">Resumo dos comandos mais usados</a></li>
+    <li><a href="#problemas">Contato em caso de problemas</a></li>
+  </ol>
+</nav>
+
+<h2 id="parte-1">Parte 1 — Conta e projeto no Google Cloud</h2>
+
+<h3>1.1 Criar um projeto</h3>
+<ol>
+  <li>No painel do Google Cloud, clique no seletor de projetos no topo (ao lado do logo Google Cloud).</li>
+  <li>Clique em <strong>Novo projeto</strong>.</li>
+  <li>Nome sugerido: <code>tg-site-prod</code></li>
+  <li>Clique em <strong>Criar</strong> e aguarde.</li>
+  <li>Certifique-se de que o projeto novo está selecionado no seletor.</li>
+</ol>
+
+<h2 id="parte-2">Parte 2 — Criar a máquina virtual (VM)</h2>
+
+<h3>2.1 Navegar até Compute Engine</h3>
+<ol>
+  <li>No menu lateral, clique em <strong>Compute Engine</strong> &gt; <strong>Instâncias de VM</strong>.</li>
+  <li>Se for a primeira vez, clique em <strong>Ativar</strong> e aguarde alguns minutos.</li>
+</ol>
+
+<h3>2.2 Criar a instância</h3>
+<p>Clique em <strong>Criar instância</strong> e configure:</p>
+<table>
+  <thead><tr><th>Campo</th><th>Valor</th></tr></thead>
+  <tbody>
+    <tr><td>Nome</td><td><code>tg-site</code></td></tr>
+    <tr><td>Região</td><td><code>southamerica-east1</code> (São Paulo)</td></tr>
+    <tr><td>Zona</td><td><code>southamerica-east1-a</code></td></tr>
+    <tr><td>Tipo de máquina</td><td><code>e2-small</code> (1 vCPU, 2 GB RAM)</td></tr>
+    <tr><td>Sistema operacional</td><td>Ubuntu 22.04 LTS (x86/64)</td></tr>
+    <tr><td>Disco de inicialização</td><td>SSD persistente, 20 GB</td></tr>
+    <tr><td>Firewall</td><td>Marcar <strong>Permitir tráfego HTTP</strong> e <strong>Permitir tráfego HTTPS</strong></td></tr>
+  </tbody>
+</table>
+<blockquote>
+  <p><strong>Custo estimado:</strong> e2-small em São Paulo custa aproximadamente US$ 14/mês. Você pode reduzir para e2-micro (~US$ 6/mês) após o site estar estável, mas e2-micro pode ser lento durante o build inicial do Docker.</p>
+</blockquote>
+<p>Clique em <strong>Criar</strong> e aguarde a VM ficar com o status "Em execução" (bolinha verde).</p>
+
+<h3>2.3 Reservar um IP externo estático</h3>
+<p>Por padrão, o IP externo da VM é <strong>efêmero</strong> — ele muda se a VM for parada e iniciada novamente, o que quebraria o DNS do domínio. Antes de apontar o domínio (Parte 8), reserve um IP fixo:</p>
+<ol>
+  <li>No menu lateral, vá em <strong>VPC Network</strong> &gt; <strong>Endereços IP externos</strong>.</li>
+  <li>Localize o IP da VM <code>tg-site</code> na lista, com tipo "Efêmero".</li>
+  <li>Clique em <strong>Reservar</strong> (ou no menu de três pontos &gt; "Promover para estático").</li>
+  <li>Dê um nome, por exemplo <code>tg-site-ip</code>, e confirme.</li>
+</ol>
+<p>A partir daqui, esse é o IP que você usará nos registros DNS na Parte 8.</p>
+
+<h3>2.4 Abrir as portas do site no firewall</h3>
+<p>O site roda em Docker Compose com Caddy na frente. O Caddy expõe as portas <code>80</code> e <code>443</code> para o mundo e encaminha o tráfego internamente para a aplicação. As portas <code>80</code> e <code>443</code> já foram liberadas ao marcar HTTP/HTTPS na criação da VM. Nenhuma ação adicional é necessária.</p>
+
+<h2 id="parte-3">Parte 3 — Conectar à VM e instalar dependências</h2>
+
+<h3>3.1 Abrir o terminal SSH</h3>
+<p>Na lista de instâncias, clique em <strong>SSH</strong> ao lado da VM <code>tg-site</code>. Uma janela de terminal abre no navegador. Todos os comandos a seguir são executados nesse terminal.</p>
+
+<h3>3.2 Atualizar o sistema</h3>
+<pre><code>sudo apt update &amp;&amp; sudo apt upgrade -y</code></pre>
+
+<h3>3.3 Instalar Docker</h3>
+<pre><code>curl -fsSL https://get.docker.com | sudo sh
+sudo usermod -aG docker $USER
+newgrp docker</code></pre>
+<p>Verificar se funcionou:</p>
+<pre><code>docker --version</code></pre>
+<p>Deve aparecer algo como <code>Docker version 26.x.x</code>.</p>
+
+<h3>3.4 Instalar Git</h3>
+<pre><code>sudo apt install -y git</code></pre>
+
+<h3>3.5 Criar um arquivo de swap (recomendado em e2-small/e2-micro)</h3>
+<p>O build do Docker compila módulos nativos (<code>better-sqlite3</code>) e roda o build do Astro dentro de 2 GB de RAM. Em máquinas pequenas isso pode esgotar a memória e fazer o build ser encerrado ("Killed") no meio. Um arquivo de swap de 2 GB evita esse problema:</p>
+<pre><code>sudo fallocate -l 2G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab</code></pre>
+<p>Verificar:</p>
+<pre><code>free -h</code></pre>
+<p>A linha <code>Swap:</code> deve mostrar <code>2.0Gi</code>. O swap fica ativo automaticamente após reinícios da VM.</p>
+
+<h2 id="parte-4">Parte 4 — Colocar o código na VM</h2>
+<p>Escolha <strong>uma</strong> das duas opções abaixo.</p>
+
+<h3>Opção A — Via Git (recomendado se o código está em um repositório)</h3>
+<pre><code>git clone https://github.com/SEU-USUARIO/SEU-REPOSITORIO.git tg-site
+cd tg-site</code></pre>
+<p>Substitua a URL pelo endereço real do repositório. Se o repositório for privado, você precisará configurar um token de acesso pessoal do GitHub (Settings &gt; Developer settings &gt; Personal access tokens).</p>
+
+<h3>Opção B — Via arquivo .zip</h3>
+<p>Se você recebeu o projeto como arquivo .zip:</p>
+<ol>
+  <li>Instale o <code>unzip</code>:
+    <pre><code>sudo apt install -y unzip</code></pre>
+  </li>
+  <li>Faça upload do .zip usando o botão de upload do terminal SSH do Google Cloud (ícone de engrenagem no canto superior direito da janela SSH &gt; "Upload file").</li>
+  <li>Descompacte:
+    <pre><code>unzip tg-site.zip -d tg-site
+cd tg-site</code></pre>
+  </li>
+</ol>
+
+<h2 id="parte-5">Parte 5 — Configurar as variáveis de ambiente</h2>
+<p>Dentro da pasta do projeto, copie o arquivo de exemplo:</p>
+<pre><code>cp .env.example .env
+nano .env</code></pre>
+<p>O editor <code>nano</code> abre. Edite cada linha conforme abaixo:</p>
+<pre><code>ADMIN_PATH=/painel-tg-2026
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=CRIE-UMA-SENHA-FORTE-AQUI
+SESSION_SECRET=UMA-SEQUENCIA-LONGA-E-ALEATORIA-DE-LETRAS-E-NUMEROS
+SITE_DOMAINS=seudominio.com.br, www.seudominio.com.br
+SESSION_COOKIE_SECURE=true
+TRUST_PROXY_HEADERS=true
+UPLOAD_MAX_IMAGE_BYTES=8388608
+UPLOAD_MAX_HTML_BYTES=16777216
+
+SMTP_USER=conta-que-vai-enviar@gmail.com
+SMTP_PASS=xxxx xxxx xxxx xxxx
+CONTACT_TO=onde-chegar-os-emails@seudominio.com.br</code></pre>
+<p><strong>Campos obrigatórios que você precisa alterar:</strong></p>
+<ul>
+  <li><code>ADMIN_PASSWORD</code> — senha de acesso ao painel de administração. Use algo longo e difícil.</li>
+  <li><code>SESSION_SECRET</code> — sequência aleatória longa (ex: abra <a href="https://passwordsgenerator.net">passwordsgenerator.net</a> e gere 64 caracteres sem símbolos).</li>
+  <li><code>SITE_DOMAINS</code> — coloque o domínio real atendido pelo Caddy, sem <code>https://</code>. Exemplo: <code>seudominio.com.br, www.seudominio.com.br</code>.</li>
+  <li><code>SMTP_USER</code>, <code>SMTP_PASS</code>, <code>CONTACT_TO</code> — veja a <strong>Parte 7</strong> (configuração do formulário de contato).</li>
+</ul>
+<p><strong>Campos opcionais (deixe como estão, a menos que precise mudar):</strong></p>
+<ul>
+  <li><code>UPLOAD_MAX_IMAGE_BYTES</code> — tamanho máximo (em bytes) de cada imagem enviada no painel. Padrão: 8 MB.</li>
+  <li><code>UPLOAD_MAX_HTML_BYTES</code> — tamanho máximo (em bytes) de cada arquivo HTML enviado em "Páginas privadas" (veja a <strong>Parte 9</strong>). Como esses arquivos costumam ter imagens embutidas em base64, o padrão é generoso: 16 MB.</li>
+</ul>
+<p>Para salvar no <code>nano</code>: <code>Ctrl+O</code>, Enter, depois <code>Ctrl+X</code>.</p>
+
+<h2 id="parte-6">Parte 6 — Subir o site com Docker</h2>
+<p>Dentro da pasta do projeto:</p>
+<pre><code>docker compose up --build -d</code></pre>
+<p>O build leva 3–5 minutos na primeira vez. Para verificar se está rodando:</p>
+<pre><code>docker compose ps</code></pre>
+<p>Devem aparecer dois containers com status <code>Up</code>: <code>app</code> e <code>caddy</code>.</p>
+<blockquote>
+  <p>Você também verá um terceiro container, <code>app-permissions</code>, com status <code>Exited (0)</code>. <strong>Isso é esperado e correto</strong> — ele é um passo de inicialização que ajusta as permissões das pastas de dados e encerra sozinho. Só precisa se preocupar se o status dele for diferente de <code>Exited (0)</code>.</p>
+</blockquote>
+<p>Para ver os logs em tempo real:</p>
+<pre><code>docker compose logs -f</code></pre>
+<p>O Caddy escuta nas portas <code>80</code> e <code>443</code>. Depois que o domínio apontar para a VM, acesse:</p>
+<pre><code>https://seudominio.com.br</code></pre>
+<p>Para um teste local sem domínio real, use <code>SITE_DOMAINS=localhost</code> no <code>.env</code>, rode <code>docker compose up --build -d</code> e acesse <code>http://localhost</code> na própria máquina. Na VM de produção, não abra a porta <code>4321</code> no firewall: a aplicação deve ficar acessível apenas pela rede interna do Docker.</p>
+
+<h2 id="parte-7">Parte 7 — Configurar o formulário de contato (Gmail)</h2>
+<p>O formulário de contato do site envia emails via Gmail. Você precisa de uma conta Gmail dedicada para isso (pode ser uma conta existente da empresa).</p>
+
+<h3>7.1 Ativar a verificação em duas etapas</h3>
+<ol>
+  <li>Acesse <a href="https://myaccount.google.com">myaccount.google.com</a>.</li>
+  <li>Segurança &gt; Verificação em duas etapas &gt; Ativar.</li>
+</ol>
+
+<h3>7.2 Criar uma Senha de App</h3>
+<ol>
+  <li>Ainda em Segurança, procure por <strong>Senhas de app</strong> (aparece após ativar 2FA).</li>
+  <li>Clique em <strong>Senhas de app</strong>.</li>
+  <li>Em "Selecionar app", escolha <strong>Outro (nome personalizado)</strong> e digite "Site TG".</li>
+  <li>Clique em <strong>Gerar</strong>.</li>
+  <li>Uma senha de 16 caracteres aparece. <strong>Copie agora — ela não será mostrada novamente.</strong></li>
+</ol>
+
+<h3>7.3 Preencher o .env</h3>
+<p>Abra o <code>.env</code> novamente (<code>nano .env</code>) e preencha:</p>
+<pre><code>SMTP_USER=conta-que-envia@gmail.com
+SMTP_PASS=abcd efgh ijkl mnop
+CONTACT_TO=email-onde-quer-receber@seudominio.com.br</code></pre>
+<p>Após editar, suba o container novamente para aplicar:</p>
+<pre><code>docker compose up --build -d</code></pre>
+
+<h3>Limitações conhecidas do formulário</h3>
+<ul>
+  <li>Limite de 500 emails/dia via Gmail SMTP.</li>
+  <li>Os primeiros emails podem cair na pasta de spam — adicione o endereço remetente aos contatos e verifique nas primeiras semanas.</li>
+</ul>
+
+<h2 id="parte-8">Parte 8 — Domínio e HTTPS (Caddy)</h2>
+
+<h3>8.1 Apontar o domínio para a VM</h3>
+<p>No painel do seu provedor de domínio (Registro.br, GoDaddy, etc.):</p>
+<ul>
+  <li>Crie um registro <strong>A</strong> apontando <code>@</code> (raiz) para o <strong>IP externo estático</strong> da sua VM (o que você reservou na <strong>Parte 2.3</strong>).</li>
+  <li>Crie um registro <strong>A</strong> apontando <code>www</code> para o mesmo IP.</li>
+</ul>
+<p>Aguarde a propagação (pode levar de alguns minutos até 24 horas).</p>
+
+<h3>8.2 Conferir o <code>.env</code></h3>
+<p>No arquivo <code>.env</code>, confirme que <code>SITE_DOMAINS</code> contém todos os domínios que apontam para a VM:</p>
+<pre><code>SITE_DOMAINS=seudominio.com.br, www.seudominio.com.br</code></pre>
+<p>Não inclua <code>https://</code> e não use caminhos. Use apenas nomes de domínio.</p>
+
+<h3>8.3 Subir ou reiniciar o Docker Compose</h3>
+<pre><code>docker compose up --build -d</code></pre>
+<p>O Caddy lê o <code>Caddyfile</code>, atende os domínios em <code>SITE_DOMAINS</code>, emite o certificado HTTPS automaticamente via Let's Encrypt e redireciona HTTP para HTTPS. Os certificados ficam salvos no volume Docker <code>caddy_data</code>, então não são perdidos ao reiniciar ou atualizar o site.</p>
+
+<h3>8.4 Verificar se o HTTPS funcionou</h3>
+<p>Abra no navegador:</p>
+<pre><code>https://seudominio.com.br</code></pre>
+<p>Se o certificado ainda não foi emitido, verifique:</p>
+<ul>
+  <li>O DNS do domínio já aponta para o IP externo da VM.</li>
+  <li>As portas <code>80</code> e <code>443</code> estão liberadas no firewall da VM.</li>
+  <li>O valor de <code>SITE_DOMAINS</code> está correto no <code>.env</code>.</li>
+  <li>Os logs do Caddy mostram detalhes do erro: <code>docker compose logs -f caddy</code>.</li>
+</ul>
+
+<h2 id="parte-9">Parte 9 — Painel de administração</h2>
+<p>O painel de administração está em:</p>
+<pre><code>https://seudominio.com.br/painel-tg-2026</code></pre>
+<p>Use o <code>ADMIN_USERNAME</code> e <code>ADMIN_PASSWORD</code> definidos no <code>.env</code>.</p>
+<blockquote>
+  <p>Se quiser alterar o caminho do painel, mude o valor de <code>ADMIN_PATH</code> no <code>.env</code> e suba o container novamente com <code>docker compose up --build -d</code>.</p>
+</blockquote>
+
+<h3>O que dá para gerenciar no painel</h3>
+<ul>
+  <li><strong>Casos / portfólio</strong> — título, descrição e imagens de cada projeto exibido no site.</li>
+  <li><strong>Recomendações</strong> — depoimentos/testemunhos exibidos no site.</li>
+  <li><strong>Páginas privadas</strong> — envio de arquivos HTML independentes. Cada um recebe um endereço secreto e aleatório (<code>/p/&lt;código&gt;</code>) para enviar a um contato específico. As páginas não são vinculadas em lugar nenhum do site e são marcadas como <code>noindex</code> (não aparecem em buscadores).</li>
+</ul>
+<blockquote>
+  <p><strong>Páginas privadas — observações:</strong> o HTML enviado precisa ser <strong>autossuficiente</strong> (CSS, JS e imagens embutidos no próprio arquivo, como data URIs ou URLs absolutas; caminhos relativos não funcionam). Para alterar uma página, exclua e envie de novo — isso gera um <strong>novo</strong> endereço. Qualquer pessoa com o link consegue ver a página, então trate o link como segredo. O tamanho máximo é controlado por <code>UPLOAD_MAX_HTML_BYTES</code> (veja a <strong>Parte 5</strong>).</p>
+</blockquote>
+
+<h2 id="parte-10">Parte 10 — Operação e manutenção</h2>
+
+<h3>Reiniciar o site</h3>
+<pre><code>cd ~/tg-site
+docker compose restart</code></pre>
+
+<h3>Parar o site</h3>
+<pre><code>docker compose down</code></pre>
+
+<h3>Atualizar o site (novo código)</h3>
+<pre><code>cd ~/tg-site
+git pull          # (se usar Git)
+docker compose up --build -d</code></pre>
+<blockquote>
+  <p><strong>Atualizações do banco de dados são automáticas.</strong> Quando uma nova versão do código muda a estrutura do banco, o app atualiza o arquivo <code>data/site.db</code> no lugar, na primeira vez que sobe — <strong>sem perder</strong> casos, recomendações ou páginas já cadastrados. Nenhum passo manual é necessário. Ainda assim, faça um backup (veja abaixo) antes de atualizar, por segurança.</p>
+</blockquote>
+
+<h3>Ver logs</h3>
+<pre><code>docker compose logs -f</code></pre>
+
+<h3>Reinício automático</h3>
+<p>O Compose está configurado com <code>restart: unless-stopped</code> — o container sobe automaticamente com a VM.</p>
+
+<h3>Onde ficam os dados?</h3>
+<ul>
+  <li><strong>Banco de dados (casos/portfólio, recomendações e páginas privadas):</strong> <code>~/tg-site/data/site.db</code></li>
+  <li><strong>Imagens e vídeos enviados:</strong> <code>~/tg-site/uploads/</code></li>
+</ul>
+<p><strong>Faça backup desses dois diretórios regularmente.</strong> Uma forma simples é compactá-los e baixar via SCP ou fazer upload para o Google Drive manualmente. Os dados do site não são apagados ao atualizar o código.</p>
+
+<h3>Backup manual</h3>
+<pre><code>cd ~/tg-site
+tar -czf backup-$(date +%Y%m%d).tar.gz data/ uploads/</code></pre>
+
+<h3>Backup automático diário (recomendado)</h3>
+<p>Para não depender de lembrar do backup, agende-o com o <code>cron</code>. Crie a pasta de backups e adicione uma tarefa diária às 3h da manhã:</p>
+<pre><code>mkdir -p ~/backups
+(crontab -l 2&gt;/dev/null; echo '0 3 * * * cd ~/tg-site &amp;&amp; tar -czf ~/backups/backup-$(date +\%Y\%m\%d).tar.gz data/ uploads/ &amp;&amp; find ~/backups -name "backup-*.tar.gz" -mtime +14 -delete') | crontab -</code></pre>
+<p>Isso gera um backup por dia em <code>~/backups/</code> e apaga automaticamente os que têm mais de 14 dias. Para conferir se a tarefa foi registrada: <code>crontab -l</code>. Periodicamente, baixe alguns desses arquivos para fora da VM (SCP, Google Drive), caso a VM seja perdida.</p>
+
+<h2 id="resumo">Resumo dos comandos mais usados</h2>
+<table>
+  <thead><tr><th>Ação</th><th>Comando</th></tr></thead>
+  <tbody>
+    <tr><td>Subir o site</td><td><code>docker compose up --build -d</code></td></tr>
+    <tr><td>Reiniciar</td><td><code>docker compose restart</code></td></tr>
+    <tr><td>Parar</td><td><code>docker compose down</code></td></tr>
+    <tr><td>Ver logs</td><td><code>docker compose logs -f</code></td></tr>
+    <tr><td>Ver status</td><td><code>docker compose ps</code></td></tr>
+    <tr><td>Atualizar código</td><td><code>git pull &amp;&amp; docker compose up --build -d</code></td></tr>
+    <tr><td>Backup local</td><td><code>tar -czf backup-$(date +%Y%m%d).tar.gz data/ uploads/</code></td></tr>
+  </tbody>
+</table>
+
+<h2 id="problemas">Contato em caso de problemas</h2>
+<p>Se o site parar de funcionar, verifique nesta ordem:</p>
+<ol>
+  <li><code>docker compose ps</code> — o container está <code>Up</code>?</li>
+  <li><code>docker compose logs -f</code> — há algum erro visível?</li>
+  <li><code>docker compose logs -f caddy</code> — há erro de domínio, DNS ou certificado?</li>
+  <li>O IP da VM mudou? Se você reservou um IP estático na <strong>Parte 2.3</strong>, isso não deve acontecer. Caso ainda esteja com IP efêmero, ele pode mudar quando a VM é parada e reiniciada — reserve um IP estático (VPC Network &gt; Endereços IP externos &gt; Reservar) e atualize os registros DNS do domínio.</li>
+</ol>
+
+<footer class="doc">
+  Site TG — Guia de Deploy · Documento gerado a partir de <code>DEPLOYMENT.md</code>.
+</footer>
+
+</div>
+</body>
+</html>

@@ -1,14 +1,23 @@
 ---
 ---
 <section class="hero-section">
-  <!-- Background photo -->
-  <img
-    src="/images/hero-bg.png"
-    alt=""
-    class="hero-bg"
-    aria-hidden="true"
-  />
+  <!-- Background video -->
+  <div class="hero-bg" aria-hidden="true">
+    <video
+      class="hero-bg__video"
+      data-hero-video
+      autoplay
+      muted
+      loop
+      playsinline
+    >
+      <source src="/videos/video-home-hero.webm" type="video/webm" />
+      <source src="/videos/video-home-hero.mp4" type="video/mp4" />
+    </video>
+  </div>
+  <div class="hero-overlay" aria-hidden="true"></div>
 
+  <!-- Hero headline temporarily hidden — keep for later re-enable (typing animation lives in the commented <script> below)
   <h1
     class="hero-headline"
     aria-label="Aqui tem estratégia, criatividade, inteligência, análise, planejamento e solução"
@@ -20,6 +29,19 @@
       aria-hidden="true"
     >_</span>
   </h1>
+  -->
+
+  <!-- Unmute / mute toggle for the background video -->
+  <button type="button" class="hero-sound" data-hero-sound aria-label="Ativar som do vídeo" aria-pressed="false">
+    <svg class="hero-sound__icon hero-sound__icon--muted" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M11 5 6 9H2v6h4l5 4V5z" fill="currentColor" />
+      <path d="m23 9-6 6M17 9l6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </svg>
+    <svg class="hero-sound__icon hero-sound__icon--on" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M11 5 6 9H2v6h4l5 4V5z" fill="currentColor" />
+      <path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </svg>
+  </button>
 
   <!-- Bottom bar: social icons + address -->
   <div class="hero-footer" data-reveal="up">
@@ -49,6 +71,11 @@
   </button>
 </section>
 
+<!--
+  Hero headline typing animation. The headline <h1> above is currently commented out,
+  so `typedWord`/`cursor` resolve to null and this safely no-ops. Re-enable the <h1>
+  to bring the animation back — no changes needed here.
+-->
 <script>
   const typedWord = document.querySelector<HTMLElement>('[data-hero-typed-word]');
   const cursor = document.querySelector<HTMLElement>('[data-hero-typing-cursor]');
@@ -105,6 +132,27 @@
   }
 </script>
 
+<script>
+  // Background video starts muted (required for autoplay); this toggles sound on/off.
+  const heroVideo = document.querySelector<HTMLVideoElement>('[data-hero-video]');
+  const soundBtn = document.querySelector<HTMLButtonElement>('[data-hero-sound]');
+
+  if (heroVideo && soundBtn) {
+    soundBtn.addEventListener('click', () => {
+      heroVideo.muted = !heroVideo.muted;
+      // If the browser paused playback, make sure it resumes once unmuted.
+      if (!heroVideo.muted) heroVideo.play().catch(() => {});
+
+      soundBtn.classList.toggle('is-on', !heroVideo.muted);
+      soundBtn.setAttribute('aria-pressed', String(!heroVideo.muted));
+      soundBtn.setAttribute(
+        'aria-label',
+        heroVideo.muted ? 'Ativar som do vídeo' : 'Desativar som do vídeo'
+      );
+    });
+  }
+</script>
+
 <style>
   .hero-section {
     position: relative;
@@ -114,14 +162,28 @@
     overflow: hidden;
   }
 
-  /* Background photo */
+  /* Background video */
   .hero-bg {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .hero-bg__video {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
     object-position: center;
+  }
+
+  /* Darkening overlay so the headline stays legible */
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.2);
     pointer-events: none;
   }
 
@@ -274,6 +336,60 @@
 
   .scroll-arrow:hover {
     opacity: 1;
+  }
+
+  /* Sound toggle — bottom-right, above the address */
+  .hero-sound {
+    position: absolute;
+    bottom: 13%;
+    right: 3%;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1), background 0.25s ease;
+  }
+
+  .hero-sound:hover {
+    transform: scale(1.08);
+    background: rgba(0, 0, 0, 0.55);
+  }
+
+  .hero-sound__icon {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+  }
+
+  /* Show the muted icon by default, the sound-on icon once unmuted */
+  .hero-sound__icon--on {
+    display: none;
+  }
+
+  .hero-sound.is-on .hero-sound__icon--muted {
+    display: none;
+  }
+
+  .hero-sound.is-on .hero-sound__icon--on {
+    display: block;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-sound {
+      transition: none;
+    }
+    .hero-sound:hover {
+      transform: none;
+    }
   }
 
   @media (max-width: 768px) {

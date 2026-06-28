@@ -43,7 +43,20 @@ Clique em **Criar instância** e configure:
 
 Clique em **Criar** e aguarde a VM ficar com o status "Em execução" (bolinha verde).
 
-### 2.3 Abrir as portas do site no firewall
+### 2.3 Reservar um IP externo estático
+
+Por padrão, o IP externo da VM é **efêmero** — ele muda se a VM for parada e
+iniciada novamente, o que quebraria o DNS do domínio. Antes de apontar o domínio
+(Parte 8), reserve um IP fixo:
+
+1. No menu lateral, vá em **VPC Network** > **Endereços IP externos**.
+2. Localize o IP da VM `tg-site` na lista, com tipo "Efêmero".
+3. Clique em **Reservar** (ou no menu de três pontos > "Promover para estático").
+4. Dê um nome, por exemplo `tg-site-ip`, e confirme.
+
+A partir daqui, esse é o IP que você usará nos registros DNS na Parte 8.
+
+### 2.4 Abrir as portas do site no firewall
 
 O site roda em Docker Compose com Caddy na frente. O Caddy expõe as portas
 `80` e `443` para o mundo e encaminha o tráfego internamente para a aplicação.
@@ -87,6 +100,30 @@ Deve aparecer algo como `Docker version 26.x.x`.
 ```bash
 sudo apt install -y git
 ```
+
+### 3.5 Criar um arquivo de swap (recomendado em e2-small/e2-micro)
+
+O build do Docker compila módulos nativos (`better-sqlite3`) e roda o build do
+Astro dentro de 2 GB de RAM. Em máquinas pequenas isso pode esgotar a memória e
+fazer o build ser encerrado ("Killed") no meio. Um arquivo de swap de 2 GB evita
+esse problema:
+
+```bash
+sudo fallocate -l 2G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+```
+
+Verificar:
+
+```bash
+free -h
+```
+
+A linha `Swap:` deve mostrar `2.0Gi`. O swap fica ativo automaticamente após
+reinícios da VM.
 
 ---
 
@@ -143,6 +180,7 @@ SITE_DOMAINS=seudominio.com.br, www.seudominio.com.br
 SESSION_COOKIE_SECURE=true
 TRUST_PROXY_HEADERS=true
 UPLOAD_MAX_IMAGE_BYTES=8388608
+UPLOAD_MAX_HTML_BYTES=16777216
 
 SMTP_USER=conta-que-vai-enviar@gmail.com
 SMTP_PASS=xxxx xxxx xxxx xxxx
@@ -155,6 +193,11 @@ CONTACT_TO=onde-chegar-os-emails@seudominio.com.br
 - `SESSION_SECRET` — sequência aleatória longa (ex: abra [passwordsgenerator.net](https://passwordsgenerator.net) e gere 64 caracteres sem símbolos).
 - `SITE_DOMAINS` — coloque o domínio real atendido pelo Caddy, sem `https://`. Exemplo: `seudominio.com.br, www.seudominio.com.br`.
 - `SMTP_USER`, `SMTP_PASS`, `CONTACT_TO` — veja a **Parte 7** (configuração do formulário de contato).
+
+**Campos opcionais (deixe como estão, a menos que precise mudar):**
+
+- `UPLOAD_MAX_IMAGE_BYTES` — tamanho máximo (em bytes) de cada imagem enviada no painel. Padrão: 8 MB.
+- `UPLOAD_MAX_HTML_BYTES` — tamanho máximo (em bytes) de cada arquivo HTML enviado em "Páginas privadas" (veja a **Parte 9**). Como esses arquivos costumam ter imagens embutidas em base64, o padrão é generoso: 16 MB.
 
 Para salvar no `nano`: `Ctrl+O`, Enter, depois `Ctrl+X`.
 
@@ -175,6 +218,11 @@ docker compose ps
 ```
 
 Devem aparecer dois containers com status `Up`: `app` e `caddy`.
+
+Você também verá um terceiro container, `app-permissions`, com status
+`Exited (0)`. **Isso é esperado e correto** — ele é um passo de inicialização que
+ajusta as permissões das pastas de dados e encerra sozinho. Só precisa se
+preocupar se o status dele for diferente de `Exited (0)`.
 
 Para ver os logs em tempo real:
 
@@ -243,7 +291,7 @@ docker compose up --build -d
 
 No painel do seu provedor de domínio (Registro.br, GoDaddy, etc.):
 
-- Crie um registro **A** apontando `@` (raiz) para o **IP externo** da sua VM.
+- Crie um registro **A** apontando `@` (raiz) para o **IP externo estático** da sua VM (o que você reservou na **Parte 2.3**).
 - Crie um registro **A** apontando `www` para o mesmo IP.
 
 Aguarde a propagação (pode levar de alguns minutos até 24 horas).
@@ -300,6 +348,22 @@ Use o `ADMIN_USERNAME` e `ADMIN_PASSWORD` definidos no `.env`.
 > Se quiser alterar o caminho do painel, mude o valor de `ADMIN_PATH` no `.env`
 > e suba o container novamente com `docker compose up --build -d`.
 
+### O que dá para gerenciar no painel
+
+- **Casos / portfólio** — título, descrição e imagens de cada projeto exibido no site.
+- **Recomendações** — depoimentos/testemunhos exibidos no site.
+- **Páginas privadas** — envio de arquivos HTML independentes. Cada um recebe um
+  endereço secreto e aleatório (`/p/<código>`) para enviar a um contato específico.
+  As páginas não são vinculadas em lugar nenhum do site e são marcadas como
+  `noindex` (não aparecem em buscadores).
+
+> **Páginas privadas — observações:** o HTML enviado precisa ser **autossuficiente**
+> (CSS, JS e imagens embutidos no próprio arquivo, como data URIs ou URLs absolutas;
+> caminhos relativos não funcionam). Para alterar uma página, exclua e envie de novo
+> — isso gera um **novo** endereço. Qualquer pessoa com o link consegue ver a página,
+> então trate o link como segredo. O tamanho máximo é controlado por
+> `UPLOAD_MAX_HTML_BYTES` (veja a **Parte 5**).
+
 ---
 
 ## Parte 10 — Operacao e manutencao
@@ -325,6 +389,12 @@ git pull          # (se usar Git)
 docker compose up --build -d
 ```
 
+> **Atualizações do banco de dados são automáticas.** Quando uma nova versão do
+> código muda a estrutura do banco, o app atualiza o arquivo `data/site.db` no
+> lugar, na primeira vez que sobe — **sem perder** casos, recomendações ou páginas
+> já cadastrados. Nenhum passo manual é necessário. Ainda assim, faça um backup
+> (veja abaixo) antes de atualizar, por segurança.
+
 ### Ver logs
 
 ```bash
@@ -337,7 +407,7 @@ O Compose está configurado com `restart: unless-stopped` — o container sobe a
 
 ### Onde ficam os dados?
 
-- **Banco de dados (casos/portfólio):** `~/tg-site/data/site.db`
+- **Banco de dados (casos/portfólio, recomendações e páginas privadas):** `~/tg-site/data/site.db`
 - **Imagens e vídeos enviados:** `~/tg-site/uploads/`
 
 **Faça backup desses dois diretórios regularmente.** Uma forma simples é compactá-los e baixar via SCP ou fazer upload para o Google Drive manualmente. Os dados do site não são apagados ao atualizar o código.
@@ -348,6 +418,21 @@ O Compose está configurado com `restart: unless-stopped` — o container sobe a
 cd ~/tg-site
 tar -czf backup-$(date +%Y%m%d).tar.gz data/ uploads/
 ```
+
+### Backup automático diário (recomendado)
+
+Para não depender de lembrar do backup, agende-o com o `cron`. Crie a pasta de
+backups e adicione uma tarefa diária às 3h da manhã:
+
+```bash
+mkdir -p ~/backups
+(crontab -l 2>/dev/null; echo '0 3 * * * cd ~/tg-site && tar -czf ~/backups/backup-$(date +\%Y\%m\%d).tar.gz data/ uploads/ && find ~/backups -name "backup-*.tar.gz" -mtime +14 -delete') | crontab -
+```
+
+Isso gera um backup por dia em `~/backups/` e apaga automaticamente os que têm
+mais de 14 dias. Para conferir se a tarefa foi registrada: `crontab -l`.
+Periodicamente, baixe alguns desses arquivos para fora da VM (SCP, Google Drive),
+caso a VM seja perdida.
 
 ---
 
@@ -372,5 +457,7 @@ Se o site parar de funcionar, verifique nesta ordem:
 1. `docker compose ps` — o container está `Up`?
 2. `docker compose logs -f` — há algum erro visível?
 3. `docker compose logs -f caddy` — há erro de domínio, DNS ou certificado?
-4. O IP da VM mudou? VMs no Google Cloud podem ter IP externo dinâmico —
-   considere reservar um IP estático (VPC Network > Endereços IP externos > Reservar).
+4. O IP da VM mudou? Se você reservou um IP estático na **Parte 2.3**, isso não
+   deve acontecer. Caso ainda esteja com IP efêmero, ele pode mudar quando a VM é
+   parada e reiniciada — reserve um IP estático (VPC Network > Endereços IP
+   externos > Reservar) e atualize os registros DNS do domínio.
