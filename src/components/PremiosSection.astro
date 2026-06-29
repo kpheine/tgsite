@@ -61,6 +61,11 @@ const { showCta = true, variant = 'home' } = Astro.props;
     min-height: 100svh;
     padding: 5rem 0 5rem 8.4%;
     gap: 4rem;
+    /* The collage's float animation rotates slightly; since the right column
+       bleeds to the viewport edge, the rotation can push a few px past it and
+       trigger a periodic horizontal scrollbar. Clip only the X axis so the
+       vertical float still shows. */
+    overflow-x: clip;
   }
 
   /* ── Left column ─────────────────────────────── */
