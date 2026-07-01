@@ -67,6 +67,17 @@ Admins can upload standalone HTML files in the panel; each gets a secret random 
 - **Keep the sending Gmail account active.** If the account is deleted or the App Password is revoked, contact form emails will silently stop arriving.
 - **Renew the App Password if they change their Google account security settings** (e.g. after a password change or security review, App Passwords may be invalidated).
 
+### Spam protection (no setup or config required)
+
+The contact form has four layers of anti-spam defense, all server-side and invisible to real users:
+
+1. **Honeypot field** — a hidden `website` input; bots that fill it are silently dropped.
+2. **Time trap** — submissions arriving under 3 seconds (or with no JS-set timestamp, i.e. raw POST bots) are silently dropped.
+3. **Content validation** — email format, per-field length caps, and a link-stuffing check on the message.
+4. **Rate limiting** — max 3 submissions / 10 min and 20 / day per IP (enforced in `src/middleware.ts`).
+
+Dropped spam returns a fake success so bots stop retrying; no email is sent. If spam ever gets past these, the next step is adding Cloudflare Turnstile (free, but requires API keys in `.env`).
+
 ### Known limitations to communicate
 
 - **500 emails/day limit** via Gmail SMTP. Effectively unlimited for a contact form.

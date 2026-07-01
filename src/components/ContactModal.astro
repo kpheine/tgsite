@@ -43,6 +43,17 @@ import Modal from './Modal.astro';
           <textarea name="mensagem" placeholder="Mensagem" rows="4"></textarea>
         </label>
 
+        {/* Honeypot: hidden from real users; bots fill it and get silently dropped. */}
+        <div class="contact-modal__hp" aria-hidden="true">
+          <label>
+            Não preencha este campo
+            <input type="text" name="website" tabindex="-1" autocomplete="off" />
+          </label>
+        </div>
+
+        {/* Time trap: stamped by JS on load; server rejects instant submissions. */}
+        <input type="hidden" name="_ts" value="" />
+
         <div class="contact-modal__actions">
           <button class="site-button site-button--gradient contact-modal__submit" type="button" data-state="idle">
             <span class="btn-label">Enviar</span>
@@ -154,6 +165,16 @@ import Modal from './Modal.astro';
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 9px;
+  }
+
+  /* Honeypot — kept in the DOM and accessibility tree out, but visually gone
+     and off the layout. Not display:none, so naive bots still "see" the field. */
+  .contact-modal__hp {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
   }
 
   .contact-modal__field {
@@ -338,6 +359,11 @@ import Modal from './Modal.astro';
   const dialog    = document.getElementById('contact-modal') as HTMLDialogElement;
   const submitBtn = document.querySelector<HTMLButtonElement>('.contact-modal__submit');
   const overlay   = document.querySelector<HTMLElement>('.contact-success-overlay');
+  const tsField   = document.querySelector<HTMLInputElement>('.contact-modal__form input[name="_ts"]');
+
+  // Stamp the moment the form became interactive. A direct POST bot that never
+  // runs this script leaves _ts empty, and the server rejects instant submits.
+  if (tsField) tsField.value = String(Date.now());
 
   function setState(state: 'idle' | 'loading' | 'error') {
     if (!submitBtn) return;
