@@ -90,10 +90,23 @@ const origin = Astro.url.origin;
           </div>
           <div class="admin-case-card__footer">
             <span>Criada em {new Date(page.created_at).toLocaleDateString('pt-BR')}</span>
-            <form method="post" action="/api/panel/shared-pages/delete" data-shared-page-delete-form>
-              <input type="hidden" name="id" value={page.id} />
-              <button class="admin-button admin-button--danger" type="submit">Excluir</button>
-            </form>
+            <div class="admin-shared-page-actions">
+              <form
+                method="post"
+                action="/api/panel/shared-pages/replace"
+                enctype="multipart/form-data"
+                data-shared-page-replace-form
+                data-max-html-bytes={env.uploadMaxHtmlBytes}
+              >
+                <input type="hidden" name="id" value={page.id} />
+                <input type="file" name="file" accept=".html,.htm,text/html" hidden data-replace-input />
+                <button class="admin-button" type="button" data-replace-trigger>Substituir HTML</button>
+              </form>
+              <form method="post" action="/api/panel/shared-pages/delete" data-shared-page-delete-form>
+                <input type="hidden" name="id" value={page.id} />
+                <button class="admin-button admin-button--danger" type="submit">Excluir</button>
+              </form>
+            </div>
           </div>
         </article>
       ))}
@@ -102,6 +115,17 @@ const origin = Astro.url.origin;
 </AdminLayout>
 
 <style>
+  /* These cards only hold a title, link, and actions — let them span two grid tracks
+     and size to their content instead of the default square case-card. */
+  .admin-shared-page-card {
+    aspect-ratio: auto;
+    grid-column: span 2;
+  }
+  @media (max-width: 640px) {
+    .admin-shared-page-card {
+      grid-column: auto;
+    }
+  }
   /* The shared __content grid uses an implicit auto column that grows to the URL's
      max-content width; cap it so the link can scroll/shrink inside the card. */
   .admin-shared-page-card .admin-case-card__content {
@@ -126,5 +150,11 @@ const origin = Astro.url.origin;
   }
   .admin-shared-page-link .admin-support-copy-button {
     flex-shrink: 0;
+  }
+  .admin-shared-page-actions {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 </style>

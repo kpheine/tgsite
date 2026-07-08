@@ -205,9 +205,9 @@ src/
   lib/auth.ts            — admin path helpers, username login/session cookie utilities
   lib/bytes.ts           — shared pure byte label formatter used by server and browser upload code
   lib/db.ts              — SQLite connection, fresh-schema creation, forward-only migration runner (schema v3), env-synced primary admin credentials, support user seeding (`cases`, `imagens_case`, `testimonials`, `shared_pages`)
-  lib/shared-pages.ts    — private shared HTML pages domain logic (token gen, list/get/create/delete)
+  lib/shared-pages.ts    — private shared HTML pages domain logic (token gen, list/get/create/replace/delete)
   pages/p/[token].ts     — public serving route for shared HTML pages (sandboxed, noindex, no-store)
-  pages/api/panel/shared-pages/{create,delete}.ts — admin create/delete endpoints for shared pages
+  pages/api/panel/shared-pages/{create,replace,delete}.ts — admin create/replace/delete endpoints for shared pages
   lib/env.ts             — server env helper for Astro import.meta.env + process.env fallback
   lib/upload-limits.ts   — env-driven admin image size limits
   lib/uploads.ts         — buffered image upload validation and filesystem writes
@@ -268,7 +268,7 @@ one-off HTML to a few contacts. Reuses the existing admin CRUD/auth/rate-limit p
 
 - **Storage:** inline in SQLite `shared_pages` (`id, token, title, html, created_at`) — no files on
   disk. `SharedPageRecord` in `src/lib/db.ts`; domain logic in `src/lib/shared-pages.ts`
-  (`SharedPageError`, `listSharedPages`, `getSharedPageHtml`, `createSharedPage`, `deleteSharedPage`).
+  (`SharedPageError`, `listSharedPages`, `getSharedPageHtml`, `createSharedPage`, `replaceSharedPageHtml`, `deleteSharedPage`).
 - **Token:** `randomBytes(16).toString('base64url')` (~22 chars, 128-bit) with a UNIQUE-collision retry loop.
 - **Serving route:** `src/pages/p/[token].ts` (APIRoute GET) returns the stored HTML with
   `Content-Security-Policy: sandbox allow-scripts`, `X-Robots-Tag: noindex, nofollow, noarchive`,
@@ -278,12 +278,16 @@ one-off HTML to a few contacts. Reuses the existing admin CRUD/auth/rate-limit p
   to admin endpoints. Verified in-browser: `document.cookie` and `localStorage` both throw `SecurityError`.
   No `allow-same-origin`/`allow-forms`/`allow-popups`. Same-domain serving (no subdomain/DNS/Caddy work).
 - **Admin:** `[adminPath]/paginas/index.astro` — upload form (single `.html`, `accept=".html,.htm"`) +
-  list with per-row **copy-link** and **delete**. API: `src/pages/api/panel/shared-pages/create.ts` &
-  `delete.ts` (auto rate-limited via `/api/panel/*`). Lifecycle is **delete only** (no edit — re-upload
-  makes a new URL). Nav link "Páginas privadas" in `AdminLayout.astro`.
+  list with per-row **copy-link**, **Substituir HTML** (replace), and **delete**. API:
+  `src/pages/api/panel/shared-pages/{create,replace,delete}.ts` (auto rate-limited via `/api/panel/*`).
+  **Replace** overwrites `html` for an existing row **keeping the same `id`/`token`** (link unchanged);
+  title is untouched. No in-site editing — replace only swaps the uploaded file. Nav link "Páginas
+  privadas" in `AdminLayout.astro`.
 - **Reused scripts:** copy handler `admin-support-password-copy.ts` broadened to `[data-copy-link]`;
   delete confirm branch added to `admin-case-delete-confirm.ts`; new client size-check
-  `admin-shared-page-upload.ts` (reads `data-max-html-bytes` via `getByteLimit`). Server-side cap is
+  `admin-shared-page-upload.ts` (reads `data-max-html-bytes` via `getByteLimit`); replace flow
+  `admin-shared-page-replace.ts` (hidden file input → `window.confirm` overwrite warning → auto-submit).
+  Server-side cap is
   source of truth: `UPLOAD_MAX_HTML_BYTES` (default 16 MB) in `src/lib/env.ts` (`env.uploadMaxHtmlBytes`).
 - **Constraint:** uploaded HTML must be self-contained (inline or absolute-URL assets); relative paths
   don't resolve in the opaque origin.

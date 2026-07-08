@@ -49,6 +49,16 @@ export function createSharedPage({ title, html }: { title: string; html: string 
   throw new SharedPageError('Não foi possível gerar um link único. Tente novamente.', 500);
 }
 
+export function replaceSharedPageHtml(id: number, html: string): void {
+  if (!Number.isInteger(id)) throw new SharedPageError('Não encontrado', 404);
+
+  const cleanHtml = html.trim();
+  if (!cleanHtml) throw new SharedPageError('O arquivo HTML está vazio.');
+
+  const result = db.prepare('UPDATE shared_pages SET html = ? WHERE id = ?').run(cleanHtml, id);
+  if (result.changes === 0) throw new SharedPageError('Não encontrado', 404);
+}
+
 export function deleteSharedPage(id: number) {
   if (!Number.isInteger(id)) throw new SharedPageError('Não encontrado', 404);
   db.prepare('DELETE FROM shared_pages WHERE id = ?').run(id);
