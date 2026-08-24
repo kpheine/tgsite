@@ -320,12 +320,28 @@ one-off HTML to a few contacts. Reuses the existing admin CRUD/auth/rate-limit p
   (`SharedPageError`, `listSharedPages`, `getSharedPageHtml`, `createSharedPage`, `replaceSharedPageHtml`, `deleteSharedPage`).
 - **Token:** `randomBytes(16).toString('base64url')` (~22 chars, 128-bit) with a UNIQUE-collision retry loop.
 - **Serving route:** `src/pages/p/[token].ts` (APIRoute GET) returns the stored HTML with
-  `Content-Security-Policy: sandbox allow-scripts`, `X-Robots-Tag: noindex, nofollow, noarchive`,
+  `Content-Security-Policy: sandbox allow-scripts allow-popups allow-popups-to-escape-sandbox`,
+  `X-Robots-Tag: noindex, nofollow, noarchive`,
   `Cache-Control: no-store`, `Referrer-Policy: no-referrer`. 404 when the token is unknown.
 - **Security model:** the `CSP: sandbox` header puts each page in an **opaque origin** — uploaded JS
   runs (animations) but **cannot read `tg_admin_session`/`localStorage` or send credentialed requests**
   to admin endpoints. Verified in-browser: `document.cookie` and `localStorage` both throw `SecurityError`.
-  No `allow-same-origin`/`allow-forms`/`allow-popups`. Same-domain serving (no subdomain/DNS/Caddy work).
+  No `allow-same-origin` and no `allow-forms`. Same-domain serving (no subdomain/DNS/Caddy work).
+- **`allow-popups` + `allow-popups-to-escape-sandbox` (added 2026-08-24, bug fix):** without
+  `allow-popups` the browser blocks every `target="_blank"` link and `window.open` outright
+  ("Blocked opening '…' in a new window because the request was made in a sandboxed frame whose
+  'allow-popups' permission is not set"). With `allow-popups` alone the opened tab **inherits the
+  sandbox** — verified in-browser: `origin === 'null'`, cookies and `localStorage` both throw — so
+  external sites load crippled; `allow-popups-to-escape-sandbox` is what makes the new tab a normal
+  page. Neither flag weakens the model: the opener stays in an opaque origin, so it is cross-origin
+  to everything it opens. Verified worst case — a shared page calling
+  `window.open('/canal-de-denuncias')` and probing the handle — every read
+  (`location.href`, `document`, `document.cookie`, `localStorage`) throws `DOMException`.
+- **Same-tab links always worked**: a top-level sandboxed document may navigate itself, so
+  `allow-top-navigation` was never needed and is deliberately not set.
+- **Not a Caddy concern.** `Caddyfile` sets no CSP; it only adds HSTS/`X-Content-Type-Options`/
+  `X-Frame-Options`/`Referrer-Policy`/`Permissions-Policy` and proxies. This header is owned entirely
+  by `src/pages/p/[token].ts`.
 - **Admin:** `[adminPath]/paginas/index.astro` — upload form (single `.html`, `accept=".html,.htm"`) +
   list with per-row **copy-link**, **Substituir HTML** (replace), and **delete**. API:
   `src/pages/api/panel/shared-pages/{create,replace,delete}.ts` (auto rate-limited via `/api/panel/*`).

@@ -25,6 +25,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `src/lib/anti-spam.ts` (honeypot, 3-second time trap, HTML escaping, link counting)
   instead of duplicating them. Contact form behaviour is unchanged.
 
+### Fixed
+- **Links out of private shared pages (`/p/<token>`) no longer fail.** Any
+  `target="_blank"` link or `window.open` was blocked by the page's
+  `Content-Security-Policy: sandbox allow-scripts` header ("Blocked opening '…' in a
+  new window because the request was made in a sandboxed frame whose 'allow-popups'
+  permission is not set"). The header now sends
+  `sandbox allow-scripts allow-popups allow-popups-to-escape-sandbox`. The escape flag
+  is required as well, otherwise the destination site inherits the sandbox and loads
+  with no cookies, no storage and no forms. The isolation guarantee is unchanged: the
+  shared page itself stays in an opaque origin and cannot read anything it opens.
+
 ### Notes
 - Reports carry no IP address, no browser information, and no reply address, so an
   anonymous report cannot be traced or replied to. The neutral subject line

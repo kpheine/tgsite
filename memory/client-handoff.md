@@ -42,6 +42,9 @@ Admins can upload standalone HTML files in the panel; each gets a secret random 
 
 - Uploaded HTML must be **self-contained**: inline CSS/JS and images as data URIs or absolute
   URLs. Relative asset paths will not resolve (pages run in an isolated/opaque origin).
+- **Links to external sites work**, both in the same tab and with `target="_blank"`. HTML forms
+  inside a shared page are still blocked by the sandbox — if a page needs to collect input, it has
+  to link out to a form hosted elsewhere.
 - To change a page, delete it and upload again — this produces a **new** URL.
 - Anyone with the link can view the page; treat the link as the secret.
 
