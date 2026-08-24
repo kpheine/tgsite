@@ -127,8 +127,8 @@ file" through the MCP, so the bubble art was supplied by the user as a PNG inste
   collapsing at 1024px), standard `#030303` + `degrade-pixels.png` background, "Aqui tem" gradient
   span + white "respeito.", explanatory copy, the código de conduta download CTA, 3D speech-bubble
   art (`/images/denuncias/dialog-gradient.png`, on `.blob-float`), and the white report form card.
-- **Deliberately NOT in the header nav** — the user asked for the page to work first. Adding it means
-  one `<a>` in `Header.astro`.
+- **Linked from the header nav** as "Canal de denúncias" (added after the page shipped). Adding the
+  fourth link forced the nav breakpoint change below.
 - **Top padding is 160px, not the usual 100px**: the sticky `Header` is 120px tall with
   `margin-bottom: -120px`, so page content sits behind it and the first line needs the clearance.
 - Download CTA serves `public/docs/codigo-de-conduta.pdf` — the first static document on the site, so
@@ -145,6 +145,19 @@ file" through the MCP, so the bubble art was supplied by the user as a PNG inste
 - Gotcha found while testing: `ContactModal` also has a `textarea[name="mensagem"]` and renders on
   every page via `Header`, so a bare `document.querySelector('textarea[name="mensagem"]')` hits the
   modal's, not this page's. Scope form queries to `.denuncia-form`.
+
+## Header nav breakpoint (changed 2026-08-24)
+
+`Header.astro`'s overlay menu now takes over at **`max-width: 1080px`**, not 768px. With four nav
+links the row needs ~1036px between the logo and the actions; below that the links wrapped and the
+nav collided with the Contato button. The three-link nav used to fit down to 768px, so this
+threshold moved when "Canal de denúncias" was added.
+
+- The `.btn-contato` / `.whatsapp-link img` shrink rules were **split out into their own
+  `max-width: 768px` block** so tablets keep the full-size button and icon exactly as before.
+- Measure before adding a fifth link: natural nav width = sum of link widths + `gap` × (n − 1), and
+  required viewport ≈ (logo + actions + nav + 2 × breathing) / (1 − 0.0568) — the `0.0568` is the
+  `header-inner` 2.84% padding on both sides.
 
 ## Git Workflow Preference
 

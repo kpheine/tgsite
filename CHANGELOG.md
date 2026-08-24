@@ -10,13 +10,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   ethics channel where colaboradores, clientes, fornecedores and parceiros can send a
   report anonymously or identified. Includes a "Baixar o código de conduta" download
   (`public/docs/codigo-de-conduta.pdf`) and a report form posting to a new
-  `POST /api/denuncia` endpoint. The page is **not yet linked from the header nav** —
-  it is reachable by direct URL only.
+  `POST /api/denuncia` endpoint, and is linked from the header nav as
+  "Canal de denúncias".
 - **`DENUNCIA_TO` env var** — restricted recipient for reports; falls back to
   `CONTACT_TO` when unset. Reuses the existing Gmail App Password, so the client needs
   no second email account. See `memory/client-handoff.md`.
 
 ### Changed
+- **Header nav collapses to the overlay menu at 1080px instead of 768px.** The fourth
+  nav link needs ~1036px to sit on one row; below that the links wrapped into the
+  Contato button. The Contato button and WhatsApp icon keep their original 768px
+  sizing rules.
 - Contact and denúncia endpoints now share their anti-spam primitives through
   `src/lib/anti-spam.ts` (honeypot, 3-second time trap, HTML escaping, link counting)
   instead of duplicating them. Contact form behaviour is unchanged.
