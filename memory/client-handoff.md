@@ -83,3 +83,44 @@ Dropped spam returns a fake success so bots stop retrying; no email is sent. If 
 - **500 emails/day limit** via Gmail SMTP. Effectively unlimited for a contact form.
 - **Spam folder risk** — the first few emails may be flagged as spam by the recipient's mail provider, especially corporate Exchange/Outlook inboxes. Recommend the client add the sending address to their contacts and check spam initially.
 - **No delivery receipts** — the system fires and forgets. If an email fails to send (e.g. wrong SMTP credentials), the user currently sees an error state on the form but no retry mechanism exists.
+
+## Canal de Denúncias — Report Channel (`/canal-de-denuncias`)
+
+A public whistleblower page where employees, clients, suppliers and partners can send a report
+anonymously or identified. It is **not linked from the site navigation yet** — the page is reachable
+only by its direct URL until the client asks for a menu entry.
+
+### One-time setup the client must perform
+
+1. **Decide who receives reports.** This should be a restricted mailbox (compliance, HR, or a
+   director) — not the general contact inbox, since reports may concern staff.
+2. **Set it in `.env`:**
+   ```
+   DENUNCIA_TO=denuncias@yourdomain.com
+   ```
+   If `DENUNCIA_TO` is left unset, reports fall back to `CONTACT_TO`.
+3. **No second email account is needed.** The channel reuses the same `SMTP_USER` / `SMTP_PASS`
+   Gmail App Password already configured for the contact form.
+
+### The código de conduta download
+
+The "Baixar o código de conduta" button serves `public/docs/codigo-de-conduta.pdf`. To publish a new
+revision, replace that file (keeping the same name) and restart the container — no code change is
+required.
+
+### Anonymity — what the client should know
+
+- Reports carry **no IP address, no browser information, and no reply address**. A report sent
+  without filling the optional "Quer se identificar?" field genuinely cannot be traced back from the
+  email that arrives.
+- Because there is no reply address, **an anonymous report cannot be answered.** If the client needs
+  to follow up, the reporter must have identified themselves or left contact details in the message
+  body.
+- The email subject is always the neutral "Nova denúncia pelo site" — no part of the report appears
+  in notification previews on a phone or desktop.
+
+### Spam protection (no setup or config required)
+
+The same four layers as the contact form: honeypot, 3-second time trap, content validation, and
+per-IP rate limiting at 3 reports / 10 minutes and 20 / day. The rate limiter holds IPs in memory
+only; nothing is written to disk and nothing is logged.

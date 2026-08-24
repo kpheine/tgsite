@@ -71,4 +71,5 @@ export const env = {
   smtpUser: readEnv('SMTP_USER'),
   smtpPass: readEnv('SMTP_PASS'),
   contactTo: readEnv('CONTACT_TO'),
+  denunciaTo: readEnv('DENUNCIA_TO'),
 };

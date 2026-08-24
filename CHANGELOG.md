@@ -3,6 +3,31 @@
 All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+
+### Added
+- **Canal de Denúncias page** (`/canal-de-denuncias`) — a public whistleblower and
+  ethics channel where colaboradores, clientes, fornecedores and parceiros can send a
+  report anonymously or identified. Includes a "Baixar o código de conduta" download
+  (`public/docs/codigo-de-conduta.pdf`) and a report form posting to a new
+  `POST /api/denuncia` endpoint. The page is **not yet linked from the header nav** —
+  it is reachable by direct URL only.
+- **`DENUNCIA_TO` env var** — restricted recipient for reports; falls back to
+  `CONTACT_TO` when unset. Reuses the existing Gmail App Password, so the client needs
+  no second email account. See `memory/client-handoff.md`.
+
+### Changed
+- Contact and denúncia endpoints now share their anti-spam primitives through
+  `src/lib/anti-spam.ts` (honeypot, 3-second time trap, HTML escaping, link counting)
+  instead of duplicating them. Contact form behaviour is unchanged.
+
+### Notes
+- Reports carry no IP address, no browser information, and no reply address, so an
+  anonymous report cannot be traced or replied to. The neutral subject line
+  ("Nova denúncia pelo site") keeps report content out of notification previews.
+- The denúncia endpoint is rate limited at 3 reports / 10 minutes and 20 / day per IP,
+  matching the contact form.
+
 ## [1.1.0] — 2026-07-13
 
 ### Added
