@@ -436,6 +436,111 @@ caso a VM seja perdida.
 
 ---
 
+## Atualização 1.2.0 — Canal de Denúncias (25/08/2026)
+
+Esta seção descreve **apenas** o que muda nesta atualização. O procedimento geral
+de atualização está na **Parte 10**.
+
+### O que vem nesta versão
+
+- **Nova página `/canal-de-denuncias`** — canal público onde colaboradores,
+  clientes, fornecedores e parceiros podem enviar um relato de forma anônima ou
+  identificada. Já aparece no menu do topo do site como "Canal de denúncias".
+- **Download do código de conduta** — o PDF já vem junto com o código, em
+  `public/docs/codigo-de-conduta.pdf`. Não é preciso enviar nada pelo painel.
+- **Correção nas páginas privadas (`/p/<link secreto>`)** — links que abrem em
+  nova aba (`target="_blank"`) dentro dessas páginas estavam sendo bloqueados
+  pelo navegador. Agora funcionam normalmente.
+
+### Passo 1 — Backup (recomendado)
+
+```bash
+cd ~/tg-site
+tar -czf backup-$(date +%Y%m%d).tar.gz data/ uploads/
+```
+
+### Passo 2 — Baixar o código novo
+
+```bash
+cd ~/tg-site
+git pull
+```
+
+> Se você recebeu o projeto como **.zip** em vez de Git: descompacte a nova versão
+> por cima da pasta do projeto, **sem apagar** as pastas `data/` e `uploads/` nem
+> o arquivo `.env` — é onde ficam os seus dados e as suas senhas.
+
+### Passo 3 — Adicionar a variável `DENUNCIA_TO` no `.env`
+
+Este é o **único passo manual** desta atualização. O `git pull` nunca altera o seu
+arquivo `.env`, então a nova linha precisa ser adicionada por você:
+
+```bash
+nano .env
+```
+
+Acrescente ao final do arquivo:
+
+```
+DENUNCIA_TO=denuncias@seudominio.com.br
+```
+
+Para salvar: `Ctrl+O`, Enter, depois `Ctrl+X`.
+
+**Escolha bem esse endereço.** Ele é quem vai receber as denúncias, e os relatos
+podem envolver funcionários da própria empresa — por isso o indicado é uma caixa
+restrita (compliance, RH ou uma diretoria), e **não** o mesmo e-mail que recebe os
+contatos comerciais do site.
+
+- Não é preciso criar uma nova conta de e-mail nem uma nova Senha de App: o canal
+  usa o mesmo `SMTP_USER` / `SMTP_PASS` que o formulário de contato já usa.
+- Se você deixar essa linha de fora, o site continua funcionando, mas as denúncias
+  vão para o endereço do `CONTACT_TO` (a caixa de contato geral).
+
+### Passo 4 — Subir a nova versão
+
+```bash
+docker compose up --build -d
+```
+
+O comando pode demorar alguns minutos na primeira vez, porque o site é
+reconstruído. O site fica fora do ar por poucos segundos no final.
+
+### Passo 5 — Conferir se deu certo
+
+1. Abra `https://seudominio.com.br/canal-de-denuncias` — a página deve carregar.
+2. Confira se "Canal de denúncias" aparece no menu do topo.
+3. Clique em **"Baixar o código de conduta"** — o PDF deve baixar.
+4. Envie uma mensagem de teste pelo formulário e confirme que ela chegou no
+   e-mail que você colocou em `DENUNCIA_TO`.
+5. Se você usa **Páginas privadas**: abra uma delas e clique em um link que
+   aponte para fora do site — deve abrir normalmente em uma nova aba.
+
+Se algo não funcionar, veja os logs com `docker compose logs -f`.
+
+### Perguntas frequentes
+
+**Vou perder os cases, recomendações ou páginas privadas já cadastrados?**
+Não. Esta atualização não altera a estrutura do banco de dados, e as pastas
+`data/` e `uploads/` não são tocadas pelo `git pull`.
+
+**Preciso mexer em DNS, domínio ou certificado?**
+Não. Nada muda no Caddy nem no HTTPS.
+
+**Preciso rodar algum comando de banco de dados?**
+Não. Nenhuma migração é necessária nesta versão.
+
+**Como troco o PDF do código de conduta depois?**
+Substitua o arquivo `public/docs/codigo-de-conduta.pdf` (mantendo o mesmo nome) e
+rode `docker compose up --build -d` de novo.
+
+**As denúncias anônimas podem ser respondidas?**
+Não. O sistema não guarda endereço de IP, dados do navegador nem e-mail de
+resposta de quem envia — é isso que garante o anonimato. Se a pessoa não se
+identificar no campo opcional, não há como responder nem rastrear.
+
+---
+
 ## Resumo dos comandos mais usados
 
 | Acao | Comando |
