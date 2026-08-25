@@ -84,15 +84,35 @@ function routeLimits(pathname: string, method: string) {
   return null;
 }
 
+// Astro only falls through to src/pages/404.astro when no route handles the
+// request at all. Several routes answer with a bare 404 Response instead — most
+// of all the one-segment [adminPath] route, which matches every `/whatever` and
+// so swallows the 404 page for the entire site. Rewriting here catches all of
+// them in one place, including /p/<token> and future routes.
+function wantsHtml404(context: { request: Request; url: URL }, response: Response) {
+  if (response.status !== 404) return false;
+  if (context.request.method !== 'GET') return false;
+  // Keep API clients on JSON/plain bodies, and never rewrite the 404 page onto
+  // itself (that would loop, since it answers with a 404 status by design).
+  if (context.url.pathname.startsWith('/api/')) return false;
+  if (context.url.pathname === '/404') return false;
+  // An <img>/fetch for a missing upload should stay a bare 404; only a browser
+  // navigation asks for HTML.
+  return (context.request.headers.get('accept') || '').includes('text/html');
+}
+
 export const onRequest = defineMiddleware(async (context, next) => {
   const pathname = context.url.pathname;
   const limits = routeLimits(pathname, context.request.method);
-  if (!limits) return next();
 
-  const ip = clientIp(context.request, context.clientAddress);
-  const result = checkRateLimit(`${limits.scope}:${ip}`, limits.rules);
+  if (limits) {
+    const ip = clientIp(context.request, context.clientAddress);
+    const result = checkRateLimit(`${limits.scope}:${ip}`, limits.rules);
 
-  if (!result.allowed) return rateLimitResponse(context.request, pathname, result.retryAfterSeconds);
+    if (!result.allowed) return rateLimitResponse(context.request, pathname, result.retryAfterSeconds);
+  }
 
-  return next();
+  const response = await next();
+
+  return wantsHtml404(context, response) ? context.rewrite('/404') : response;
 });

@@ -146,6 +146,31 @@ file" through the MCP, so the bubble art was supplied by the user as a PNG inste
   every page via `Header`, so a bare `document.querySelector('textarea[name="mensagem"]')` hits the
   modal's, not this page's. Scope form queries to `.denuncia-form`.
 
+## Custom 404 page (added 2026-08-25)
+
+`src/pages/404.astro` — branded error page reusing the site shell (Header +
+ContatoFooter), the `#030303` + `degrade-pixels.png` background, and the site-wide
+"Aqui tem…" headline motif, inverted to **"Aqui não tem essa página."** Sets
+`Astro.response.status = 404` so it is a real 404, not a soft one.
+
+- **The gotcha that made it necessary:** Astro only falls through to `404.astro` when
+  *no* route handles the request. The one-segment `[adminPath]` route matches every
+  `/whatever`, and each `[adminPath]/**` page answers a wrong path with
+  `new Response('Não encontrado', { status: 404 })` — a handled response. So before
+  this change every mistyped URL on the site returned that bare text, and `404.astro`
+  alone would never have rendered.
+- **Fix lives in `src/middleware.ts`**, not in the ~10 admin routes: after `next()`,
+  any 404 that is a GET, outside `/api/`, not already `/404`, and whose `Accept`
+  includes `text/html` is rewritten with `context.rewrite('/404')`. That also upgrades
+  `/p/<token>` and `/uploads/*` misses, and covers future routes for free.
+- Guards worth keeping: the `/404` check prevents a rewrite loop (the page answers
+  with a 404 status by design), and the `Accept` check keeps `<img>`/fetch misses on
+  a bare 404 body instead of serving them an HTML page.
+- Verified on the **production build** (`node dist/server/entry.mjs`), not just dev —
+  SSR 404 routing can differ between the two.
+- Section is `align-items: flex-start`, not centred: centring let tall content
+  overflow upward under the 120px sticky header on short viewports.
+
 ## Header nav breakpoint (changed 2026-08-24)
 
 `Header.astro`'s overlay menu now takes over at **`max-width: 1080px`**, not 768px. With four nav
