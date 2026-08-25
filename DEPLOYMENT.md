@@ -448,6 +448,9 @@ de atualização está na **Parte 10**.
   identificada. Já aparece no menu do topo do site como "Canal de denúncias".
 - **Download do código de conduta** — o PDF já vem junto com o código, em
   `public/docs/codigo-de-conduta.pdf`. Não é preciso enviar nada pelo painel.
+- **Página de erro personalizada** — endereços digitados errado agora mostram uma
+  página do site, com o menu e um caminho de volta, em vez de uma tela em branco
+  escrito "Não encontrado".
 - **Correção nas páginas privadas (`/p/<link secreto>`)** — links que abrem em
   nova aba (`target="_blank"`) dentro dessas páginas estavam sendo bloqueados
   pelo navegador. Agora funcionam normalmente.
