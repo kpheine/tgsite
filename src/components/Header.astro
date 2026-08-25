@@ -11,6 +11,7 @@ import ContactModal from './ContactModal.astro';
       <a href="/#cases">Cases</a>
       <a href="/sobre">Nossa história</a>
       <a href="/wpi">Conexão global</a>
+      <a href="/canal-de-denuncias">Canal de denúncias</a>
     </nav>
 
     <div class="header-actions">
@@ -176,7 +177,9 @@ import ContactModal from './ContactModal.astro';
     transform: translateY(-7px) rotate(-45deg);
   }
 
-  @media (max-width: 768px) {
+  /* The four nav links need ~1036px to sit on one row between the logo and the
+     actions, so the overlay menu takes over below that — not at 768px. */
+  @media (max-width: 1080px) {
     .nav {
       display: none;
       position: fixed;
@@ -203,7 +206,9 @@ import ContactModal from './ContactModal.astro';
       display: flex;
       z-index: 201;
     }
+  }
 
+  @media (max-width: 768px) {
     .btn-contato {
       --site-button-padding: 0.7rem 1.5rem;
       --site-button-font-size: 0.9rem;

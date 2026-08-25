@@ -13,6 +13,11 @@ const CONTACT_LIMITS: RateLimitRule[] = [
   { name: 'contact-day', limit: 20, windowMs: 24 * 60 * 60_000 },
 ];
 
+const DENUNCIA_LIMITS: RateLimitRule[] = [
+  { name: 'denuncia-10m', limit: 3, windowMs: 10 * 60_000 },
+  { name: 'denuncia-day', limit: 20, windowMs: 24 * 60 * 60_000 },
+];
+
 const ADMIN_WRITE_LIMITS: RateLimitRule[] = [
   { name: 'admin-write-minute', limit: 60, windowMs: 60_000 },
 ];
@@ -42,7 +47,7 @@ function clientIp(request: Request, directAddress: string | undefined) {
 async function rateLimitResponse(request: Request, pathname: string, retryAfterSeconds: number) {
   const headers = { 'Retry-After': String(retryAfterSeconds) };
 
-  if (pathname === '/api/contact') {
+  if (pathname === '/api/contact' || pathname === '/api/denuncia') {
     return Response.json(
       { error: 'Muitas tentativas. Tente novamente em alguns minutos.' },
       { status: 429, headers },
@@ -70,6 +75,7 @@ async function rateLimitResponse(request: Request, pathname: string, retryAfterS
 function routeLimits(pathname: string, method: string) {
   if (method !== 'POST') return null;
   if (pathname === '/api/contact') return { scope: 'contact', rules: CONTACT_LIMITS };
+  if (pathname === '/api/denuncia') return { scope: 'denuncia', rules: DENUNCIA_LIMITS };
   if (pathname === '/api/panel/login') return { scope: 'login', rules: LOGIN_LIMITS };
   if (pathname.startsWith('/api/panel/') && pathname !== '/api/panel/logout') {
     return { scope: 'admin-write', rules: ADMIN_WRITE_LIMITS };

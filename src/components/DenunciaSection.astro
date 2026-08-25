@@ -1,0 +1,559 @@
+---
+---
+
+<section class="denuncia">
+  <div class="denuncia__inner">
+    <div class="denuncia__left" data-reveal-stagger>
+      <p class="denuncia__eyebrow" data-reveal="up">Canal de denúncias</p>
+
+      <h1 class="denuncia__title" data-reveal="up">
+        <span class="denuncia__title-gradient">Aqui tem </span>respeito.
+      </h1>
+
+      <p class="denuncia__lead" data-reveal="up">
+        Acreditamos que relações saudáveis começam com confiança, ética e responsabilidade.
+      </p>
+
+      <div class="denuncia__body" data-reveal="up">
+        <p>
+          Por isso, disponibilizamos este canal para que colaboradores, clientes, fornecedores e
+          parceiros possam relatar, de forma anônima ou identificada, qualquer situação incompatível
+          com nossos valores ou com a legislação.
+        </p>
+        <p>
+          Este é um espaço seguro, aberto e respeitoso, livre de preconceitos ou discriminação.
+          Todas as manifestações são recebidas com confidencialidade, analisadas com imparcialidade
+          e tratadas com seriedade e responsabilidade.
+        </p>
+        <p>Falar também é uma forma de construir um ambiente melhor para todos.</p>
+      </div>
+    </div>
+
+    <div class="denuncia__right" data-reveal-stagger>
+      <div class="denuncia__bubbles" data-reveal="right">
+        <img
+          src="/images/denuncias/dialog-gradient.png"
+          alt=""
+          aria-hidden="true"
+          width="562"
+          height="400"
+          class="blob-float"
+        />
+      </div>
+
+      <a
+        href="/docs/codigo-de-conduta.pdf"
+        download
+        class="site-button site-button--gradient denuncia__download"
+        data-reveal="up"
+      >
+        Baixar o código de conduta
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M12 3v13" />
+          <path d="m6 12 6 6 6-6" />
+          <path d="M4 21h16" />
+        </svg>
+      </a>
+
+      <div class="denuncia-card" data-reveal="up">
+        <form class="denuncia-form">
+          <label class="denuncia-form__field">
+            <span class="sr-only">Identificação (opcional)</span>
+            <input
+              type="text"
+              name="identificacao"
+              maxlength="120"
+              placeholder="Quer se identificar? (opcional)"
+              autocomplete="off"
+            />
+          </label>
+
+          <label class="denuncia-form__field">
+            <span class="sr-only">Mensagem</span>
+            <textarea
+              name="mensagem"
+              rows="7"
+              maxlength="4000"
+              placeholder="Insira sua mensagem aqui:"></textarea>
+          </label>
+
+          {/* Honeypot: hidden from real users; bots fill it and get silently dropped. */}
+          <div class="denuncia-form__hp" aria-hidden="true">
+            <label>
+              Não preencha este campo
+              <input type="text" name="website" tabindex="-1" autocomplete="off" />
+            </label>
+          </div>
+
+          {/* Time trap: stamped by JS on load; server rejects instant submissions. */}
+          <input type="hidden" name="_ts" value="" />
+
+          <button class="site-button denuncia-form__submit" type="button" data-state="idle">
+            <span class="btn-label">Enviar</span>
+            <span class="btn-loading" aria-hidden="true">
+              <span class="btn-spinner"></span>
+              Enviando...
+            </span>
+            <span class="btn-empty" aria-live="polite">✕ Escreva sua mensagem</span>
+            <span class="btn-error" aria-live="polite">✕ Algo deu errado</span>
+          </button>
+        </form>
+
+        <div class="denuncia-success" aria-hidden="true">
+          <svg
+            class="denuncia-success__check"
+            viewBox="0 0 64 64"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle cx="32" cy="32" r="31" stroke="white" stroke-width="2" stroke-opacity="0.3" />
+            <polyline
+              points="18,33 28,43 46,22"
+              stroke="white"
+              stroke-width="4"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <p class="denuncia-success__label">Enviado!</p>
+          <p class="denuncia-success__note">Sua mensagem foi recebida com confidencialidade.</p>
+          <button type="button" class="denuncia-success__again">Enviar outra mensagem</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .denuncia {
+    background-color: #030303;
+    background-image: url('/images/degrade-pixels.png');
+    background-size: auto;
+    background-repeat: repeat-x;
+    background-position: 0 center;
+    background-blend-mode: hard-light;
+    animation: bg-pan-x 240s linear infinite reverse;
+    width: 100%;
+    min-height: 100svh;
+    /* Extra top padding clears the 120px sticky header, which sits over the page
+       via its own negative margin. */
+    padding: 160px 165px 100px;
+  }
+
+  .denuncia__inner {
+    display: grid;
+    grid-template-columns: 1fr 1.15fr;
+    gap: clamp(2.5rem, 6vw, 7.5rem);
+    align-items: start;
+  }
+
+  /* ─── Left column ─────────────────────────────────────────────────────── */
+  .denuncia__left {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .denuncia__eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.1rem, 1.5vw, 1.75rem);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #fff;
+    margin: 0;
+  }
+
+  .denuncia__title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 5.6vw, 6.7rem);
+    line-height: 0.95;
+    color: #fff;
+    margin: 0.35em 0 0;
+  }
+
+  .denuncia__title-gradient {
+    background: linear-gradient(90deg, #ea0e81 0%, #a343cb 50%, #216ef2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .denuncia__lead {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.3rem, 2vw, 2.15rem);
+    line-height: 1.25;
+    color: #fff;
+    margin: clamp(1.75rem, 3vw, 3rem) 0 0;
+    max-width: 32ch;
+  }
+
+  .denuncia__body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5em;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: clamp(1rem, 1.35vw, 1.5rem);
+    line-height: 1.5;
+    color: #e9e9e9;
+    margin-top: clamp(2rem, 3.5vw, 3.5rem);
+  }
+
+  .denuncia__body p {
+    margin: 0;
+  }
+
+  /* ─── Right column ────────────────────────────────────────────────────── */
+  .denuncia__right {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1.5rem, 2.5vw, 2.5rem);
+  }
+
+  .denuncia__bubbles {
+    align-self: flex-end;
+    width: clamp(200px, 24vw, 430px);
+  }
+
+  .denuncia__bubbles img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .denuncia__download {
+    align-self: flex-start;
+    gap: 0.85em;
+    --site-button-padding: 1.05rem 2.4rem;
+    --site-button-font-size: clamp(0.95rem, 1.15vw, 1.3rem);
+  }
+
+  .denuncia__download svg {
+    width: 1.35em;
+    height: 1.35em;
+    flex-shrink: 0;
+  }
+
+  /* ─── Form card ───────────────────────────────────────────────────────── */
+  .denuncia-card {
+    position: relative;
+    background: #fff;
+    border-radius: 30px;
+    padding: clamp(1.75rem, 3vw, 3.4rem);
+  }
+
+  .denuncia-form {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.85rem, 1.4vw, 1.35rem);
+  }
+
+  .denuncia-form__field {
+    display: block;
+  }
+
+  .denuncia-form__field input,
+  .denuncia-form__field textarea {
+    width: 100%;
+    border: 0;
+    border-radius: 8px;
+    background: #d9d9d9;
+    padding: 0.9rem 1.1rem;
+    font: 400 clamp(0.95rem, 1.05vw, 1.15rem)/1.5 'Inter', system-ui, sans-serif;
+    color: #1b1b1b;
+  }
+
+  .denuncia-form__field textarea {
+    resize: vertical;
+    min-height: 9.5rem;
+  }
+
+  .denuncia-form__field input::placeholder,
+  .denuncia-form__field textarea::placeholder {
+    color: #5b6b8c;
+  }
+
+  .denuncia-form__field input:focus-visible,
+  .denuncia-form__field textarea:focus-visible {
+    outline: 2px solid #3157d6;
+    outline-offset: 2px;
+  }
+
+  /* Honeypot — kept in the DOM and out of the accessibility tree, but visually
+     gone and off the layout. Not display:none, so naive bots still fill it. */
+  .denuncia-form__hp {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Submit — the mockup uses a filled pill, unlike the site's outline CTA, so
+     .site-button supplies shape/typography and the fill is overridden here. */
+  .denuncia-form__submit {
+    align-self: flex-start;
+    width: min(100%, 345px);
+    margin-top: 0.35rem;
+    background: linear-gradient(90deg, #ec148f 0%, #7b3fbf 50%, #3157d6 100%);
+    --site-button-padding: 1.05rem 2.4rem;
+    --site-button-font-size: clamp(0.95rem, 1.15vw, 1.3rem);
+  }
+
+  /* Hide every state's content by default; the active one is shown below. */
+  .btn-label,
+  .btn-loading,
+  .btn-empty,
+  .btn-error {
+    display: none;
+  }
+
+  .denuncia-form__submit[data-state='idle'] .btn-label {
+    display: inline;
+  }
+
+  .denuncia-form__submit[data-state='loading'] .btn-loading {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .denuncia-form__submit[data-state='loading'] {
+    pointer-events: none;
+    opacity: 0.8;
+  }
+
+  .denuncia-form__submit[data-state='empty'] .btn-empty {
+    display: inline;
+  }
+
+  .denuncia-form__submit[data-state='error'] .btn-error {
+    display: inline;
+  }
+
+  .denuncia-form__submit[data-state='empty'],
+  .denuncia-form__submit[data-state='error'] {
+    background: linear-gradient(135deg, #7a1a2a, #c0302b);
+  }
+
+  .btn-spinner {
+    width: 15px;
+    height: 15px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #fff;
+    border-radius: 50%;
+    flex-shrink: 0;
+    animation: denuncia-spin 0.7s linear infinite;
+  }
+
+  @keyframes denuncia-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* ─── Success overlay ─────────────────────────────────────────────────── */
+  .denuncia-success {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    padding: clamp(1.5rem, 3vw, 3rem);
+    border-radius: inherit;
+    background: linear-gradient(135deg, #0a3d24 0%, #1a7a4a 100%);
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 300ms ease;
+  }
+
+  .denuncia-success.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .denuncia-success__check {
+    width: 80px;
+    height: 80px;
+  }
+
+  .denuncia-success__label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 4vw, 4rem);
+    letter-spacing: 0.02em;
+    color: #fff;
+    margin: 0;
+  }
+
+  .denuncia-success__note {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(0.95rem, 1.05vw, 1.15rem);
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0;
+    max-width: 32ch;
+  }
+
+  .denuncia-success__again {
+    border: 0;
+    background: transparent;
+    padding: 0.25rem;
+    color: #fff;
+    cursor: pointer;
+    font: 600 clamp(0.9rem, 1vw, 1.05rem)/1 'Inter', system-ui, sans-serif;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .denuncia-success__again:hover {
+    color: var(--color-accent);
+  }
+
+  /* ─── Responsive ──────────────────────────────────────────────────────── */
+  @media (max-width: 1024px) {
+    .denuncia {
+      padding: 160px 5rem 4.5rem;
+    }
+
+    .denuncia__inner {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+
+    .denuncia__lead {
+      max-width: none;
+    }
+
+    .denuncia__bubbles {
+      align-self: center;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .denuncia {
+      padding: 9rem 1.5rem 3.5rem;
+    }
+
+    .denuncia__inner {
+      gap: 2.5rem;
+    }
+
+    .denuncia-form__submit {
+      width: 100%;
+    }
+
+    .denuncia__download {
+      align-self: stretch;
+      /* Tighter metrics so the long label stays on one line at 390px. */
+      --site-button-padding: 1rem 1.25rem;
+      --site-button-font-size: 0.9rem;
+      gap: 0.6em;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .denuncia {
+      animation: none;
+    }
+
+    .denuncia-success {
+      transition: none;
+    }
+
+    .btn-spinner {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('.denuncia-form');
+  const submitBtn = document.querySelector<HTMLButtonElement>('.denuncia-form__submit');
+  const overlay = document.querySelector<HTMLElement>('.denuncia-success');
+  const againBtn = document.querySelector<HTMLButtonElement>('.denuncia-success__again');
+  const tsField = form?.querySelector<HTMLInputElement>('input[name="_ts"]');
+
+  // Stamp the moment the form became interactive. A direct POST bot that never
+  // runs this script leaves _ts empty, and the server rejects instant submits.
+  function stampTimestamp() {
+    if (tsField) tsField.value = String(Date.now());
+  }
+
+  stampTimestamp();
+
+  function setState(state: 'idle' | 'loading' | 'empty' | 'error') {
+    if (!submitBtn) return;
+    submitBtn.dataset.state = state;
+    submitBtn.disabled = state === 'loading';
+  }
+
+  function flashState(state: 'empty' | 'error') {
+    setState(state);
+    setTimeout(() => setState('idle'), 3000);
+  }
+
+  againBtn?.addEventListener('click', () => {
+    overlay?.classList.remove('is-visible');
+    overlay?.setAttribute('aria-hidden', 'true');
+    setState('idle');
+  });
+
+  submitBtn?.addEventListener('click', async () => {
+    if (!form) return;
+
+    const data = Object.fromEntries(new FormData(form)) as Record<string, string>;
+
+    if (!String(data.mensagem || '').trim()) {
+      flashState('empty');
+      form.querySelector<HTMLTextAreaElement>('textarea[name="mensagem"]')?.focus();
+      return;
+    }
+
+    setState('loading');
+
+    try {
+      const res = await fetch('/api/denuncia', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) throw new Error('send failed');
+
+      overlay?.classList.add('is-visible');
+      overlay?.setAttribute('aria-hidden', 'false');
+      form.reset();
+      // The form stays mounted behind the overlay, so restart the time trap for
+      // whoever sends a second report.
+      stampTimestamp();
+      setState('idle');
+    } catch {
+      flashState('error');
+    }
+  });
+</script>

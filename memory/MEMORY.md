@@ -30,8 +30,9 @@
 - Case videos are YouTube URLs or raw 11-character YouTube IDs stored normalized in `cases.video_url`; the admin form validates supported YouTube URL/ID formats client/server side and shows an iframe preview so users can verify the link before saving.
 - Public case modal YouTube iframes are stopped by unloading their `src` whenever the user switches to another case or closes the modal, then restored when that case becomes active again.
 - Server env reads go through `src/lib/env.ts`, which checks Astro `import.meta.env` first and falls back to `process.env`; this keeps `.env` working in `npm run dev` and Docker/process env working in production. Env defaults, parsing helpers, and required-secret placeholder validation are centralized there, and application code consumes the single exported `env` object instead of raw env access.
-- Sensitive POST endpoints are protected by a centralized in-memory Astro middleware rate limiter (`src/middleware.ts`, `src/lib/rate-limit.ts`): login allows 5/minute and 20/hour per client IP, contact allows 3/10 minutes and 20/day, and authenticated admin writes allow 60/minute. `TRUST_PROXY_HEADERS` defaults to true so production behind Nginx/Caddy keys limits by `X-Forwarded-For` / `X-Real-IP`; set it false if exposing Astro directly.
+- Sensitive POST endpoints are protected by a centralized in-memory Astro middleware rate limiter (`src/middleware.ts`, `src/lib/rate-limit.ts`): login allows 5/minute and 20/hour per client IP, contact and denuncia each allow 3/10 minutes and 20/day, and authenticated admin writes allow 60/minute. `TRUST_PROXY_HEADERS` defaults to true so production behind Nginx/Caddy keys limits by `X-Forwarded-For` / `X-Real-IP`; set it false if exposing Astro directly.
 - Contact form email HTML escapes user-provided name, email, phone, and message fields before interpolation to prevent HTML/script injection in rendered emails; the raw trimmed email is still used only for `replyTo`.
+- Both public form endpoints (`/api/contact`, `/api/denuncia`) share their anti-spam primitives through `src/lib/anti-spam.ts` (`escapeHtml`, `countLinks`, `silentOk`, `looksLikeBot` with the honeypot + 3s time trap). Per-route rules — `MAX_LEN`, `EMAIL_RE` — stay in their own routes because the two forms differ.
 - Popup framework: native HTML `<dialog>` wrapped by `src/components/Modal.astro`, controlled by `src/scripts/modal-manager.ts`; content is layout-agnostic and can come from Astro components, structured API data, Markdown-rendered HTML, or sanitized raw HTML. Open/close transitions are handled with `.is-open` / `.is-closing` classes plus a short close delay so native dialogs can animate out. Modal scroll lock measures the active scrollbar width and compensates with body padding only when needed to avoid layout shifts without forcing a permanent gutter. `Modal.astro` supports a `className` hook for per-modal styling. `src/components/ContactModal.astro` owns the public header contact popup UI: dark rounded two-column form, Bebas Neue "FALE COM A GENTE." title, TG brand mark, WhatsApp CTA, and responsive stacked mobile layout. The submit button has a `data-state` attribute (`idle` / `loading` / `error`) controlling its appearance; on success a full-panel green overlay fades in over the modal with a checkmark SVG and "Enviado!" in Bebas Neue, then the modal auto-closes after 1 second via `[data-modal-close]` click. Form submission POSTs JSON to `POST /api/contact`, which validates fields and sends via Nodemailer + Gmail SMTP; see `memory/client-handoff.md` for the client's one-time Gmail App Password setup. Public case carousel cards open one shared white case modal with a large padded container, fixed topbar containing only previous/next arrows between published cases, in-place fade transitions between case content, a separate scrollable body whose scrollbar is offset right while preserving content width, optional video playback only when `video_url` exists, client label when present, large Bebas Neue case title, conditional cards for non-empty `desafio`, `entrega`, and `resultado` fields with distinct gradients per card (centered 3-card-width flex row on desktop, stacked full-width cards on tablet/mobile), and an ordered case image gallery where `destaque` images span full width while regular images use a two-column desktop grid and stack on mobile.
 
 ## Project Context
@@ -113,6 +114,50 @@ All in `src/components/` and `src/pages/sobre.astro`:
 4. `SobreClientesSection.astro` — dark, gradient "AQUI TEM" title, Figtree subtitle, 8×3 logo grid rendered from shared `clientLogos` data
 5. `PremiosSection.astro` with `showCta={false}` and `variant="sobre"` — shared awards intro without the CTA button
 6. `SobreAwardsCards.astro` — 3 gradient award cards (FIP full-width, Colunistas+Lusófonos row, Caio full-width)
+
+## /canal-de-denuncias Page (added 2026-08-24)
+
+Public whistleblower / ethics channel. Built from a PNG mockup, **not** Figma — the Figma node for
+this block (`KKxqaISNZmWF3nhfSakj9D`, node `2001-207`) returns "you don't have edit access to this
+file" through the MCP, so the bubble art was supplied by the user as a PNG instead.
+
+- `src/pages/canal-de-denuncias.astro` — page shell, same shape as `wpi.astro`
+  (Layout + Header + main + ContatoFooter).
+- `src/components/DenunciaSection.astro` — the whole block: two-column grid (`1fr 1.15fr`,
+  collapsing at 1024px), standard `#030303` + `degrade-pixels.png` background, "Aqui tem" gradient
+  span + white "respeito.", explanatory copy, the código de conduta download CTA, 3D speech-bubble
+  art (`/images/denuncias/dialog-gradient.png`, on `.blob-float`), and the white report form card.
+- **Linked from the header nav** as "Canal de denúncias" (added after the page shipped). Adding the
+  fourth link forced the nav breakpoint change below.
+- **Top padding is 160px, not the usual 100px**: the sticky `Header` is 120px tall with
+  `margin-bottom: -120px`, so page content sits behind it and the first line needs the clearance.
+- Download CTA serves `public/docs/codigo-de-conduta.pdf` — the first static document on the site, so
+  `public/docs/` is new. Replacing the file publishes a new revision with no code change.
+- The submit button is a **filled** pink→blue pill, unlike the site's outline `site-button--gradient`.
+  It extends `.site-button` for shape/typography and overrides `background` only.
+- `.sr-only` and the off-screen honeypot wrapper are **duplicated locally** — both are Astro-scoped in
+  `ContactModal.astro`, not global.
+- Success is a green overlay absolutely positioned over the card (same treatment as the contact
+  modal's), but it **persists** rather than auto-closing — there is no dialog to dismiss — and offers
+  an "Enviar outra mensagem" button that restores the form.
+- The form's client script re-stamps `_ts` after a successful send so a second report isn't caught by
+  the time trap.
+- Gotcha found while testing: `ContactModal` also has a `textarea[name="mensagem"]` and renders on
+  every page via `Header`, so a bare `document.querySelector('textarea[name="mensagem"]')` hits the
+  modal's, not this page's. Scope form queries to `.denuncia-form`.
+
+## Header nav breakpoint (changed 2026-08-24)
+
+`Header.astro`'s overlay menu now takes over at **`max-width: 1080px`**, not 768px. With four nav
+links the row needs ~1036px between the logo and the actions; below that the links wrapped and the
+nav collided with the Contato button. The three-link nav used to fit down to 768px, so this
+threshold moved when "Canal de denúncias" was added.
+
+- The `.btn-contato` / `.whatsapp-link img` shrink rules were **split out into their own
+  `max-width: 768px` block** so tablets keep the full-size button and icon exactly as before.
+- Measure before adding a fifth link: natural nav width = sum of link widths + `gap` × (n − 1), and
+  required viewport ≈ (logo + actions + nav + 2 × breathing) / (1 − 0.0568) — the `0.0568` is the
+  `header-inner` 2.84% padding on both sides.
 
 ## Git Workflow Preference
 
@@ -197,12 +242,14 @@ background-clip: text;
 src/
   components/AdminLayout.astro — standalone dashboard shell for private content management
   components/AdminCaseForm.astro — shared admin case create/edit form markup
+  components/DenunciaSection.astro — Canal de Denúncias block: copy, código de conduta download, report form
   components/Modal.astro    — reusable layout-agnostic modal shell using native <dialog>
   data/site-content.ts      — shared static logo/award metadata rendered by repeated public sections
   layouts/Layout.astro   — base HTML shell, imports global.css, Google Fonts (Inter)
   lib/admin-cases.ts     — admin case create/update/delete domain operations with validation, transactions, and media cleanup
   lib/admin-order.ts     — shared admin drag-order parsing and descending `sort_order` persistence for cases/testimonials
   lib/auth.ts            — admin path helpers, username login/session cookie utilities
+  lib/anti-spam.ts       — shared honeypot/time-trap/escapeHtml/countLinks primitives used by both public form endpoints
   lib/bytes.ts           — shared pure byte label formatter used by server and browser upload code
   lib/db.ts              — SQLite connection, fresh-schema creation, forward-only migration runner (schema v3), env-synced primary admin credentials, support user seeding (`cases`, `imagens_case`, `testimonials`, `shared_pages`)
   lib/shared-pages.ts    — private shared HTML pages domain logic (token gen, list/get/create/replace/delete)
@@ -214,8 +261,10 @@ src/
   lib/youtube.ts         — YouTube URL parsing, validation, and embed URL helpers
   pages/[adminPath]/...  — configurable private dashboard routes
   pages/api/contact.ts   — public POST endpoint: validates form fields, sends HTML email via Nodemailer + Gmail SMTP
+  pages/api/denuncia.ts  — public POST endpoint for the Canal de Denúncias: optional identificação + required mensagem, emails DENUNCIA_TO (falls back to CONTACT_TO)
   pages/api/panel/...    — protected login/logout/case endpoints
   pages/index.astro      — hello world page
+  pages/canal-de-denuncias.astro — public whistleblower channel page (Header + DenunciaSection + ContatoFooter)
   pages/uploads/[...path].ts — serves full media files from local uploads volume without HTTP range support
   scripts/admin-upload-shared.ts — shared browser upload primitives for file input syncing, drop zones, image validation, upload messages, and size labels
   scripts/admin-upload-limits.ts — browser-safe upload limit data attribute parsing and byte label formatting
@@ -228,7 +277,7 @@ scripts/dev-reset.mjs    — dev-only local SQLite/uploads reset command used by
   Dockerfile               — multi-stage, Node 20 Alpine + native build deps, runs dist/server/entry.mjs
   docker-compose.yml       — Caddy on ports 80/443, internal app:4321, data/uploads volumes, Caddy cert volumes, reads .env
   .dockerignore            — excludes host node_modules/dist/data/uploads so native dependencies are built for Linux inside Docker and bind-mounted content is not copied into the image
-.env.example             — SITE_DOMAINS, ADMIN_PATH, ADMIN_USERNAME, ADMIN_PASSWORD, SESSION_SECRET, SESSION_COOKIE_SECURE, UPLOAD_MAX_IMAGE_BYTES, SMTP_USER, SMTP_PASS, CONTACT_TO
+.env.example             — SITE_DOMAINS, ADMIN_PATH, ADMIN_USERNAME, ADMIN_PASSWORD, SESSION_SECRET, SESSION_COOKIE_SECURE, UPLOAD_MAX_IMAGE_BYTES, SMTP_USER, SMTP_PASS, CONTACT_TO, DENUNCIA_TO
 astro.config.mjs         — output: server, adapter: @astrojs/node (standalone)
 ```
 
@@ -271,12 +320,28 @@ one-off HTML to a few contacts. Reuses the existing admin CRUD/auth/rate-limit p
   (`SharedPageError`, `listSharedPages`, `getSharedPageHtml`, `createSharedPage`, `replaceSharedPageHtml`, `deleteSharedPage`).
 - **Token:** `randomBytes(16).toString('base64url')` (~22 chars, 128-bit) with a UNIQUE-collision retry loop.
 - **Serving route:** `src/pages/p/[token].ts` (APIRoute GET) returns the stored HTML with
-  `Content-Security-Policy: sandbox allow-scripts`, `X-Robots-Tag: noindex, nofollow, noarchive`,
+  `Content-Security-Policy: sandbox allow-scripts allow-popups allow-popups-to-escape-sandbox`,
+  `X-Robots-Tag: noindex, nofollow, noarchive`,
   `Cache-Control: no-store`, `Referrer-Policy: no-referrer`. 404 when the token is unknown.
 - **Security model:** the `CSP: sandbox` header puts each page in an **opaque origin** — uploaded JS
   runs (animations) but **cannot read `tg_admin_session`/`localStorage` or send credentialed requests**
   to admin endpoints. Verified in-browser: `document.cookie` and `localStorage` both throw `SecurityError`.
-  No `allow-same-origin`/`allow-forms`/`allow-popups`. Same-domain serving (no subdomain/DNS/Caddy work).
+  No `allow-same-origin` and no `allow-forms`. Same-domain serving (no subdomain/DNS/Caddy work).
+- **`allow-popups` + `allow-popups-to-escape-sandbox` (added 2026-08-24, bug fix):** without
+  `allow-popups` the browser blocks every `target="_blank"` link and `window.open` outright
+  ("Blocked opening '…' in a new window because the request was made in a sandboxed frame whose
+  'allow-popups' permission is not set"). With `allow-popups` alone the opened tab **inherits the
+  sandbox** — verified in-browser: `origin === 'null'`, cookies and `localStorage` both throw — so
+  external sites load crippled; `allow-popups-to-escape-sandbox` is what makes the new tab a normal
+  page. Neither flag weakens the model: the opener stays in an opaque origin, so it is cross-origin
+  to everything it opens. Verified worst case — a shared page calling
+  `window.open('/canal-de-denuncias')` and probing the handle — every read
+  (`location.href`, `document`, `document.cookie`, `localStorage`) throws `DOMException`.
+- **Same-tab links always worked**: a top-level sandboxed document may navigate itself, so
+  `allow-top-navigation` was never needed and is deliberately not set.
+- **Not a Caddy concern.** `Caddyfile` sets no CSP; it only adds HSTS/`X-Content-Type-Options`/
+  `X-Frame-Options`/`Referrer-Policy`/`Permissions-Policy` and proxies. This header is owned entirely
+  by `src/pages/p/[token].ts`.
 - **Admin:** `[adminPath]/paginas/index.astro` — upload form (single `.html`, `accept=".html,.htm"`) +
   list with per-row **copy-link**, **Substituir HTML** (replace), and **delete**. API:
   `src/pages/api/panel/shared-pages/{create,replace,delete}.ts` (auto rate-limited via `/api/panel/*`).
