@@ -127,8 +127,10 @@ file" through the MCP, so the bubble art was supplied by the user as a PNG inste
   collapsing at 1024px), standard `#030303` + `degrade-pixels.png` background, "Aqui tem" gradient
   span + white "respeito.", explanatory copy, the código de conduta download CTA, 3D speech-bubble
   art (`/images/denuncias/dialog-gradient.png`, on `.blob-float`), and the white report form card.
-- **Linked from the header nav** as "Canal de denúncias" (added after the page shipped). Adding the
-  fourth link forced the nav breakpoint change below.
+- **Linked from the footer, not the header nav** (client's call, 2026-08-26). The link lives in
+  `ContatoFooter.astro` under the TG logo, in a `.footer-nav` styled to match the header nav
+  (Bebas Neue, uppercase, scaleX underline on hover). It briefly sat in the header nav; that was
+  reverted, along with the breakpoint change it had forced.
 - **Top padding is 160px, not the usual 100px**: the sticky `Header` is 120px tall with
   `margin-bottom: -120px`, so page content sits behind it and the first line needs the clearance.
 - Download CTA serves `public/docs/codigo-de-conduta.pdf` — the first static document on the site, so
@@ -168,21 +170,23 @@ ContatoFooter), the `#030303` + `degrade-pixels.png` background, and the site-wi
   a bare 404 body instead of serving them an HTML page.
 - Verified on the **production build** (`node dist/server/entry.mjs`), not just dev —
   SSR 404 routing can differ between the two.
+- The shortcut row mirrors the header nav (3 links). Canal de denúncias is deliberately left out —
+  the footer directly below the same page already carries it.
 - Section is `align-items: flex-start`, not centred: centring let tall content
   overflow upward under the 120px sticky header on short viewports.
 
-## Header nav breakpoint (changed 2026-08-24)
+## Header nav capacity (measured 2026-08-24, reverted 2026-08-26)
 
-`Header.astro`'s overlay menu now takes over at **`max-width: 1080px`**, not 768px. With four nav
-links the row needs ~1036px between the logo and the actions; below that the links wrapped and the
-nav collided with the Contato button. The three-link nav used to fit down to 768px, so this
-threshold moved when "Canal de denúncias" was added.
+`Header.astro` is back to its original **`max-width: 768px`** overlay breakpoint. The three-link nav
+fits down to 768px with 19px of breathing room each side — verified.
 
-- The `.btn-contato` / `.whatsapp-link img` shrink rules were **split out into their own
-  `max-width: 768px` block** so tablets keep the full-size button and icon exactly as before.
-- Measure before adding a fifth link: natural nav width = sum of link widths + `gap` × (n − 1), and
-  required viewport ≈ (logo + actions + nav + 2 × breathing) / (1 − 0.0568) — the `0.0568` is the
-  `header-inner` 2.84% padding on both sides.
+**A fourth link does not fit.** When "Canal de denúncias" was briefly added to the nav, the row
+needed ~1036px between the logo and the actions; between 769px and 1036px the links wrapped into the
+Contato button, which forced the breakpoint to 1080px. That was reverted when the link moved to the
+footer. Before adding any fourth nav item, measure first: natural nav width = sum of link widths +
+`gap` × (n − 1), and required viewport ≈ (logo + actions + nav + 2 × breathing) / (1 − 0.0568) — the
+`0.0568` is the `header-inner` 2.84% padding on both sides. Note a shorter label does not rescue it:
+even "Denúncias" needs ~954px.
 
 ## Git Workflow Preference
 
