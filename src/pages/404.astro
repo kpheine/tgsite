@@ -7,11 +7,12 @@ import ContatoFooter from '../components/ContatoFooter.astro';
 // response below so crawlers and monitoring see a real 404, not a soft one.
 Astro.response.status = 404;
 
+// Mirrors the header nav. Canal de denúncias is deliberately absent: it lives in
+// the footer, which is right below this on the same page.
 const atalhos = [
   { href: '/#cases', label: 'Cases' },
   { href: '/sobre', label: 'Nossa história' },
   { href: '/wpi', label: 'Conexão global' },
-  { href: '/canal-de-denuncias', label: 'Canal de denúncias' },
 ];
 ---
 <Layout

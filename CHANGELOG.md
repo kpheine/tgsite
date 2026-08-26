@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   ethics channel where colaboradores, clientes, fornecedores and parceiros can send a
   report anonymously or identified. Includes a "Baixar o código de conduta" download
   (`public/docs/codigo-de-conduta.pdf`) and a report form posting to a new
-  `POST /api/denuncia` endpoint, and is linked from the header nav as
+  `POST /api/denuncia` endpoint, and is linked from the site footer as
   "Canal de denúncias".
 - **Custom 404 page** (`src/pages/404.astro`) — branded "Aqui não tem essa página."
   with a route back to the site, replacing the bare `Não encontrado` text that any
@@ -20,10 +20,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   no second email account. See `memory/client-handoff.md`.
 
 ### Changed
-- **Header nav collapses to the overlay menu at 1080px instead of 768px.** The fourth
-  nav link needs ~1036px to sit on one row; below that the links wrapped into the
-  Contato button. The Contato button and WhatsApp icon keep their original 768px
-  sizing rules.
 - **Unmatched URLs now reach the 404 page.** The one-segment `[adminPath]` route
   matches every `/whatever` and answered with a bare 404 `Response`, so Astro never
   fell through to `404.astro` — the same applied to `/p/<token>` and `/uploads/*`.
