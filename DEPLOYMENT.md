@@ -445,7 +445,7 @@ de atualização está na **Parte 10**.
 
 - **Nova página `/canal-de-denuncias`** — canal público onde colaboradores,
   clientes, fornecedores e parceiros podem enviar um relato de forma anônima ou
-  identificada. Já aparece no menu do topo do site como "Canal de denúncias".
+  identificada. O link para ela fica no rodapé do site, abaixo do logo da TG.
 - **Download do código de conduta** — o PDF já vem junto com o código, em
   `public/docs/codigo-de-conduta.pdf`. Não é preciso enviar nada pelo painel.
 - **Página de erro personalizada** — endereços digitados errado agora mostram uma
@@ -512,7 +512,7 @@ reconstruído. O site fica fora do ar por poucos segundos no final.
 ### Passo 5 — Conferir se deu certo
 
 1. Abra `https://seudominio.com.br/canal-de-denuncias` — a página deve carregar.
-2. Confira se "Canal de denúncias" aparece no menu do topo.
+2. Confira se "Canal de denúncias" aparece no rodapé, abaixo do logo da TG.
 3. Clique em **"Baixar o código de conduta"** — o PDF deve baixar.
 4. Envie uma mensagem de teste pelo formulário e confirme que ela chegou no
    e-mail que você colocou em `DENUNCIA_TO`.
