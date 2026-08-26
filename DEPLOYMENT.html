@@ -179,6 +179,7 @@
     <li><a href="#parte-8">Domínio e HTTPS (Caddy)</a></li>
     <li><a href="#parte-9">Painel de administração</a></li>
     <li><a href="#parte-10">Operação e manutenção</a></li>
+    <li><a href="#atualizacao-120">Atualização 1.2.0 — Canal de Denúncias</a></li>
     <li><a href="#resumo">Resumo dos comandos mais usados</a></li>
     <li><a href="#problemas">Contato em caso de problemas</a></li>
   </ol>
@@ -452,6 +453,69 @@ tar -czf backup-$(date +%Y%m%d).tar.gz data/ uploads/</code></pre>
 <pre><code>mkdir -p ~/backups
 (crontab -l 2&gt;/dev/null; echo '0 3 * * * cd ~/tg-site &amp;&amp; tar -czf ~/backups/backup-$(date +\%Y\%m\%d).tar.gz data/ uploads/ &amp;&amp; find ~/backups -name "backup-*.tar.gz" -mtime +14 -delete') | crontab -</code></pre>
 <p>Isso gera um backup por dia em <code>~/backups/</code> e apaga automaticamente os que têm mais de 14 dias. Para conferir se a tarefa foi registrada: <code>crontab -l</code>. Periodicamente, baixe alguns desses arquivos para fora da VM (SCP, Google Drive), caso a VM seja perdida.</p>
+
+<h2 id="atualizacao-120">Atualização 1.2.0 — Canal de Denúncias (25/08/2026)</h2>
+
+<p>Esta seção descreve <strong>apenas</strong> o que muda nesta atualização. O procedimento geral de atualização está na <strong>Parte 10</strong>.</p>
+
+<h3>O que vem nesta versão</h3>
+<ul>
+  <li><strong>Nova página <code>/canal-de-denuncias</code></strong> — canal público onde colaboradores, clientes, fornecedores e parceiros podem enviar um relato de forma anônima ou identificada. O link para ela fica no rodapé do site, abaixo do logo da TG.</li>
+  <li><strong>Download do código de conduta</strong> — o PDF já vem junto com o código, em <code>public/docs/codigo-de-conduta.pdf</code>. Não é preciso enviar nada pelo painel.</li>
+  <li><strong>Página de erro personalizada</strong> — endereços digitados errado agora mostram uma página do site, com um caminho de volta, em vez de uma tela em branco escrito "Não encontrado".</li>
+  <li><strong>Correção nas páginas privadas (<code>/p/&lt;link secreto&gt;</code>)</strong> — links que abrem em nova aba dentro dessas páginas estavam sendo bloqueados pelo navegador. Agora funcionam normalmente.</li>
+</ul>
+
+<h3>Passo 1 — Backup (recomendado)</h3>
+<pre><code>cd ~/tg-site
+tar -czf backup-$(date +%Y%m%d).tar.gz data/ uploads/</code></pre>
+
+<h3>Passo 2 — Baixar o código novo</h3>
+<pre><code>cd ~/tg-site
+git pull</code></pre>
+<blockquote>
+  <p>Se você recebeu o projeto como <strong>.zip</strong> em vez de Git: descompacte a nova versão por cima da pasta do projeto, <strong>sem apagar</strong> as pastas <code>data/</code> e <code>uploads/</code> nem o arquivo <code>.env</code> — é onde ficam os seus dados e as suas senhas.</p>
+</blockquote>
+
+<h3>Passo 3 — Adicionar a variável <code>DENUNCIA_TO</code> no <code>.env</code></h3>
+<p>Este é o <strong>único passo manual</strong> desta atualização. O <code>git pull</code> nunca altera o seu arquivo <code>.env</code>, então a nova linha precisa ser adicionada por você:</p>
+<pre><code>nano .env</code></pre>
+<p>Acrescente ao final do arquivo:</p>
+<pre><code>DENUNCIA_TO=denuncias@seudominio.com.br</code></pre>
+<p>Para salvar no <code>nano</code>: <code>Ctrl+O</code>, Enter, depois <code>Ctrl+X</code>.</p>
+<blockquote>
+  <p><strong>Escolha bem esse endereço.</strong> Ele é quem vai receber as denúncias, e os relatos podem envolver funcionários da própria empresa — por isso o indicado é uma caixa restrita (compliance, RH ou uma diretoria), e <strong>não</strong> o mesmo e-mail que recebe os contatos comerciais do site.</p>
+</blockquote>
+<ul>
+  <li>Não é preciso criar uma nova conta de e-mail nem uma nova Senha de App: o canal usa o mesmo <code>SMTP_USER</code> / <code>SMTP_PASS</code> que o formulário de contato já usa.</li>
+  <li>Se você deixar essa linha de fora, o site continua funcionando, mas as denúncias vão para o endereço do <code>CONTACT_TO</code> (a caixa de contato geral).</li>
+</ul>
+
+<h3>Passo 4 — Subir a nova versão</h3>
+<pre><code>docker compose up --build -d</code></pre>
+<p>O comando pode demorar alguns minutos na primeira vez, porque o site é reconstruído. O site fica fora do ar por poucos segundos no final.</p>
+
+<h3>Passo 5 — Conferir se deu certo</h3>
+<ol>
+  <li>Abra <code>https://seudominio.com.br/canal-de-denuncias</code> — a página deve carregar.</li>
+  <li>Confira se "Canal de denúncias" aparece no rodapé, abaixo do logo da TG.</li>
+  <li>Clique em <strong>"Baixar o código de conduta"</strong> — o PDF deve baixar.</li>
+  <li>Envie uma mensagem de teste pelo formulário e confirme que ela chegou no e-mail que você colocou em <code>DENUNCIA_TO</code>.</li>
+  <li>Se você usa <strong>Páginas privadas</strong>: abra uma delas e clique em um link que aponte para fora do site — deve abrir normalmente em uma nova aba.</li>
+</ol>
+<p>Se algo não funcionar, veja os logs com <code>docker compose logs -f</code>.</p>
+
+<h3>Perguntas frequentes</h3>
+<p><strong>Vou perder os cases, recomendações ou páginas privadas já cadastrados?</strong><br>
+Não. Esta atualização não altera a estrutura do banco de dados, e as pastas <code>data/</code> e <code>uploads/</code> não são tocadas pelo <code>git pull</code>.</p>
+<p><strong>Preciso mexer em DNS, domínio ou certificado?</strong><br>
+Não. Nada muda no Caddy nem no HTTPS.</p>
+<p><strong>Preciso rodar algum comando de banco de dados?</strong><br>
+Não. Nenhuma migração é necessária nesta versão.</p>
+<p><strong>Como troco o PDF do código de conduta depois?</strong><br>
+Substitua o arquivo <code>public/docs/codigo-de-conduta.pdf</code> (mantendo o mesmo nome) e rode <code>docker compose up --build -d</code> de novo.</p>
+<p><strong>As denúncias anônimas podem ser respondidas?</strong><br>
+Não. O sistema não guarda endereço de IP, dados do navegador nem e-mail de resposta de quem envia — é isso que garante o anonimato. Se a pessoa não se identificar no campo opcional, não há como responder nem rastrear.</p>
 
 <h2 id="resumo">Resumo dos comandos mais usados</h2>
 <table>
